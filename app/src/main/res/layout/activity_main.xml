@@ -34,4 +34,6 @@
         app:layout_constraintBottom_toTopOf="@+id/downMenu"
         android:background="@color/colorYellow" />
 
+    <!--Комментарий для внесения изменений в проект-->
+
 </androidx.constraintlayout.widget.ConstraintLayout>
