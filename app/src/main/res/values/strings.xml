@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">ANDR_finalproject_modul_19_part_1</string>
+    <string name="app_name">AndroidAppFilmProject</string>
+    <string name="text_on_topMenu">Поиск фильмов</string>
+    <string name="disclaimer">Картинки взяты с https://www.movieposters.com/</string>
+    <string name="btn_menu_1">Меню</string>
+    <string name="btn_menu_2">Избранное</string>
+    <string name="btn_menu_3">Посмотреть позже</string>
+    <string name="btn_menu_4">Подборки</string>
+    <string name="btn_menu_5">Настройки</string>
 </resources>
