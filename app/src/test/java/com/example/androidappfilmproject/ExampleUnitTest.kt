@@ -1,4 +1,4 @@
-package com.example.andr_finalproject_modul_19_part_1
+package com.example.androidappfilmproject
 
 import org.junit.Test
 

@@ -19,6 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ANDR_finalproject_modul_19_part_1"
+rootProject.name = "AndroidAppFilmProject" +
+        ""
 include(":app")
  
