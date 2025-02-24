@@ -3,6 +3,14 @@
     <style name="Base.Theme.AndroidAppFilmProject" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimaryDark">@color/colorBlue</item>
+        <item name="colorPrimary">@color/colorSky</item>
+    </style>
+
+    <!-- Определяем стиль для заголовка в Toolbar -->
+
+    <style name="Toolbar_Primary" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="titleTextColor">@android:color/white</item> <!-- Цвет заголовка -->
     </style>
 
     <style name="Theme.AndroidAppFilmProject" parent="Base.Theme.AndroidAppFilmProject" />

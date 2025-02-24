@@ -1,7 +1,17 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.AndroidAppFilmProject" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    <style name="Base.Theme.AndroidAppFilmProject" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/colorBlue</item>
     </style>
+
+    <!-- Определяем стиль для заголовка в Toolbar -->
+
+    <style name="Toolbar_Primary" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="titleTextColor">@android:color/white</item> <!-- Цвет заголовка -->
+    </style>
+
+    <style name="Theme.AndroidAppFilmProject" parent="Base.Theme.AndroidAppFilmProject" />
 </resources>
