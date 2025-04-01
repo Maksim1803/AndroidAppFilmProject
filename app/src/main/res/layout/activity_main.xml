@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/corner_background"
@@ -40,6 +41,7 @@
             app:menu="@menu/toolbar_menu"
             app:navigationIcon="@drawable/baseline_menu_24"
             app:title="@string/page_title" />
+
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -125,6 +127,93 @@
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/navigation_menu" />
+
+<!--Контейнер для постеров-->
+
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:columnCount="2"
+        android:orientation="horizontal"
+        android:useDefaultMargins="true"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/poster_1"
+            android:clickable="true"
+            android:stateListAnimator="@animator/add_button_animation"
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            app:cardCornerRadius="15dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/interstellar_1"
+                android:scaleType="centerCrop"/>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/poster_2"
+            android:clickable="true"
+            android:stateListAnimator="@animator/add_button_animation"
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            app:cardCornerRadius="15dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/interstellar_2"
+                android:scaleType="centerCrop"/>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/poster_3"
+            android:clickable="true"
+            android:stateListAnimator="@animator/add_button_animation"
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            app:cardCornerRadius="15dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/interstellar_3"
+                android:scaleType="centerCrop"/>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/poster_4"
+            android:clickable="true"
+            android:stateListAnimator="@animator/add_button_animation"
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            app:cardCornerRadius="15dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/interstellar_4"
+                android:scaleType="centerCrop"/>
+        </androidx.cardview.widget.CardView>
+
+    </GridLayout>
+
+    <!--Темный фон для анимации AnimatorSet на poster4-->
+
+    <View
+        android:id="@+id/night"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_row="0"
+        android:layout_column="3"
+        android:alpha="0"
+        android:background="#000000" />
 
     <!--Закомметил на всякий случай-->
     <!-- Контейнер под кнопку "Поиск фильмов":
