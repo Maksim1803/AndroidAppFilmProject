@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.andr_finalproject_modul_19_part_1"
+    namespace = "com.example.androidappfilmproject"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.andr_finalproject_modul_19_part_1"
+        applicationId = "com.example.androidappfilmproject"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

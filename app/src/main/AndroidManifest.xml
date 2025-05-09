@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ANDR_finalproject_modul_19_part_1"
+        android:theme="@style/Theme.AndroidAppFilmProject"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
