@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.parcelize)
+//    id ("kotlin-parcelize")
 }
 
 android {
@@ -59,4 +61,6 @@ dependencies {
     implementation ("com.google.android.material:material:1.12.0")
     //Coordinator layout
     implementation ("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
+
+
 }

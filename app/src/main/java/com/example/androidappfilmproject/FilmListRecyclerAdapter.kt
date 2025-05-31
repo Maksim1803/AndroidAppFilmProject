@@ -58,11 +58,50 @@ import com.example.androidappfilmproject.databinding.FilmItemBinding
 //    }
 //}
 
-// Вариант с diffutils
+// Вариант с submitList() и ListAdapter
+
+//class FilmListRecyclerAdapter(
+//    private val clickListener: OnItemClickListener
+//) : ListAdapter<Film, FilmListRecyclerAdapter.FilmViewHolder>(FilmDiffCallback()) {
+//
+//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmViewHolder {
+//        val binding = FilmItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+//        return FilmViewHolder(binding)
+//    }
+//
+//    override fun onBindViewHolder(holder: FilmViewHolder, position: Int) {
+//        val film = getItem(position)
+//        holder.bind(film)
+//        holder.itemView.setOnClickListener {
+//            clickListener.click(film)
+//        }
+//    }
+//
+//    // Используйте submitList() в активности/фрагменте
+//    interface OnItemClickListener {
+//        fun click(film: Film)
+//    }
+//
+//    inner class FilmViewHolder(private val binding: FilmItemBinding) :
+//        RecyclerView.ViewHolder(binding.root) {
+//
+//        fun bind(film: Film) {
+//            binding.title.text = film.title
+//            binding.poster.setImageResource(film.poster)
+//            binding.description.text = film.description
+//        }
+//    }
+//}
+
+// Вариант с RecyclerView.Adapter
 
 class FilmListRecyclerAdapter(
     private val clickListener: OnItemClickListener
-) : ListAdapter<Film, FilmListRecyclerAdapter.FilmViewHolder>(FilmDiffCallback()) {
+) : RecyclerView.Adapter<FilmListRecyclerAdapter.FilmViewHolder>() {
+
+    private val items = mutableListOf<Film>()
+
+    override fun getItemCount() = items.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmViewHolder {
         val binding = FilmItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -70,11 +109,17 @@ class FilmListRecyclerAdapter(
     }
 
     override fun onBindViewHolder(holder: FilmViewHolder, position: Int) {
-        val film = getItem(position)
+        val film = items[position]
         holder.bind(film)
         holder.itemView.setOnClickListener {
             clickListener.click(film)
         }
+    }
+
+    fun setItems(newItems: List<Film>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
     }
 
     inner class FilmViewHolder(private val binding: FilmItemBinding) :
@@ -91,7 +136,4 @@ class FilmListRecyclerAdapter(
         fun click(film: Film)
     }
 }
-
-
-
 
