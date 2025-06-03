@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
@@ -43,6 +44,14 @@ class DetailsFragment : Fragment() {
 
         // Установка деталей фильма
         setFilmsDetails()
+
+        // Доступ к ImageView через View Binding
+        val imageView = binding?.detailsPoster
+
+        // Изменяем scaleType динамически
+        if (imageView != null) {
+            imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+        }
     }
 
     private fun setFilmsDetails() {

@@ -90,6 +90,6 @@ class HomeFragment : Fragment() {
             adapter = filmsAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
-        filmsAdapter.setItems(filmsDataBase)
+        filmsAdapter.submitList(filmsDataBase)
     }
 }
