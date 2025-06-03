@@ -10,6 +10,8 @@ import androidx.fragment.app.Fragment
 import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
 import com.google.android.material.snackbar.Snackbar
 
+//Комменты для гита
+
 class DetailsFragment : Fragment() {
 
     private var binding: FragmentDetailsBinding? = null// Объявление переменной для View Binding

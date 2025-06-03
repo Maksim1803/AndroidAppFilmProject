@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
 
+//Комменты для гита
 
 class MainActivity : AppCompatActivity() {
 

@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidappfilmproject.databinding.FilmItemBinding
 
+//Комменты для гита
+
 //Вариант без diffutils
 //class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
 //    RecyclerView.Adapter<RecyclerView.ViewHolder>() {

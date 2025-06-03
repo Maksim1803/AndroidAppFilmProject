@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.databinding.FragmentHomeBinding
 
+//Комменты для гита
+
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
