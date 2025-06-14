@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id ("kotlin-parcelize")
 }
 
 android {
@@ -49,4 +50,14 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    //Новые библиотеки
+    // RecyclerView
+    implementation ("androidx.recyclerview:recyclerview:1.4.0")
+    // AdapterDelegate
+    implementation ("com.hannesdorfmann:adapterdelegates4-kotlin-dsl:4.3.2")
+    //MaterialDesign
+    implementation ("com.google.android.material:material:1.12.0")
+    //Coordinator layout
+    implementation ("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
 }
