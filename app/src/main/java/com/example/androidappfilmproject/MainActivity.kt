@@ -1,299 +1,88 @@
 package com.example.androidappfilmproject
 
-
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
 
-
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding // Объявление переменной для View Binding
+     private lateinit var binding: ActivityMainBinding // Объявление переменной для View Binding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater) // Инициализация binding
-        setContentView(binding.root) // Устанавливаем contentView через binding
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            binding = ActivityMainBinding.inflate(layoutInflater) // Инициализация binding
+            setContentView(binding.root) // Устанавливаем contentView через binding
 
-        initNavigation()
+            initNavigation()
 
-        // Запускаем фрагмент при старте, используя binding.fragmentPlaceholder
-        binding.fragmentPlaceholder?.let {
-            supportFragmentManager
-                .beginTransaction()
-                .add(binding.fragmentPlaceholder!!.id, HomeFragment())
-                .commit()
-        }
-    }
-
-    fun launchDetailsFragment(film: Film) {
-        val bundle = Bundle().apply {
-            putParcelable("film", film)
-        }
-        val fragment = DetailsFragment().apply {
-            arguments = bundle
-        }
-        binding.fragmentPlaceholder?.let {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(it.id, fragment)
-                .addToBackStack(null)
-                .commit()
-        }
-        }
-
-
-    private fun initNavigation() {
-        // Обращение к topAppBar через binding
-        binding.topAppBar?.setNavigationOnClickListener {
-            Toast.makeText(this, "Когда-нибудь здесь будет навигация...", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.topAppBar?.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.settings -> {
-                    Toast.makeText(this, "Настройки", Toast.LENGTH_SHORT).show()
-                    true
-                }
-
-                else -> false
+            // Запускаем фрагмент при старте, используя binding.fragmentPlaceholder
+            binding.fragmentPlaceholder?.let {
+                supportFragmentManager
+                    .beginTransaction()
+                    .add(binding.fragmentPlaceholder!!.id, HomeFragment())
+                    .commit()
             }
         }
 
-        // Обращение к bottomNavigation через binding
-        binding.bottomNavigation?.setOnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.favorites -> {
-                    Toast.makeText(this, "Избранное", Toast.LENGTH_SHORT).show()
-                    true
-                }
+        fun launchDetailsFragment(film: Film) {
+            val bundle = Bundle().apply {
+                putParcelable("film", film)
+            }
+            val fragment = DetailsFragment().apply {
+                arguments = bundle
+            }
+            binding.fragmentPlaceholder?.let {
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(it.id, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
 
-                R.id.watch_later -> {
-                    Toast.makeText(this, "Посмотреть позже", Toast.LENGTH_SHORT).show()
-                    true
-                }
 
-                R.id.selections -> {
-                    Toast.makeText(this, "Подборки", Toast.LENGTH_SHORT).show()
-                    true
-                }
+        private fun initNavigation() {
+            // Обращение к topAppBar через binding
+            binding.topAppBar?.setNavigationOnClickListener {
+                Toast.makeText(this, "Когда-нибудь здесь будет навигация...", Toast.LENGTH_SHORT).show()
+            }
 
-                else -> false
+            binding.topAppBar?.setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.settings -> {
+                        Toast.makeText(this, "Настройки", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+
+            // Обращение к bottomNavigation через binding
+            binding.bottomNavigation?.setOnNavigationItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.favorites -> {
+                        Toast.makeText(this, "Избранное", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+
+                    R.id.watch_later -> {
+                        Toast.makeText(this, "Посмотреть позже", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+
+                    R.id.selections -> {
+                        Toast.makeText(this, "Подборки", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+
+                    else -> false
+                }
             }
         }
     }
-}
-    //Метод, отображающий список фильмов и обрабатывающий нажатие на фильм из списка
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        binding = ActivityMainBinding.inflate(layoutInflater) // Инициализация binding
-//        setContentView(binding.root) // Устанавливаем contentView через binding
-//
-//        initNavigation()
-//
-//       //Запускаем фрагмент при старте
-//        supportFragmentManager
-//            .beginTransaction()
-//            .add(AndroidR.id.fragment_placeholder, HomeFragment())
-//            .addToBackStack(null)
-//            .commit()
-//    }
-//
-//    fun launchDetailsFragment(film: Film) {
-//        // Создаем "посылку" с данными фильма
-//        val bundle = Bundle().apply {
-//            putParcelable("film", film)
-//        }
-//
-//        // Создаем фрагмент и передаем аргументы
-//        val fragment = DetailsFragment().apply {
-//            arguments = bundle
-//        }
-//
-//        // Заменяем текущий фрагмент на DetailsFragment
-//        supportFragmentManager
-//            .beginTransaction()
-//            .replace(AndroidR.id.fragment_placeholder, fragment)
-//            .addToBackStack(null)
-//            .commit()
-//    }
-//
-//    //Реализация метода для всплывающих надписей при нажатии на иконки
-//    private fun initNavigation() {
-//
-//        //Надпись для верхней иконки "Навигация" (верхнее меню)
-//        binding.topAppBar?.setNavigationOnClickListener {
-//            Toast.makeText(this, "Когда-нибудь здесь будет навигация...", Toast.LENGTH_SHORT)
-//                .show()
-//        }
-//        //Надпись для верхней иконки "Настройки" (верхнее меню)
-//        binding.topAppBar?.setOnMenuItemClickListener {
-//            when (it.itemId) {
-//                AndroidR.id.settings -> {
-//                    Toast.makeText(this, "Настройки", Toast.LENGTH_SHORT).show()
-//                    true
-//                }
-//
-//                else -> false
-//            }
-//        }
-//        //Всплывающие надписи для иконок нижнего меню
-//        binding.bottomNavigation?.setOnNavigationItemSelectedListener {
-//
-//            when (it.itemId) {
-//                AndroidR.id.favorites -> {
-//                    Toast.makeText(this, "Избранное", Toast.LENGTH_SHORT).show()
-//                    true
-//                }
-//
-//                AndroidR.id.watch_later -> {
-//                    Toast.makeText(this, "Посмотреть позже", Toast.LENGTH_SHORT).show()
-//                    true
-//                }
-//
-//                AndroidR.id.selections -> {
-//                    Toast.makeText(this, "Подборки", Toast.LENGTH_SHORT).show()
-//                    true
-//                }
-//
-//                else -> false
-//            }
-//        }
-//    }
-//}
 
-// Закомментим код из 22-го модуля на всякий случай, может пригодится...
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        enableEdgeToEdge()
-//
-//        // Инициализация View Binding
-//        binding = ActivityMainBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-//
-//        initNavigation()
-//
-//        //Запуск с кнопки анимации для poster2
-//        binding.poster2?.setOnClickListener() {
-//            startPoster2Animation()
-//        }
-//
-//        //Запуск с кнопки анимации для poster3
-//        val animation_Poster3 = AnimationUtils.loadAnimation(this, R.anim.poster3_anim)
-//
-//        binding.poster3?.setOnClickListener {
-//            binding.poster3!!.startAnimation(animation_Poster3)
-//
-//        }
-//
-//        //Запуск с кнопки анимации для poster4
-//
-//
-//        binding.poster4?.setOnClickListener {
-//            startPoster4Animation()
-//        }
-//    }
-//
-//    private fun initNavigation() {
-//        //Надпись для верхней иконки "Навигация"
-//        binding.topAppBar?.setNavigationOnClickListener {
-//            Toast.makeText(this, "Когда-нибудь здесь будет навигация...", Toast.LENGTH_SHORT)
-//                .show()
-//        }
-//
-//        //Надпись для верхней иконки "Настройки"
-//        binding.topAppBar?.setOnMenuItemClickListener {
-//            when (it.itemId) {
-//                R.id.settings -> {
-//                    Toast.makeText(this, "Настройки", Toast.LENGTH_SHORT).show()
-//                    true
-//                }
-//
-//                else -> false
-//            }
-//        }
-//
-//        //Надписи для иконок нижнего меню
-//        binding.bottomNavigation?.setOnNavigationItemSelectedListener {
-//
-//            when (it.itemId) {
-//                R.id.favorites -> {
-//                    Toast.makeText(this, "Избранное", Toast.LENGTH_SHORT).show()
-//                    true
-//                }
-//
-//                R.id.watch_later -> {
-//                    Toast.makeText(this, "Посмотреть позже", Toast.LENGTH_SHORT).show()
-//                    true
-//                }
-//
-//                R.id.selections -> {
-//                    Toast.makeText(this, "Подборки", Toast.LENGTH_SHORT).show()
-//                    true
-//                }
-//
-//                else -> false
-//            }
-//        }
-//    }
-//
-//    private fun startPoster2Animation() {
-//        // Исчезновение постера
-//        binding.poster2?.animate()
-//            ?.setDuration(4000)
-//            ?.setInterpolator(DecelerateInterpolator())
-//            ?.alpha(0f)
-//            ?.withStartAction {
-//                Log.d("Animation", "Исчезновение постера 2")
-//                Toast.makeText(this@MainActivity, "Исчезновение постера 2", Toast.LENGTH_SHORT)
-//                    .show()
-//            }
-//            ?.withEndAction {
-//                // Появление ракеты (после исчезновения)
-//                binding.poster2?.animate()
-//                    ?.setDuration(4000)
-//                    ?.alpha(1f)
-//                    ?.withStartAction {
-//                        Log.d("Animation", "Появление постера 2")
-//                        Toast.makeText(
-//                            this@MainActivity,
-//                            "Появление постера 2",
-//                            Toast.LENGTH_SHORT
-//                        )
-//                            .show()
-//                    }
-//                    ?.start()
-//            }
-//            ?.start()
-//    }
-//
-//    private fun startPoster4Animation() {
-//
-//        val justAnim = ObjectAnimator.ofFloat(binding.poster4, View.TRANSLATION_Y, -1000f)
-//        justAnim.duration = 4500
-//
-//        val nightAnim = ObjectAnimator.ofFloat(binding.night, View.ALPHA, 1f)
-//        nightAnim.duration = 4500
-//
-//        val animatorPoster4 = AnimatorSet()
-//        animatorPoster4.playTogether(justAnim, nightAnim)
-//
-//        animatorPoster4.addListener(object : AnimatorListenerAdapter() {
-//
-//
-//            override fun onAnimationEnd(animation: Animator) {
-//                super.onAnimationEnd(animation)
-//                // Возвращаем элементы в исходное состояние после окончания анимации
-//                binding.poster4?.translationY = 0f
-//                binding.night?.alpha = 0f
-//            }
-//        })
-//        animatorPoster4.start()
-//    }
-//
-//}
-//
 
 //Может пригодится...
 
