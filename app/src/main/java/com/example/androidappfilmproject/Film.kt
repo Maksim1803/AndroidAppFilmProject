@@ -47,12 +47,11 @@ import kotlinx.parcelize.Parcelize
 //    }
 //}
 
-//Отредактировалось для модуля 25
+//Отредактировалось как надо, начиная с модуля 25
 @Parcelize
 data class Film(
     val title: String,
     val poster: Int,
-    val description: String
+    val description: String,
+    var isInFavorites: Boolean = false
 ) : Parcelable
-
-//Комменты для гита

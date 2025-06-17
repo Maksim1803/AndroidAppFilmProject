@@ -99,6 +99,17 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/details_fab_favorites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:borderWidth="0dp"
+        android:backgroundTint="@color/colorPrimaryDark"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="left|bottom"
+        app:srcCompat="@drawable/baseline_favorite_border_24"
+        app:tint="@android:color/white"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-<!--    Комменты для гита-->

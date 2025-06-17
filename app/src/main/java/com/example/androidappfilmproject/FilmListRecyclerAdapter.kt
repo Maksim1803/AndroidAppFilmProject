@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidappfilmproject.databinding.FilmItemBinding
 
-//Комменты для гита
+
 
 //Вариант без diffutils
 //class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
@@ -80,6 +80,15 @@ class FilmListRecyclerAdapter(
     }
 
 
+        //Функция для обновления списка фильмов, заменяет текущий список новым.
+        fun addItems(newItems: List<Film>) {
+            val currentList = currentList.toMutableList()
+            currentList.clear()
+            currentList.addAll(newItems)
+            submitList(currentList)
+        }
+
+
     interface OnItemClickListener {
         fun click(film: Film)
     }
@@ -91,8 +100,14 @@ class FilmListRecyclerAdapter(
             binding.title.text = film.title
             binding.poster.setImageResource(film.poster)
             binding.description.text = film.description
+
+            // Установка слушателя кликов для каждого элемента списка
+            itemView.setOnClickListener {
+                clickListener.click(film)
+            }
         }
     }
+
 }
 
 // Вариант с RecyclerView.Adapter
