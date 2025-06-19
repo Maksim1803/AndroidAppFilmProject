@@ -74,9 +74,16 @@ class HomeFragment : Fragment() {
             "Очень крутой боевик с Томом Крузом в главной роли. "
         ),
         Film(
+            "Анора",
+            R.drawable.anora,
+            "Молодая стриптизерша из Бруклина знакомится с сыном олигарха и выходит за него замуж. Как только новость доходит до его родителей, её сказке приходит конец."
+        ),
+
+        Film(
             "Индиана Джонс",
             R.drawable.indianajones,
-            "Крутой, можно сказать христоматийный приключенческий боевик" )
+            "Крутой, можно сказать христоматийный приключенческий боевик"
+        )
     )
 
     override fun onCreateView(
@@ -90,7 +97,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-       // Инициализация адаптера
+        // Инициализация адаптера
         filmsAdapter =
             FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
                 override fun click(film: Film) {
