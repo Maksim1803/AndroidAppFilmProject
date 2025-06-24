@@ -8,8 +8,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 
 class DetailsFragment : Fragment() {
 
@@ -20,7 +22,7 @@ class DetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentDetailsBinding.inflate(inflater, container, false)
+        this.binding = FragmentDetailsBinding.inflate(inflater, container, false)
         return binding?.root
     }
 
@@ -32,6 +34,7 @@ class DetailsFragment : Fragment() {
         film = args?.getParcelable<Film>("film")
         if (film == null) {
             // Обработка ошибки: фильм не передан
+            Snackbar.make(view, "Ошибка: Фильм не найден", Snackbar.LENGTH_SHORT).show()
             activity?.finish()
             return
         }
@@ -40,39 +43,40 @@ class DetailsFragment : Fragment() {
         (activity as? AppCompatActivity)?.setSupportActionBar(binding?.detailsToolbar)
         (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // Обработка кнопок
+
+        // Обновляем иконку
+        setFilmsDetails()
+        // Обработка кнопки "добавить в избранное"
         binding?.favoriteButton?.setOnClickListener {
-            Snackbar.make(binding!!.root, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
+            film?.let {
+                if (!it.isInFavorites) {
+                    // Добавляем в избранное
+                    it.isInFavorites = true
+                    binding!!.favoriteButton.setImageResource(R.drawable.baseline_favorite_24)
+                    Snackbar.make(binding!!.root, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
+                } else {
+                    // Удаляем из избранного
+                    it.isInFavorites = false
+                    binding!!.favoriteButton.setImageResource(R.drawable.baseline_favorite_border_24)
+                    Snackbar.make(binding!!.root, "Удалено из избранного", Snackbar.LENGTH_SHORT).show()
+                }
+            }
         }
 
+        // Обработка кнопки "посмотреть позже"
         binding?.watchLaterButton?.setOnClickListener {
             Snackbar.make(binding!!.root, "Добавлено в список 'Посмотреть позже'", Snackbar.LENGTH_SHORT).show()
         }
 
         binding?.detailsFab?.setOnClickListener {
-            Snackbar.make(binding!!.root, "Функция 'Поделиться' еще не реализована", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding!!.root, "Функция 'Поделиться' уже реализована", Snackbar.LENGTH_SHORT).show()
         }
-
-        // Установка деталей фильма
-        setFilmsDetails()
 
         // Доступ к ImageView через View Binding и изменение scaleType
         binding?.detailsPoster?.apply {
             this.scaleType = ImageView.ScaleType.CENTER_CROP
         }
 
-        // Обработка кнопки "добавить в избранное"
-        binding?.detailsFabFavorites?.setOnClickListener {
-            film?.let {
-                if (!it.isInFavorites) {
-                    it.isInFavorites = true
-                    binding?.detailsFabFavorites?.setImageResource(R.drawable.baseline_favorite_24)
-                } else {
-                    it.isInFavorites = false
-                    binding?.detailsFabFavorites?.setImageResource(R.drawable.baseline_favorite_border_24)
-                }
-            }
-        }
 
         // Обработка кнопки "поделиться"
         binding?.detailsFab?.setOnClickListener {
@@ -91,6 +95,8 @@ class DetailsFragment : Fragment() {
     }
 
     private fun setFilmsDetails() {
+        viewLifecycleOwner.lifecycleScope.launch {
+
         binding?.apply {
             film?.let {
                 detailsToolbar.title = it.title
@@ -98,11 +104,12 @@ class DetailsFragment : Fragment() {
                 detailsDescription.text = it.description
 
                 // Устанавливаем иконку в зависимости от статуса
-                detailsFabFavorites.setImageResource(
+                favoriteButton.setImageResource(
                     if (it.isInFavorites) R.drawable.baseline_favorite_24
                     else R.drawable.baseline_favorite_border_24
                 )
             }
+        }
         }
     }
 

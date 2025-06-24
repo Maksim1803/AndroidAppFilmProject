@@ -5,7 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidappfilmproject.databinding.FilmItemBinding
-
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import androidx.lifecycle.lifecycleScope
 
 
 //Вариант без diffutils
@@ -79,15 +81,16 @@ class FilmListRecyclerAdapter(
         }
     }
 
-
         //Функция для обновления списка фильмов, заменяет текущий список новым.
-        fun addItems(newItems: List<Film>) {
-            val currentList = currentList.toMutableList()
-            currentList.clear()
-            currentList.addAll(newItems)
-            submitList(currentList)
-        }
+        suspend fun addItems(newItemsFlow: Flow<List<Film>>) {
 
+                newItemsFlow.collectLatest { newItems ->
+                    val currentList = currentList.toMutableList()
+                    currentList.clear()
+                    currentList.addAll(newItems)
+                    submitList(currentList)
+                }
+            }
 
     interface OnItemClickListener {
         fun click(film: Film)

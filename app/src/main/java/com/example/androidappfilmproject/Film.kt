@@ -1,5 +1,8 @@
 package com.example.androidappfilmproject
+
 import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
 //Для первой части:
@@ -49,9 +52,16 @@ import kotlinx.parcelize.Parcelize
 
 //Отредактировалось как надо, начиная с модуля 25
 @Parcelize
-data class Film(
+// Создание базы данных избранных фильмов для модуля 26
+@Entity(tableName = "film_table") // Имя таблицы
+data class Film( // Класс представляет таблицу в базе данных
+    @PrimaryKey(autoGenerate = true)
+    // Поле id с аннотацией @PrimaryKey необходимо для
+    // уникальной идентификации каждой записи в базе данных
+
     val title: String,
     val poster: Int,
     val description: String,
-    var isInFavorites: Boolean = false
+    var isInFavorites: Boolean = false,
+    val id: Int = 0,
 ) : Parcelable
