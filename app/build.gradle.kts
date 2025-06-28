@@ -82,7 +82,5 @@ dependencies {
 
     // Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-
-
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 }

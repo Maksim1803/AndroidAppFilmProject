@@ -5,12 +5,83 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidappfilmproject.databinding.FilmItemBinding
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
-import androidx.lifecycle.lifecycleScope
+
+// Вариант 4 с submitList() и ListAdapter (используется)
+
+class FilmListRecyclerAdapter(
+
+    private val clickListener: OnItemClickListener
+
+) : ListAdapter<Film, FilmListRecyclerAdapter.FilmViewHolder>(FilmDiffCallback()) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmViewHolder {
+        val binding = FilmItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return FilmViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: FilmViewHolder, position: Int) {
+        val film = getItem(position)
+        holder.bind(film)
+        holder.itemView.setOnClickListener {
+            clickListener.click(film)
+        }
+    }
+
+    interface OnItemClickListener {
+        fun click(film: Film)
+    }
+
+    inner class FilmViewHolder(private val binding: FilmItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(film: Film) {
+            binding.title.text = film.title
+            binding.poster.setImageResource(film.poster)
+            binding.description.text = film.description
+
+        }
+    }
+}
+// Вариант 3
+//class FilmListRecyclerAdapter(
+//
+//    private val clickListener: OnItemClickListener
+//
+//) : ListAdapter<Film, FilmListRecyclerAdapter.FilmViewHolder>(FilmDiffCallback()) {
+//
+//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmViewHolder {
+//        val binding = FilmItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+//        return FilmViewHolder(binding)
+//    }
+//
+//    override fun onBindViewHolder(holder: FilmViewHolder, position: Int) {
+//        val film = getItem(position)
+//        holder.bind(film)
+//        holder.itemView.setOnClickListener {
+//            clickListener.click(film)
+//        }
+//    }
+//
+//    interface OnItemClickListener {
+//        fun click(film: Film)
+//    }
+//
+//    inner class FilmViewHolder(private val binding: FilmItemBinding) :
+//        RecyclerView.ViewHolder(binding.root) {
+//
+//        fun bind(film: Film) {
+//            binding.title.text = film.title ?: "No Title" // Обрабатываем случай, когда title == null
+//            binding.poster.setImageResource(film.poster) // Проверять poster на валидность сложнее (см. ниже)
+//            binding.description.text = film.description ?: "No Description" // Обрабатываем случай, когда description == null
+//        }
+//    }
+//  }
+//
 
 
-//Вариант без diffutils
+
+//Вариант 2 без diffutils
+
 //class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
 //    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 //    //Здесь у нас хранится список элементов для RV
@@ -62,58 +133,8 @@ import androidx.lifecycle.lifecycleScope
 //    }
 //}
 
-// Вариант с submitList() и ListAdapter
 
-class FilmListRecyclerAdapter(
-    private val clickListener: OnItemClickListener
-) : ListAdapter<Film, FilmListRecyclerAdapter.FilmViewHolder>(FilmDiffCallback()) {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmViewHolder {
-        val binding = FilmItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return FilmViewHolder(binding)
-    }
-
-    override fun onBindViewHolder(holder: FilmViewHolder, position: Int) {
-        val film = getItem(position)
-        holder.bind(film)
-        holder.itemView.setOnClickListener {
-            clickListener.click(film)
-        }
-    }
-
-        //Функция для обновления списка фильмов, заменяет текущий список новым.
-        suspend fun addItems(newItemsFlow: Flow<List<Film>>) {
-
-                newItemsFlow.collectLatest { newItems ->
-                    val currentList = currentList.toMutableList()
-                    currentList.clear()
-                    currentList.addAll(newItems)
-                    submitList(currentList)
-                }
-            }
-
-    interface OnItemClickListener {
-        fun click(film: Film)
-    }
-
-    inner class FilmViewHolder(private val binding: FilmItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(film: Film) {
-            binding.title.text = film.title
-            binding.poster.setImageResource(film.poster)
-            binding.description.text = film.description
-
-            // Установка слушателя кликов для каждого элемента списка
-            itemView.setOnClickListener {
-                clickListener.click(film)
-            }
-        }
-    }
-
-}
-
-// Вариант с RecyclerView.Adapter
+// Вариант 1 с RecyclerView.Adapter
 
 //class Film ListRecyclerAdapter(
 //    private val clickListener: OnItemClickListener

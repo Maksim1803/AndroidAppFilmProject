@@ -24,7 +24,7 @@ interface FilmDao {
     suspend fun delete(film: Film)
 
     // Обновление и получение данных из базы данных
-    @Query("SELECT * FROM film_table")
+   @Query("SELECT * FROM film_table")
     fun getAllFilms(): Flow<List<Film>>
 
     @Query("SELECT * FROM film_table WHERE isInFavorites = 1")

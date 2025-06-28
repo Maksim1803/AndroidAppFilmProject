@@ -13,15 +13,18 @@ import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
+// Вариант 3 рабочий (используется)
 class DetailsFragment : Fragment() {
-
+    // View Binding для доступа к элементам разметки
     private var binding: FragmentDetailsBinding? = null
-    private var film: Film? = null  // Объявляем переменную для фильма
+    // Объявляем переменную для фильма
+    private var film: Film? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // Создание объектов для элементов интерфейса из XML-разметки с помощью View Binding.
         this.binding = FragmentDetailsBinding.inflate(inflater, container, false)
         return binding?.root
     }
@@ -49,16 +52,14 @@ class DetailsFragment : Fragment() {
         // Обработка кнопки "добавить в избранное"
         binding?.favoriteButton?.setOnClickListener {
             film?.let {
-                if (!it.isInFavorites) {
-                    // Добавляем в избранное
-                    it.isInFavorites = true
-                    binding!!.favoriteButton.setImageResource(R.drawable.baseline_favorite_24)
-                    Snackbar.make(binding!!.root, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
-                } else {
-                    // Удаляем из избранного
-                    it.isInFavorites = false
+                if (App.favoriteFilms.contains(it)) {
+                    App.favoriteFilms.remove(it)
                     binding!!.favoriteButton.setImageResource(R.drawable.baseline_favorite_border_24)
                     Snackbar.make(binding!!.root, "Удалено из избранного", Snackbar.LENGTH_SHORT).show()
+                } else {
+                    App.favoriteFilms.add(it)
+                    binding!!.favoriteButton.setImageResource(R.drawable.baseline_favorite_24)
+                    Snackbar.make(binding!!.root, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
                 }
             }
         }
@@ -67,10 +68,10 @@ class DetailsFragment : Fragment() {
         binding?.watchLaterButton?.setOnClickListener {
             Snackbar.make(binding!!.root, "Добавлено в список 'Посмотреть позже'", Snackbar.LENGTH_SHORT).show()
         }
-
-        binding?.detailsFab?.setOnClickListener {
-            Snackbar.make(binding!!.root, "Функция 'Поделиться' уже реализована", Snackbar.LENGTH_SHORT).show()
-        }
+        // Обработка кнопки "поделиться" (уже не нужна, но жалко выкинуть)
+//        binding?.detailsFab?.setOnClickListener {
+//            Snackbar.make(binding!!.root, "Функция 'Поделиться' уже реализована", Snackbar.LENGTH_SHORT).show()
+//        }
 
         // Доступ к ImageView через View Binding и изменение scaleType
         binding?.detailsPoster?.apply {
@@ -94,32 +95,267 @@ class DetailsFragment : Fragment() {
         }
     }
 
+    // Метод для обновления деталей фильма на экране
     private fun setFilmsDetails() {
+
+        // Запускаем поток выполнения в цикле фрагмента
         viewLifecycleOwner.lifecycleScope.launch {
 
-        binding?.apply {
-            film?.let {
-                detailsToolbar.title = it.title
-                detailsPoster.setImageResource(it.poster)
-                detailsDescription.text = it.description
+            binding?.apply {
+                film?.let {
+                    // Установка названия в Toolbar
+                    detailsToolbar.title = it.title
+                    // Установка изображения постера
+                    detailsPoster.setImageResource(it.poster)
+                    // Установка описания
+                    detailsDescription.text = it.description
 
-                // Устанавливаем иконку в зависимости от статуса
-                favoriteButton.setImageResource(
-                    if (it.isInFavorites) R.drawable.baseline_favorite_24
-                    else R.drawable.baseline_favorite_border_24
-                )
+                    // Устанавливаем иконку в зависимости от статуса
+                    favoriteButton.setImageResource(
+                        if (it.isInFavorites) R.drawable.baseline_favorite_24
+                        else R.drawable.baseline_favorite_border_24
+                    )
+                }
             }
         }
-        }
     }
-
     override fun onDestroyView() {
         super.onDestroyView()
+        // Освобождаем ссылку на биндинг при уничтожении View
         binding = null
     }
 }
 
+// Вариант 2
+//class DetailsFragment : Fragment() {
+//    // View Binding для доступа к элементам разметки
+//    private var binding: FragmentDetailsBinding? = null
+//    // Объявляем переменную для фильма
+//    private var film: Film? = null
 //
+//    override fun onCreateView(
+//        inflater: LayoutInflater, container: ViewGroup?,
+//        savedInstanceState: Bundle?
+//    ): View? {
+//        // Создание объектов для элементов интерфейса из XML-разметки с помощью View Binding.
+//        this.binding = FragmentDetailsBinding.inflate(inflater, container, false)
+//        return binding?.root
+//    }
+//
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//
+//        // Получение фильма из аргументов
+//        val args = arguments
+//        film = args?.getParcelable<Film>("film")
+//        if (film == null) {
+//            // Обработка ошибки: фильм не передан
+//            Snackbar.make(view, "Ошибка: Фильм не найден", Snackbar.LENGTH_SHORT).show()
+//            activity?.finish()
+//            return
+//        }
+//
+//        // Устанавливаем Toolbar
+//        (activity as? AppCompatActivity)?.setSupportActionBar(binding?.detailsToolbar)
+//        (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//
+//
+//        // Обновляем иконку
+//        setFilmsDetails()
+//        // Обработка кнопки "добавить в избранное"
+//        binding?.favoriteButton?.setOnClickListener {
+//            film?.let {
+//                if (!it.isInFavorites) {
+//                    // Добавляем в избранное
+//                    it.isInFavorites = true
+//                    binding!!.favoriteButton.setImageResource(R.drawable.baseline_favorite_24)
+//                    Snackbar.make(binding!!.root, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
+//                } else {
+//                    // Удаляем из избранного
+//                    it.isInFavorites = false
+//                    binding!!.favoriteButton.setImageResource(R.drawable.baseline_favorite_border_24)
+//                    Snackbar.make(binding!!.root, "Удалено из избранного", Snackbar.LENGTH_SHORT).show()
+//                }
+//            }
+//        }
+//
+//        // Обработка кнопки "посмотреть позже"
+//        binding?.watchLaterButton?.setOnClickListener {
+//            Snackbar.make(binding!!.root, "Добавлено в список 'Посмотреть позже'", Snackbar.LENGTH_SHORT).show()
+//        }
+//        // Обработка кнопки "поделиться" (уже не нужна, но жалко выкинуть)
+////        binding?.detailsFab?.setOnClickListener {
+////            Snackbar.make(binding!!.root, "Функция 'Поделиться' уже реализована", Snackbar.LENGTH_SHORT).show()
+////        }
+//
+//        // Доступ к ImageView через View Binding и изменение scaleType
+//        binding?.detailsPoster?.apply {
+//            this.scaleType = ImageView.ScaleType.CENTER_CROP
+//        }
+//
+//
+//        // Обработка кнопки "поделиться"
+//        binding?.detailsFab?.setOnClickListener {
+//            film?.let {
+//                val intent = Intent().apply {
+//                    action = Intent.ACTION_SEND
+//                    putExtra(
+//                        Intent.EXTRA_TEXT,
+//                        "Check out this film: ${it.title}\n\n${it.description}"
+//                    )
+//                    type = "text/plain"
+//                }
+//                startActivity(Intent.createChooser(intent, "Share To:"))
+//            }
+//        }
+//    }
+//
+//    // Метод для обновления деталей фильма на экране
+//    private fun setFilmsDetails() {
+//
+//        // Запускаем поток выполнения в цикле фрагмента
+//        viewLifecycleOwner.lifecycleScope.launch {
+//
+//            binding?.apply {
+//                film?.let {
+//                    // Установка названия в Toolbar
+//                    detailsToolbar.title = it.title
+//                    // Установка изображения постера
+//                    detailsPoster.setImageResource(it.poster)
+//                    // Установка описания
+//                    detailsDescription.text = it.description
+//
+//                    // Устанавливаем иконку в зависимости от статуса
+//                    favoriteButton.setImageResource(
+//                        if (it.isInFavorites) R.drawable.baseline_favorite_24
+//                        else R.drawable.baseline_favorite_border_24
+//                    )
+//                }
+//            }
+//        }
+//    }
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        // Освобождаем ссылку на биндинг при уничтожении View
+//        binding = null
+//    }
+//}
+
+// Вариант 1
+//class DetailsFragment : Fragment() {
+//    // View Binding для доступа к элементам разметки
+//    private var binding: FragmentDetailsBinding? = null
+//    // Объявляем переменную для фильма
+//    private var film: Film? = null
+//
+//    override fun onCreateView(
+//        inflater: LayoutInflater, container: ViewGroup?,
+//        savedInstanceState: Bundle?
+//    ): View? {
+//        // Создание объектов для элементов интерфейса из XML-разметки с помощью View Binding.
+//        this.binding = FragmentDetailsBinding.inflate(inflater, container, false)
+//        return binding?.root
+//    }
+//
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//
+//        // Получение фильма из аргументов
+//        val args = arguments
+//        film = args?.getParcelable<Film>("film")
+//        if (film == null) {
+//            // Обработка ошибки: фильм не передан
+//            Snackbar.make(view, "Ошибка: Фильм не найден", Snackbar.LENGTH_SHORT).show()
+//            activity?.finish()
+//            return
+//        }
+//
+//        // Устанавливаем Toolbar
+//        (activity as? AppCompatActivity)?.setSupportActionBar(binding?.detailsToolbar)
+//        (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//
+//        // Обработка кнопки "добавить в избранное"
+//        binding?.favoriteButton?.setOnClickListener {
+//            film?.let {
+//                it.isInFavorites = !it.isInFavorites // Инвертируем значение
+//
+//                // Запускаем корутину для обновления фильма в базе данных
+//                lifecycleScope.launch(Dispatchers.IO) {
+//                    App.instance.db.filmDao().update(it)
+//
+//                    // Обновляем UI в главном потоке (если необходимо)
+//                    withContext(Dispatchers.Main) {
+//                        setFilmsDetails() // Обновляем иконку
+//                        val message = if (it.isInFavorites) "Добавлено в избранное" else "Удалено из избранного"
+//                        Snackbar.make(binding!!.root, message, Snackbar.LENGTH_SHORT).show()
+//                    }
+//                }
+//            }
+//        }
+//        // Обработка кнопки "посмотреть позже"
+//        binding?.watchLaterButton?.setOnClickListener {
+//            Snackbar.make(binding!!.root, "Добавлено в список 'Посмотреть позже'", Snackbar.LENGTH_SHORT).show()
+//        }
+//        // Обработка кнопки "поделиться" (уже не нужна, но жалко выкинуть)
+////        binding?.detailsFab?.setOnClickListener {
+////            Snackbar.make(binding!!.root, "Функция 'Поделиться' уже реализована", Snackbar.LENGTH_SHORT).show()
+////        }
+//
+//        // Доступ к ImageView через View Binding и изменение scaleType
+//        binding?.detailsPoster?.apply {
+//            this.scaleType = ImageView.ScaleType.CENTER_CROP
+//        }
+//
+//
+//        // Обработка кнопки "поделиться"
+//        binding?.detailsFab?.setOnClickListener {
+//            film?.let {
+//                val intent = Intent().apply {
+//                    action = Intent.ACTION_SEND
+//                    putExtra(
+//                        Intent.EXTRA_TEXT,
+//                        "Check out this film: ${it.title}\n\n${it.description}"
+//                    )
+//                    type = "text/plain"
+//                }
+//                startActivity(Intent.createChooser(intent, "Share To:"))
+//            }
+//        }
+//    }
+//
+//    // Метод для обновления деталей фильма на экране
+//    private fun setFilmsDetails() {
+//
+//        // Запускаем поток выполнения в цикле фрагмента
+//        viewLifecycleOwner.lifecycleScope.launch {
+//
+//            binding?.apply {
+//                film?.let {
+//                    // Установка названия в Toolbar
+//                    detailsToolbar.title = it.title
+//                    // Установка изображения постера
+//                    detailsPoster.setImageResource(it.poster)
+//                    // Установка описания
+//                    detailsDescription.text = it.description
+//
+//                    // Устанавливаем иконку в зависимости от статуса
+//                    favoriteButton.setImageResource(
+//                        if (it.isInFavorites) R.drawable.baseline_favorite_24
+//                        else R.drawable.baseline_favorite_border_24
+//                    )
+//                }
+//            }
+//        }
+//    }
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        // Освобождаем ссылку на биндинг при уничтожении View
+//        binding = null
+//    }
+//}
+
+
+// Это на всякий случай закомментил (старый код):
 //   private var binding: FragmentDetailsBinding? = null// Объявление переменной для View Binding
 //
 //   override fun onCreateView(
