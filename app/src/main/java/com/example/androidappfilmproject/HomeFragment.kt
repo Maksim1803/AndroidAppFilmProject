@@ -4,9 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.androidappfilmproject.databinding.FragmentHomeBinding
+import java.util.Locale
 
 class HomeFragment : Fragment() {
 
@@ -91,20 +95,74 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Инициализация адаптера
-        filmsAdapter =
-            FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
-                override fun click(film: Film) {
-                    (requireActivity() as MainActivity).launchDetailsFragment(film)
-                }
-            })
-
-        // Настройка RecyclerView
-        binding.mainRecycler.apply {
-            adapter = filmsAdapter
-            layoutManager = LinearLayoutManager(requireContext())
+        // Для модуля 27 (кнопка поиска)
+        binding.searchView.setOnClickListener {
+            binding.searchView.isIconified = false
         }
+
+        //Подключаем слушателя изменений введенного текста в поиск
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            //Этот метод отрабатывает при нажатии кнопки "поиск" на софт клавиатуре
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+
+            //Этот метод отрабатывает на каждое изменения текста
+            override fun onQueryTextChange(newText: String): Boolean {
+                //Если ввод пуст то вставляем в адаптер всю БД
+                if (newText.isEmpty()) {
+                    filmsAdapter.submitList(filmsDataBase)
+                    return true
+                }
+                //Фильтруем список на поиск подходящих сочетаний
+                val result = filmsDataBase.filter {
+                    //Чтобы все работало правильно, нужно запросить имя фильма и приводить к нижнему регистру
+                    it.title.lowercase(Locale.getDefault()).contains(newText.lowercase(Locale.getDefault()))
+                }
+                //Добавляем в адаптер
+                filmsAdapter.submitList(result)
+                return true
+            }
+        })
+
+        //находим наш RV
+        initRecyckler()
+        //Кладем нашу БД в RV
         filmsAdapter.submitList(filmsDataBase)
+
+        //Реализация скрытия поиска при скролле вниз и отображения при скролле вверх
+        binding.mainRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0 && binding.searchView.isVisible) {
+                    // Скролл вниз
+                    binding.searchView.visibility = View.GONE
+                } else if (dy < 0 && !binding.searchView.isVisible) {
+                    // Скролл вверх
+                    binding.searchView.visibility = View.VISIBLE
+                }
+            }
+        })
+    }
+
+    private fun initRecyckler() {
+        binding.mainRecycler.apply {
+            filmsAdapter =
+                FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
+                    override fun click(film: Film) {
+                        (requireActivity() as MainActivity).launchDetailsFragment(film)
+                    }
+                })
+            //Присваиваем адаптер
+            adapter = filmsAdapter
+            //Присвоим layoutmanager
+            layoutManager = LinearLayoutManager(requireContext())
+            //Применяем декоратор для отступов
+            val decorator = TopSpacingItemDecoration(8)
+            addItemDecoration(decorator)
+        }
     }
 }
+
+
