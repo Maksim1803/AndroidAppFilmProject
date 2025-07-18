@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.androidappfilmproject.databinding.FilmItemBinding
 
 // Вариант 4 с submitList() и ListAdapter (используется)
@@ -35,13 +36,30 @@ class FilmListRecyclerAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(film: Film) {
-            binding.title.text = film.title
-            binding.poster.setImageResource(film.poster)
-            binding.description.text = film.description
 
+//            binding.title.text = film.title
+//            binding.poster.setImageResource(film.poster)
+//            binding.description.text = film.description
+
+            // Для модуля 28:
+            //Устанавливаем заголовок
+            binding.title.text = film.title
+            //Устанавливаем постер
+            //Указываем контейнер, в котором будет "жить" наша картинка
+            Glide.with(itemView)
+                //Загружаем сам ресурс
+                .load(film.poster)
+                //Центруем изображение
+                .centerCrop()
+                //Указываем ImageView, куда будем загружать изображение
+                .into(binding.poster)
+            //Устанавливаем описание
+            binding.description.text = film.description
         }
     }
 }
+
+
 // Вариант 3
 //class FilmListRecyclerAdapter(
 //

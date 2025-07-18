@@ -1,12 +1,25 @@
 package com.example.androidappfilmproject
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.transition.Scene
+import android.transition.Slide
+import android.transition.TransitionManager
+import android.transition.TransitionSet
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.SearchView
+import androidx.core.animation.doOnEnd
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.androidappfilmproject.databinding.FragmentHomeBinding
+import java.util.Locale
 
 class HomeFragment : Fragment() {
 
@@ -92,19 +105,160 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Инициализация адаптера
-        filmsAdapter =
-            FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
-                override fun click(film: Film) {
-                    (requireActivity() as MainActivity).launchDetailsFragment(film)
-                }
-            })
-
-        // Настройка RecyclerView
-        binding.mainRecycler.apply {
-            adapter = filmsAdapter
-            layoutManager = LinearLayoutManager(requireContext())
+        // Для модуля 27 (кнопка поиска)
+        binding.searchView.setOnClickListener {
+            binding.searchView.isIconified = false
         }
+
+        //Подключаем слушателя изменений введенного текста в поиск
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            //Этот метод отрабатывает при нажатии кнопки "поиск" на софт клавиатуре
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+
+            //Этот метод отрабатывает на каждое изменения текста
+            override fun onQueryTextChange(newText: String): Boolean {
+                //Если ввод пуст то вставляем в адаптер всю БД
+                if (newText.isEmpty()) {
+                    filmsAdapter.submitList(filmsDataBase)
+                    return true
+                }
+                //Фильтруем список на поиск подходящих сочетаний
+                val result = filmsDataBase.filter {
+                    //Чтобы все работало правильно, нужно запросить имя фильма и приводить к нижнему регистру
+                    it.title.lowercase(Locale.getDefault()).contains(newText.lowercase(Locale.getDefault()))
+                }
+                //Добавляем в адаптер
+                filmsAdapter.submitList(result)
+                return true
+            }
+        })
+
+        //находим наш RV
+        initRecycler()
+        //Кладем нашу БД в RV
         filmsAdapter.submitList(filmsDataBase)
+        //Вызываем анимацию после инициализации (вариант 1)
+        //startHomeScreenAnimation(view)
+        //Вызываем анимацию после инициализации (вариант 2)
+        //startHomeScreenAnimation()
+        //Вызываем анимацию после инициализации (вариант 3)
+        startCustomAnimation()
+
+
+        //Реализация скрытия поиска при скролле вниз и отображения при скролле вверх
+        binding.mainRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0 && binding.searchView.isVisible) {
+                    // Скролл вниз
+                    binding.searchView.visibility = View.GONE
+                } else if (dy < 0 && !binding.searchView.isVisible) {
+                    // Скролл вверх
+                    binding.searchView.visibility = View.VISIBLE
+                }
+            }
+        })
+    }
+
+    private fun initRecycler() {
+        binding.mainRecycler.apply {
+            filmsAdapter =
+                FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
+                    override fun click(film: Film) {
+                        (requireActivity() as MainActivity).launchDetailsFragment(film)
+                    }
+                })
+            //Присваиваем адаптер
+            adapter = filmsAdapter
+            //Присвоим layoutmanager
+            layoutManager = LinearLayoutManager(requireContext())
+            //Применяем декоратор для отступов
+            val decorator = TopSpacingItemDecoration(8)
+            addItemDecoration(decorator)
+        }
+    }
+     //Метод, запускающий анимацию (вариант 1)
+//    private fun startHomeScreenAnimation(view: View) {
+//        val homeFragmentRoot = binding.root // Получаем root view из binding
+//
+//        view.viewTreeObserver.addOnGlobalLayoutListener(object :
+//            ViewTreeObserver.OnGlobalLayoutListener {
+//            override fun onGlobalLayout() {
+//                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+//
+//                val scene = Scene(
+//                    homeFragmentRoot as ViewGroup, // Явное приведение к ViewGroup
+//                    LayoutInflater.from(requireContext())
+//                        .inflate(R.layout.merge_home_screen_content, homeFragmentRoot as ViewGroup, false) // Явное приведение к ViewGroup
+//                )
+//
+//                val searchSlide = Slide(Gravity.TOP).addTarget(binding.searchView)
+//                val recyclerSlide = Slide(Gravity.BOTTOM).addTarget(binding.mainRecycler)
+//
+//                val customTransition = TransitionSet().apply {
+//                    duration = 500
+//                    addTransition(recyclerSlide)
+//                    addTransition(searchSlide)
+//                }
+//                TransitionManager.go(scene, customTransition)
+//            }
+//        })
+//    }
+
+    //Метод, запускающий анимацию (вариант 2)
+//    private fun startHomeScreenAnimation() {
+//        val homeFragmentRoot = binding.root
+//
+//        // Создаем сцену из layout через биндинг
+//        val scene = Scene.getSceneForLayout(
+//            homeFragmentRoot,
+//            R.layout.merge_home_screen_content,
+//            requireContext()
+//        )
+//
+//        // Создаем анимацию выезда поля поиска сверху
+//        val searchSlide = Slide(Gravity.TOP).addTarget(binding.searchView)
+//        // Создаем анимацию выезда RecyclerView снизу
+//        val recyclerSlide = Slide(Gravity.BOTTOM).addTarget(binding.mainRecycler)
+//
+//        // Объединяем анимации
+//        val customTransition = TransitionSet().apply {
+//            duration = 500
+//            addTransition(recyclerSlide)
+//            addTransition(searchSlide)
+//        }
+//
+//        // Запускаем переход
+//        TransitionManager.go(scene, customTransition)
+//
+//        // Обработка клика по поисковому полю
+//        binding.searchView.setOnClickListener {
+//            binding.searchView.isIconified = false
+//        }
+//    }
+    //Метод, запускающий анимацию (вариант 3)
+    private fun startCustomAnimation() {
+        // Устанавливаем начальные значения прозрачности
+        binding.searchView.alpha = 0f
+        binding.mainRecycler.alpha = 0f
+
+        // Анимация для SearchView
+        val searchViewAnimator = ObjectAnimator.ofFloat(binding.searchView, "alpha", 0f, 1f)
+        searchViewAnimator.duration = 500 // Длительность анимации в миллисекундах
+        searchViewAnimator.interpolator = AccelerateDecelerateInterpolator() // Интерполяция
+
+        // Анимация для RecyclerView
+        val recyclerViewAnimator = ObjectAnimator.ofFloat(binding.mainRecycler, "alpha", 0f, 1f)
+        recyclerViewAnimator.duration = 500 // Длительность анимации в миллисекундах
+        recyclerViewAnimator.interpolator = AccelerateDecelerateInterpolator() // Интерполяция
+
+        // Запускаем анимации последовательно
+        searchViewAnimator.start()
+        searchViewAnimator.doOnEnd {
+            recyclerViewAnimator.start()
+        }
     }
 }
