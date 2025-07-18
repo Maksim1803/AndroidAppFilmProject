@@ -1,11 +1,13 @@
 package com.example.androidappfilmproject
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -29,12 +31,15 @@ class DetailsFragment : Fragment() {
         return binding?.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         // Получение фильма из аргументов
         val args = arguments
+    //метод getParcelable() устарел и не рекомендуется к использованию, поэтому комментим:
         film = args?.getParcelable<Film>("film")
+
         if (film == null) {
             // Обработка ошибки: фильм не передан
             Snackbar.make(view, "Ошибка: Фильм не найден", Snackbar.LENGTH_SHORT).show()

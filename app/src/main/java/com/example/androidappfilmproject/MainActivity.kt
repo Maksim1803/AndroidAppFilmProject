@@ -74,3 +74,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
+//Может пригодится...
+
+//    fun onClickToast(view: View) {
+//        Toast.makeText(this, "Меню кинофильмов", Toast.LENGTH_SHORT).show()
+//    }
+//
+//    fun onClickToast2(view: View) {
+//        Toast.makeText(this, "Избранные кинофильмы", Toast.LENGTH_SHORT).show()
+//    }
+//
+//    fun onClickToast3(view: View) {
+//        Toast.makeText(this, "Кинофильмы для просмотра попозже", Toast.LENGTH_SHORT).show()
+//    }
+//
+//    fun onClickToast4(view: View) {
+//        Toast.makeText(this, "Кинофильмы в подборке", Toast.LENGTH_SHORT).show()
+//    }
+//
+//    fun onClickToast5(view: View) {
+//        Toast.makeText(this, "Настройки для корректной работы", Toast.LENGTH_SHORT).show()
+//    }
