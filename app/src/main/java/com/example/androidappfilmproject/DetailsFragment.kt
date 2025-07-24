@@ -52,14 +52,16 @@ class DetailsFragment : Fragment() {
         // Обработка кнопки "добавить в избранное"
         binding?.favoriteButton?.setOnClickListener {
             film?.let {
-                if (App.favoriteFilms.contains(it)) {
-                    App.favoriteFilms.remove(it)
-                    binding!!.favoriteButton.setImageResource(R.drawable.baseline_favorite_border_24)
-                    Snackbar.make(binding!!.root, "Удалено из избранного", Snackbar.LENGTH_SHORT).show()
-                } else {
-                    App.favoriteFilms.add(it)
+                if (!it.isInFavorites) {
+                    // Добавляем в избранное
+                    it.isInFavorites = true
                     binding!!.favoriteButton.setImageResource(R.drawable.baseline_favorite_24)
                     Snackbar.make(binding!!.root, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
+                } else {
+                    // Удаляем из избранного
+                    it.isInFavorites = false
+                    binding!!.favoriteButton.setImageResource(R.drawable.baseline_favorite_border_24)
+                    Snackbar.make(binding!!.root, "Удалено из избранного", Snackbar.LENGTH_SHORT).show()
                 }
             }
         }

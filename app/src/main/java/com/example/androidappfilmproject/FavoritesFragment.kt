@@ -61,7 +61,7 @@ class FavoritesFragment : Fragment() {
     // Функция для получения списка избранных фильмов из базы данных
     private fun getFavoritesList() {
         filmsAdapter.submitList(App.favoriteFilms.toList())
-      }
+    }
 
     // Уничтожение View фрагмента (освобождение ресурсов)
     override fun onDestroyView() {
