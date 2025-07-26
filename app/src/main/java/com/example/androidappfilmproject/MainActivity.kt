@@ -56,84 +56,84 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.findFragmentByTag(tag)
 
 //    //Вариант 1
-//    private fun changeFragment(fragment: Fragment, tag: String) {
-//        supportFragmentManager
-//            .beginTransaction()
-//            .replace(R.id.fragment_placeholder, fragment, tag)
-//            .addToBackStack(null)
-//            .commit()
-//    }
+    private fun changeFragment(fragment: Fragment, tag: String) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_placeholder, fragment, tag)
+            .addToBackStack(null)
+            .commit()
+    }
       //Вариант 2
-      private fun changeFragment(fragment: Fragment, tag: String, bgRes: Int) {
-        setFragmentBackground(bgRes)
-          supportFragmentManager
-          .beginTransaction()
-          .replace(R.id.fragment_placeholder, fragment, tag)
-          .addToBackStack(null)
-          .commit()
-      }
+//      private fun changeFragment(fragment: Fragment, tag: String, bgRes: Int) {
+//        setFragmentBackground(bgRes)
+//          supportFragmentManager
+//          .beginTransaction()
+//          .replace(R.id.fragment_placeholder, fragment, tag)
+//          .addToBackStack(null)
+//          .commit()
+//      }
 
     private fun initNavigation() {
         binding.bottomNavigation?.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
 
                 //Вариант 1
-//                R.id.home -> {
-//                    val tag = "home"
-//                    val fragment = checkFragmentExistence(tag) ?: HomeFragment()
-//                    changeFragment(fragment, tag)
-//                    true
-//                }
-//
-//                R.id.favorites -> {
-//                    val tag = "favorites"
-//                    val fragment = checkFragmentExistence(tag) ?: FavoritesFragment()
-//                    changeFragment(fragment, tag)
-//                    true
-//                }
-//
-//                R.id.selections -> {
-//                    val tag = "selections"
-//                    val fragment = checkFragmentExistence(tag) ?: SelectionsFragment()
-//                    changeFragment(fragment, tag)
-//                    true
-//                }
-//
-//                R.id.watch_later -> {
-//                    val tag = "watch_later"
-//                    val fragment = checkFragmentExistence(tag) ?: WatchLaterFragment()
-//                    changeFragment(fragment, tag)
-//                    true
-//                }
-
-                //Вариант 2
                 R.id.home -> {
                     val tag = "home"
                     val fragment = checkFragmentExistence(tag) ?: HomeFragment()
-                    changeFragment(fragment, "home", R.drawable.corner_background)
+                    changeFragment(fragment, tag)
                     true
                 }
 
                 R.id.favorites -> {
                     val tag = "favorites"
                     val fragment = checkFragmentExistence(tag) ?: FavoritesFragment()
-                    changeFragment(fragment, "home", R.drawable.background_favorites)
+                    changeFragment(fragment, tag)
                     true
                 }
 
                 R.id.watch_later -> {
                     val tag = "watch_later"
-                    val fragment = checkFragmentExistence(tag) ?: HomeFragment()
-                    changeFragment(fragment, "home", R.drawable.background_watch_later)
+                    val fragment = checkFragmentExistence(tag) ?: WatchLaterFragment()
+                    changeFragment(fragment, tag)
                     true
                 }
 
                 R.id.selections -> {
                     val tag = "selections"
                     val fragment = checkFragmentExistence(tag) ?: SelectionsFragment()
-                    changeFragment(fragment, "home", R.drawable.background_selections)
+                    changeFragment(fragment, tag)
                     true
                 }
+
+                //Вариант 2
+//                R.id.home -> {
+//                    val tag = "home"
+//                    val fragment = checkFragmentExistence(tag) ?: HomeFragment()
+//                    changeFragment(fragment, "home", R.drawable.corner_background)
+//                    true
+//                }
+//
+//                R.id.favorites -> {
+//                    val tag = "favorites"
+//                    val fragment = checkFragmentExistence(tag) ?: FavoritesFragment()
+//                    changeFragment(fragment, "home", R.drawable.background_favorites)
+//                    true
+//                }
+//
+//                R.id.watch_later -> {
+//                    val tag = "watch_later"
+//                    val fragment = checkFragmentExistence(tag) ?: HomeFragment()
+//                    changeFragment(fragment, "home", R.drawable.background_watch_later)
+//                    true
+//                }
+//
+//                R.id.selections -> {
+//                    val tag = "selections"
+//                    val fragment = checkFragmentExistence(tag) ?: SelectionsFragment()
+//                    changeFragment(fragment, "home", R.drawable.background_selections)
+//                    true
+//                }
 
 //                R.id.favorites -> {
 //                    val tag = "favorites"

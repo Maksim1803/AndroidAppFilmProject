@@ -99,6 +99,9 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //Запускаем анимацию модуля 29
+        AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 1)
+
         // Для модуля 27 (кнопка поиска)
         binding.searchView.setOnClickListener {
             binding.searchView.isIconified = false
@@ -136,7 +139,7 @@ class HomeFragment : Fragment() {
         //Кладем нашу БД в RV
         filmsAdapter.submitList(filmsDataBase)
         //Вызываем анимацию после инициализации
-        startHomeScreenAnimation(view)
+        //startHomeScreenAnimation(view)
 
 
         //Реализация скрытия поиска при скролле вниз и отображения при скролле вверх

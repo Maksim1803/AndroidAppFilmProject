@@ -3,7 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background_favorites"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/favorites_fragment_root"
+    android:visibility="invisible"
+    tools:visibility="visible"
     tools:context=".FavoritesFragment">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -14,3 +18,4 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
 </FrameLayout>
+

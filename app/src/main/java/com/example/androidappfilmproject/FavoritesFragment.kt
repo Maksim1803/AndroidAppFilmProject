@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.databinding.FragmentFavoritesBinding
+import com.example.androidappfilmproject.databinding.FragmentWatchLaterBinding
 
 // Класс фрагмента для отображения списка избранных фильмов вариант 2 (используется)
 class FavoritesFragment : Fragment() {
@@ -32,6 +33,9 @@ class FavoritesFragment : Fragment() {
     // Когда View создана и готова к использованию
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        //Запускаем анимацию модуля 29
+        AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 2)
 
         // Инициализация адаптера RecyclerView
         filmsAdapter = FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
