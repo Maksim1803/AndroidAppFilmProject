@@ -1,7 +1,6 @@
 package com.example.androidappfilmproject
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
@@ -63,15 +62,6 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null)
             .commit()
     }
-      //Вариант 2
-//      private fun changeFragment(fragment: Fragment, tag: String, bgRes: Int) {
-//        setFragmentBackground(bgRes)
-//          supportFragmentManager
-//          .beginTransaction()
-//          .replace(R.id.fragment_placeholder, fragment, tag)
-//          .addToBackStack(null)
-//          .commit()
-//      }
 
     private fun initNavigation() {
         binding.bottomNavigation?.setOnNavigationItemSelectedListener { item ->
@@ -105,69 +95,6 @@ class MainActivity : AppCompatActivity() {
                     changeFragment(fragment, tag)
                     true
                 }
-
-                //Вариант 2
-//                R.id.home -> {
-//                    val tag = "home"
-//                    val fragment = checkFragmentExistence(tag) ?: HomeFragment()
-//                    changeFragment(fragment, "home", R.drawable.corner_background)
-//                    true
-//                }
-//
-//                R.id.favorites -> {
-//                    val tag = "favorites"
-//                    val fragment = checkFragmentExistence(tag) ?: FavoritesFragment()
-//                    changeFragment(fragment, "home", R.drawable.background_favorites)
-//                    true
-//                }
-//
-//                R.id.watch_later -> {
-//                    val tag = "watch_later"
-//                    val fragment = checkFragmentExistence(tag) ?: HomeFragment()
-//                    changeFragment(fragment, "home", R.drawable.background_watch_later)
-//                    true
-//                }
-//
-//                R.id.selections -> {
-//                    val tag = "selections"
-//                    val fragment = checkFragmentExistence(tag) ?: SelectionsFragment()
-//                    changeFragment(fragment, "home", R.drawable.background_selections)
-//                    true
-//                }
-
-//                R.id.favorites -> {
-//                    val tag = "favorites"
-//                    val fragment =
-//                        supportFragmentManager.findFragmentByTag(tag) ?: FavoritesFragment()
-//                    supportFragmentManager
-//                        .beginTransaction()
-//                        .replace(
-//                            binding.fragmentPlaceholder?.id
-//                                ?: return@setOnNavigationItemSelectedListener false, fragment, tag
-//                        )
-//                        .addToBackStack(null)
-//                        .commit()
-//                    true
-//                }
-
-//                R.id.favorites -> {
-//                    binding.fragmentPlaceholder?.let {
-//                        supportFragmentManager
-//                            .beginTransaction()
-//                            .replace(it.id, FavoritesFragment())
-//                            .addToBackStack(null)
-//                            .commit()
-//                    }
-//                    true
-//                }
-
-//                R.id.favorites -> {
-//                        val tag = "favorites"
-//                        val fragment = checkFragmentExistence(tag) ?: FavoritesFragment()
-//                        changeFragment(fragment, tag)
-//                        true
-//                        }
-
                 else -> false
             }
         }

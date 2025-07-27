@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.databinding.FragmentFavoritesBinding
-import com.example.androidappfilmproject.databinding.FragmentWatchLaterBinding
 
 // Класс фрагмента для отображения списка избранных фильмов вариант 2 (используется)
 class FavoritesFragment : Fragment() {

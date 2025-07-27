@@ -1,10 +1,10 @@
 package com.example.androidappfilmproject
 
 import android.content.Intent
-import android.graphics.drawable.Animatable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 
@@ -14,20 +14,16 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         val imageView = findViewById<ImageView>(R.id.splash_view)
-        val drawable = imageView.drawable
+        imageView.setImageResource(R.drawable.logo)
 
-        if (drawable is Animatable) {
-            drawable.start()
-        }
+        val scaleAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_up)
+        imageView.startAnimation(scaleAnimation)
 
-        // Запускаем переход через 2 секунды
         Handler(Looper.getMainLooper()).postDelayed({
-            startActivity(Intent(this, MainActivity::class.java))
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
             finish()
         }, 2000)
     }
 }
-
-
-
 
