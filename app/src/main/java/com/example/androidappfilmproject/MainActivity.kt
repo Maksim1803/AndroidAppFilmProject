@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
         // Инициализируем binding
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        // Запускаем нижнее навигационное меню
         initNavigation()
 
         // Запускаем фрагмент при старте
@@ -29,12 +29,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Запускаем функцию
+    // Запускаем фоновый ресурс для контейнера фрагмента
     private fun setFragmentBackground(colorResId: Int) {
         binding.fragmentPlaceholder?.setBackgroundResource(colorResId)
     }
 
-
+    // Запускаем фрагмент с деталями фильма
     fun launchDetailsFragment(film: Film) {
         val bundle = Bundle().apply {
             putParcelable("film", film)
@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         val fragment = DetailsFragment().apply {
             arguments = bundle
         }
-
+    // Заменяем текущий фрагмент на DetailsFragment
         binding.fragmentPlaceholder?.let {
             supportFragmentManager
                 .beginTransaction()
@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null)
             .commit()
     }
-
+    // Инициализация навигации по нижнему меню
     private fun initNavigation() {
         binding.bottomNavigation?.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
