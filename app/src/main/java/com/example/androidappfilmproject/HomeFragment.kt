@@ -138,7 +138,7 @@ class HomeFragment : Fragment() {
         initRecycler()
         //Кладем нашу БД в RV
         filmsAdapter.submitList(filmsDataBase)
-        //Вызываем анимацию после инициализации
+        //Вызываем анимацию (модуль 28) после инициализации
         //startHomeScreenAnimation(view)
 
 
@@ -175,7 +175,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    //Метод, запускающий анимацию (вариант 3)
+    //Метод, запускающий анимацию модуля 28 (вариант 3)
     private fun startHomeScreenAnimation(view: View) {
         // Устанавливаем начальные значения прозрачности
         binding.searchView.alpha = 0f
@@ -199,7 +199,7 @@ class HomeFragment : Fragment() {
     }
 }
 
-//Метод, запускающий анимацию (вариант 2)
+//Метод, запускающий анимацию модуля 28 (вариант 2)
 //    private fun startHomeScreenAnimation() {
 //        val homeFragmentRoot = binding.root
 //
@@ -232,7 +232,7 @@ class HomeFragment : Fragment() {
 //    }
 
 
-//Метод, запускающий анимацию (вариант 1)
+//Метод, запускающий анимацию модуля 28 (вариант 1)
 //    private fun startHomeScreenAnimation(view: View) {
 //        val homeFragmentRoot = binding.root // Получаем root view из binding
 //
