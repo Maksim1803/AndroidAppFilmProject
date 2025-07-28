@@ -8,6 +8,9 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 
+// Модуль 29. Класс-активити для Splash Screen (экран приветствия) с векторной
+// анимацией (задание под звездочкой).
+
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

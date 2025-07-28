@@ -2,7 +2,6 @@ package com.example.androidappfilmproject
 
 import androidx.recyclerview.widget.DiffUtil
 
-//Комменты для гита
 
 class FilmDiffCallback : DiffUtil.ItemCallback<Film>() {
 

@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--Модуль 29. Файл анимации - масштабирования для класса-активити SplashActivity.-->
+<!--Экран приветствия с векторной анимацией (задание под звездочкой).-->
+
 <scale xmlns:android="http://schemas.android.com/apk/res/android"
     android:duration="2500"
     android:fromXScale="1.0"

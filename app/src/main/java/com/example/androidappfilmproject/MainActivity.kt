@@ -7,7 +7,8 @@ import com.example.androidappfilmproject.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding  // Объявляем переменную binding
+    // Объявляем переменную binding
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
                 .commit()
         }
     }
+
     // Запускаем функцию
     private fun setFragmentBackground(colorResId: Int) {
         binding.fragmentPlaceholder?.setBackgroundResource(colorResId)
@@ -54,7 +56,7 @@ class MainActivity : AppCompatActivity() {
     private fun checkFragmentExistence(tag: String): Fragment? =
         supportFragmentManager.findFragmentByTag(tag)
 
-//    //Вариант 1
+    //Запускаем метод смены фрагментов при нажатии на иконки нижнего меню
     private fun changeFragment(fragment: Fragment, tag: String) {
         supportFragmentManager
             .beginTransaction()
@@ -67,7 +69,6 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigation?.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
 
-                //Вариант 1
                 R.id.home -> {
                     val tag = "home"
                     val fragment = checkFragmentExistence(tag) ?: HomeFragment()
@@ -95,12 +96,12 @@ class MainActivity : AppCompatActivity() {
                     changeFragment(fragment, tag)
                     true
                 }
+
                 else -> false
             }
         }
     }
 }
-
 
 
 //Может пригодится...
