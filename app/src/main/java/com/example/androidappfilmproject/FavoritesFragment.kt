@@ -33,6 +33,9 @@ class FavoritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //Запускаем анимацию модуля 29
+        AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 2)
+
         // Инициализация адаптера RecyclerView
         filmsAdapter = FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
             // Обработка клика по элементу списка
@@ -61,7 +64,7 @@ class FavoritesFragment : Fragment() {
     // Функция для получения списка избранных фильмов из базы данных
     private fun getFavoritesList() {
         filmsAdapter.submitList(App.favoriteFilms.toList())
-      }
+    }
 
     // Уничтожение View фрагмента (освобождение ресурсов)
     override fun onDestroyView() {

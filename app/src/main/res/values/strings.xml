@@ -7,6 +7,7 @@
     <string name="btn_menu_3">Посмотреть позже</string>
     <string name="btn_menu_4">Подборки</string>
     <string name="btn_menu_5">Настройки</string>
+    <string name="menu_home_title_text">Главная</string>
     <string name="menu_settings_title">Настройки</string>
     <string name="menu_favorites_title">Избранное</string>
     <string name="menu_watch_later_title">Посмотреть позже</string>

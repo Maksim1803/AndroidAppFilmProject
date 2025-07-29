@@ -1,24 +1,26 @@
 package com.example.androidappfilmproject
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-   private lateinit var binding: ActivityMainBinding  // Объявляем переменную binding
+    // Объявляем переменную binding
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Инициализируем binding
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        // Запускаем нижнее навигационное меню
         initNavigation()
 
         // Запускаем фрагмент при старте
         binding.fragmentPlaceholder?.let {
+            setFragmentBackground(R.drawable.corner_background)
             supportFragmentManager
                 .beginTransaction()
                 .add(it.id, HomeFragment())
@@ -27,6 +29,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Запускаем фоновый ресурс для контейнера фрагмента
+    private fun setFragmentBackground(colorResId: Int) {
+        binding.fragmentPlaceholder?.setBackgroundResource(colorResId)
+    }
+
+    // Запускаем фрагмент с деталями фильма
     fun launchDetailsFragment(film: Film) {
         val bundle = Bundle().apply {
             putParcelable("film", film)
@@ -34,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         val fragment = DetailsFragment().apply {
             arguments = bundle
         }
-
+    // Заменяем текущий фрагмент на DetailsFragment
         binding.fragmentPlaceholder?.let {
             supportFragmentManager
                 .beginTransaction()
@@ -44,28 +52,48 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //Ищем фрагмент по тэгу, если он есть то возвращаем его, если нет - то null
+    private fun checkFragmentExistence(tag: String): Fragment? =
+        supportFragmentManager.findFragmentByTag(tag)
+
+    //Запускаем метод смены фрагментов при нажатии на иконки нижнего меню
+    private fun changeFragment(fragment: Fragment, tag: String) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_placeholder, fragment, tag)
+            .addToBackStack(null)
+            .commit()
+    }
+    // Инициализация навигации по нижнему меню
     private fun initNavigation() {
         binding.bottomNavigation?.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
 
+                R.id.home -> {
+                    val tag = "home"
+                    val fragment = checkFragmentExistence(tag) ?: HomeFragment()
+                    changeFragment(fragment, tag)
+                    true
+                }
+
                 R.id.favorites -> {
-                    binding.fragmentPlaceholder?.let {
-                        supportFragmentManager
-                            .beginTransaction()
-                            .replace(it.id, FavoritesFragment())
-                            .addToBackStack(null)
-                            .commit()
-                    }
+                    val tag = "favorites"
+                    val fragment = checkFragmentExistence(tag) ?: FavoritesFragment()
+                    changeFragment(fragment, tag)
                     true
                 }
 
                 R.id.watch_later -> {
-                    Toast.makeText(this, "Посмотреть позже", Toast.LENGTH_SHORT).show()
+                    val tag = "watch_later"
+                    val fragment = checkFragmentExistence(tag) ?: WatchLaterFragment()
+                    changeFragment(fragment, tag)
                     true
                 }
 
                 R.id.selections -> {
-                    Toast.makeText(this, "Подборки", Toast.LENGTH_SHORT).show()
+                    val tag = "selections"
+                    val fragment = checkFragmentExistence(tag) ?: SelectionsFragment()
+                    changeFragment(fragment, tag)
                     true
                 }
 

@@ -1,0 +1,13 @@
+<!--Модуль 29. Векторное изображение для файла scale_up (масштабирование)-->
+<!--Экран приветствия с векторной анимацией (задание под звездочкой).-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <path
+        android:name="vector"
+        android:fillColor="@color/colorOrange"
+        android:pathData="M50,0 L61,35 L98,35 L68,57 L79,91 L50,70 L21,91 L32,57 L2,35 L39,35 Z"/>
+</vector>
