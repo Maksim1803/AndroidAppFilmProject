@@ -12,7 +12,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.androidappfilmproject.databinding.FragmentHomeBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class HomeFragment : Fragment() {
@@ -32,9 +36,9 @@ class HomeFragment : Fragment() {
             "Пытаясь оставить позади свою неспокойную жизнь, братья-близнецы возвращаются в родной город, и убеждаются, что здесь их ждёт ещё большее зло.",
         ),
         Film(
-            "До рассвета",
-            R.drawable.untildawn,
-            "Группа друзей, оказавшихся в ловушке временной петли, где таинственные враги убивают их ужасными способами, должна дожить до рассвета, чтобы выбраться оттуда.",
+            "Один дома",
+            R.drawable.homealone,
+            "Американское семейство отправляется из Чикаго в Европу, но в спешке сборов бестолковые родители забывают дома одного из своих детей. Юное создание, однако, не теряется и демонстрирует чудеса изобретательности...",
         ),
         Film(
             "Под огнем",

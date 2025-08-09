@@ -36,19 +36,20 @@ class FilmListRecyclerAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(film: Film) {
+            // Сначала очищаем предыдущий постер, чтобы при ресайклинге не мигало
+            Glide.with(itemView).clear(binding.poster)
+            binding.poster.setImageDrawable(null) // на всякий случай
 
-            //Устанавливаем заголовок
+            // Устанавливаем заголовок
             binding.title.text = film.title
-            //Устанавливаем постер
-            //Указываем контейнер, в котором будет "жить" наша картинка
+
+            // Загружаем постер
             Glide.with(itemView)
-                //Загружаем сам ресурс
                 .load(film.poster)
-                //Центруем изображение
                 .centerCrop()
-                //Указываем ImageView, куда будем загружать изображение
                 .into(binding.poster)
-            //Устанавливаем описание
+
+            // Устанавливаем описание
             binding.description.text = film.description
         }
     }
