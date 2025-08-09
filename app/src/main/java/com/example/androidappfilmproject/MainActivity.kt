@@ -3,7 +3,11 @@ package com.example.androidappfilmproject
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -12,6 +16,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Очистка кеша Glide (один раз при старте приложения)
+        Glide.get(this).clearMemory()
+        CoroutineScope(Dispatchers.IO).launch {
+            Glide.get(this@MainActivity).clearDiskCache()
+        }
         // Инициализируем binding
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -23,8 +33,8 @@ class MainActivity : AppCompatActivity() {
             setFragmentBackground(R.drawable.corner_background)
             supportFragmentManager
                 .beginTransaction()
-                .add(it.id, HomeFragment())
-                .addToBackStack(null)
+                .add(it.id, SplashFragment())
+             // .addToBackStack(null)
                 .commit()
         }
     }
