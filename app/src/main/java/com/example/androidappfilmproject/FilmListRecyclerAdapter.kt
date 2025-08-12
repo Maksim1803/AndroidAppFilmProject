@@ -10,10 +10,11 @@ import com.example.androidappfilmproject.databinding.FilmItemBinding
 // Вариант 4 с submitList() и ListAdapter (используется)
 
 class FilmListRecyclerAdapter(
-
     private val clickListener: OnItemClickListener
-
 ) : ListAdapter<Film, FilmListRecyclerAdapter.FilmViewHolder>(FilmDiffCallback()) {
+
+    // Отслеживаем, какие фильмы уже анимировались (по уникальному ключу, например title или id)
+    private val animatedKeys = mutableSetOf<String>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmViewHolder {
         val binding = FilmItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -36,25 +37,31 @@ class FilmListRecyclerAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(film: Film) {
-            // Сначала очищаем предыдущий постер, чтобы при ресайклинге не мигало
+            // Очистка старого постера
             Glide.with(itemView).clear(binding.poster)
-            binding.poster.setImageDrawable(null) // на всякий случай
+            binding.poster.setImageDrawable(null)
 
-            // Устанавливаем заголовок
             binding.title.text = film.title
-
-            // Загружаем постер
             Glide.with(itemView)
                 .load(film.poster)
                 .centerCrop()
                 .into(binding.poster)
-
-            // Устанавливаем описание
             binding.description.text = film.description
+
+            val key = film.title // или film.id.toString(), если id уникален
+            val progress = (film.rating * 10).toInt().coerceIn(0, 100)
+
+            if (!animatedKeys.contains(key)) {
+                // первый раз для этого фильма — анимируем
+                binding.ratingDonut.setProgressAnimated(progress, 2000L)
+                animatedKeys.add(key)
+            } else {
+                // после анимации — ставим статично, чтобы при скролле не дергало
+                binding.ratingDonut.setProgress(progress)
+            }
         }
     }
 }
-
 // Вариант 3
 //class FilmListRecyclerAdapter(
 //
@@ -90,7 +97,6 @@ class FilmListRecyclerAdapter(
 //    }
 //  }
 //
-
 
 
 //Вариант 2 без diffutils

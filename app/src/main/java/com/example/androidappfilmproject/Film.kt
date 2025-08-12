@@ -58,10 +58,11 @@ data class Film( // Класс представляет таблицу в баз
     @PrimaryKey(autoGenerate = true)
     // Поле id с аннотацией @PrimaryKey необходимо для
     // уникальной идентификации каждой записи в базе данных
-
     val title: String,
     val poster: Int,
     val description: String,
-    var isInFavorites: Boolean = false,
+    var rating: Float = 0f,
+    var isInFavorites: Boolean = false, //
     val id: Int = 0,
+
 ) : Parcelable

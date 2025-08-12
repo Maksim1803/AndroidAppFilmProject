@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RatingDonutView">
+        <!-- Прогресс 0..100 -->
+        <attr name="progress" format="integer" />
+        <!-- Толщина линии -->
+        <attr name="stroke" format="dimension" /> <!-- заменил float на dimension -->
+        <!-- Анимация при первом показе -->
+        <attr name="animateOnLoad" format="boolean" />
+        <!-- Длительность анимации -->
+        <attr name="animationDuration" format="integer" />
+    </declare-styleable>
+</resources>
