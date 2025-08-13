@@ -49,6 +49,8 @@ class DetailsFragment : Fragment() {
 
         // Обновляем иконку
         setFilmsDetails()
+
+
         // Обработка кнопки "добавить в избранное"
         binding?.favoriteButton?.setOnClickListener {
             film?.let {
@@ -117,6 +119,10 @@ class DetailsFragment : Fragment() {
                         if (it.isInFavorites) R.drawable.baseline_favorite_24
                         else R.drawable.baseline_favorite_border_24
                     )
+
+                    // Запускаем анимацию рейтинга
+                    val progress = (it.rating * 10).toInt().coerceIn(0, 100)
+                    ratingDonut.setProgressAnimated(progress, 2500L)
                 }
             }
         }

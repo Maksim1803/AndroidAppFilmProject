@@ -85,6 +85,19 @@
         android:translationX="-120dp"
         android:translationY="-10dp"/>
 
+    <com.example.androidappfilmproject.RatingDonutView
+        android:id="@+id/ratingDonut"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:translationZ="11dp"
+        app:stroke="5dp"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="bottom|right"
+        app:animateOnLoad="false"
+        app:animationDuration="2000"
+        android:translationX="-350dp"
+        android:translationY="-10dp"/>
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
