@@ -6,22 +6,23 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
     //    id ("kotlin-parcelize")
-    // kotlin("kapt")
+    //kotlin("kapt")
 
 }
 
 android {
     namespace = "com.example.androidappfilmproject"
-    compileSdk = 35
+    compileSdk = 36
 
     buildFeatures  {
         viewBinding = true
+
     }
 
     defaultConfig {
         applicationId = "com.example.androidappfilmproject"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
