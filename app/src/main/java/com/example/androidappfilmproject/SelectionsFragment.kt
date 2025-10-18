@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.viewbinding.ViewBinding
 import com.example.androidappfilmproject.databinding.FragmentSelectionsBinding
 
 class SelectionsFragment : Fragment() {
@@ -32,7 +33,8 @@ class SelectionsFragment : Fragment() {
         // Выполняем анимацию кругового раскрытия для корневого View фрагмента.
         // Используем метод AnimationHelper для анимации.
         AnimationHelper.performFragmentCircularRevealAnimation(
-            binding.selectionsFragmentRoot, requireActivity(), 4)
+            binding.selectionsFragmentRoot, requireActivity(), 4
+        )
     }
 }
 

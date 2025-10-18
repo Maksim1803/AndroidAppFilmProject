@@ -8,7 +8,8 @@ import java.util.concurrent.Executors
 import kotlin.math.hypot
 import kotlin.math.roundToInt
 
-class AnimationHelper {
+// Вариант без биндингов:
+ class AnimationHelper {
 
     companion object {
         //Переменная для того, что бы круг проявления расходился именно от иконки меню навигации
@@ -58,8 +59,5 @@ class AnimationHelper {
         }
     }
 }
-
-
-
 
 
