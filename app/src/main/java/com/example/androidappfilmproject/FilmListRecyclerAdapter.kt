@@ -10,10 +10,11 @@ import com.example.androidappfilmproject.databinding.FilmItemBinding
 // Вариант 4 с submitList() и ListAdapter (используется)
 
 class FilmListRecyclerAdapter(
-
     private val clickListener: OnItemClickListener
-
 ) : ListAdapter<Film, FilmListRecyclerAdapter.FilmViewHolder>(FilmDiffCallback()) {
+
+    // Отслеживаем, какие фильмы уже анимировались (по уникальному ключу, например title или id)
+    private val animatedKeys = mutableSetOf<String>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmViewHolder {
         val binding = FilmItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -95,7 +96,6 @@ class FilmListRecyclerAdapter(
 //    }
 //  }
 //
-
 
 
 //Вариант 2 без diffutils
