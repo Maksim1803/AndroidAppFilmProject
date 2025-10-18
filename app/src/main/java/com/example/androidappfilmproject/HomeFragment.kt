@@ -12,14 +12,21 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.example.androidappfilmproject.databinding.FragmentHomeBinding
 import java.util.Locale
 
 class HomeFragment : Fragment() {
 
-    private lateinit var binding: FragmentHomeBinding
+    // View Binding для доступа к элементам разметки фрагмента
+    private var _binding: FragmentHomeBinding? = null
+    // Не-null доступ к binding между onCreateView и onDestroyView
+    private val binding get() = _binding!!
+
+    // Адаптер для RecyclerView, который будет отображать список фильмов
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
 
+    // Список фильмов - имитатор базы данных
     val filmsDataBase: List<Film> = listOf(
         Film(
             "Начало",
@@ -99,20 +106,23 @@ class HomeFragment : Fragment() {
         ),
     )
 
+    //Создаем и возвращаем иерархию представлений, связанную с фрагментом.
+    //Инициализируем View Binding.
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+    //Вызываем onCreatedView(), когда иерархия представлений фрагмента была создана.
+    //Инициализируем UI-элементы и обработчики событий.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         //Запускаем анимацию модуля 29
         AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 1)
-
         // Для модуля 27 (кнопка поиска)
         binding.searchView.setOnClickListener {
             binding.searchView.isIconified = false
@@ -168,6 +178,7 @@ class HomeFragment : Fragment() {
         })
     }
 
+    //Инициализируем RecyclerView: устанавливаем адаптер, LayoutManager и декоратор для отступов
     private fun initRecycler() {
         binding.mainRecycler.apply {
             filmsAdapter =
@@ -208,7 +219,15 @@ class HomeFragment : Fragment() {
             recyclerViewAnimator.start()
         }
     }
+
+    //Вызываем при уничтожении иерархии представлений фрагмента.
+    //Обнуляем _binding для предотвращения утечек памяти.
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null // Освобождаем _binding
+    }
 }
+
 
 //Метод, запускающий анимацию модуля 28 (вариант 2)
 //    private fun startHomeScreenAnimation() {
