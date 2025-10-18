@@ -2,9 +2,15 @@ package com.example.androidappfilmproject
 
 import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.transition.Scene
+import android.transition.Slide
+import android.transition.TransitionManager
+import android.transition.TransitionSet
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.SearchView
 import androidx.core.animation.doOnEnd
@@ -120,8 +126,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //Запускаем анимацию модуля 29
-        AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 1)
         // Для модуля 27 (кнопка поиска)
         binding.searchView.setOnClickListener {
             binding.searchView.isIconified = false
@@ -145,8 +149,7 @@ class HomeFragment : Fragment() {
                 //Фильтруем список на поиск подходящих сочетаний
                 val result = filmsDataBase.filter {
                     //Чтобы все работало правильно, нужно запросить имя фильма и приводить к нижнему регистру
-                    it.title.lowercase(Locale.getDefault())
-                        .contains(newText.lowercase(Locale.getDefault()))
+                    it.title.lowercase(Locale.getDefault()).contains(newText.lowercase(Locale.getDefault()))
                 }
                 //Добавляем в адаптер
                 filmsAdapter.submitList(result)
@@ -158,8 +161,12 @@ class HomeFragment : Fragment() {
         initRecycler()
         //Кладем нашу БД в RV
         filmsAdapter.submitList(filmsDataBase)
-        //Вызываем анимацию (модуль 28) после инициализации
+        //Вызываем анимацию после инициализации (вариант 1)
         //startHomeScreenAnimation(view)
+        //Вызываем анимацию после инициализации (вариант 2)
+        //startHomeScreenAnimation()
+        //Вызываем анимацию после инициализации (вариант 3)
+        startCustomAnimation()
 
 
         //Реализация скрытия поиска при скролле вниз и отображения при скролле вверх
@@ -177,7 +184,6 @@ class HomeFragment : Fragment() {
         })
     }
 
-    //Инициализируем RecyclerView: устанавливаем адаптер, LayoutManager и декоратор для отступов
     private fun initRecycler() {
         binding.mainRecycler.apply {
             filmsAdapter =
@@ -195,40 +201,35 @@ class HomeFragment : Fragment() {
             addItemDecoration(decorator)
         }
     }
-
-    //Метод, запускающий анимацию модуля 28 (вариант 3)
+     //Метод, запускающий анимацию (вариант 1)
 //    private fun startHomeScreenAnimation(view: View) {
-//        // Устанавливаем начальные значения прозрачности
-//        binding.searchView.alpha = 0f
-//        binding.mainRecycler.alpha = 0f
+//        val homeFragmentRoot = binding.root // Получаем root view из binding
 //
-//        // Анимация для SearchView
-//        val searchViewAnimator = ObjectAnimator.ofFloat(binding.searchView, "alpha", 0f, 1f)
-//        searchViewAnimator.duration = 500 // Длительность анимации в миллисекундах
-//        searchViewAnimator.interpolator = AccelerateDecelerateInterpolator() // Интерполяция
+//        view.viewTreeObserver.addOnGlobalLayoutListener(object :
+//            ViewTreeObserver.OnGlobalLayoutListener {
+//            override fun onGlobalLayout() {
+//                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
 //
-//        // Анимация для RecyclerView
-//        val recyclerViewAnimator = ObjectAnimator.ofFloat(binding.mainRecycler, "alpha", 0f, 1f)
-//        recyclerViewAnimator.duration = 500 // Длительность анимации в миллисекундах
-//        recyclerViewAnimator.interpolator = AccelerateDecelerateInterpolator() // Интерполяция
+//                val scene = Scene(
+//                    homeFragmentRoot as ViewGroup, // Явное приведение к ViewGroup
+//                    LayoutInflater.from(requireContext())
+//                        .inflate(R.layout.merge_home_screen_content, homeFragmentRoot as ViewGroup, false) // Явное приведение к ViewGroup
+//                )
 //
-//        // Запускаем анимации последовательно
-//        searchViewAnimator.start()
-//        searchViewAnimator.doOnEnd {
-//            recyclerViewAnimator.start()
-//        }
+//                val searchSlide = Slide(Gravity.TOP).addTarget(binding.searchView)
+//                val recyclerSlide = Slide(Gravity.BOTTOM).addTarget(binding.mainRecycler)
+//
+//                val customTransition = TransitionSet().apply {
+//                    duration = 500
+//                    addTransition(recyclerSlide)
+//                    addTransition(searchSlide)
+//                }
+//                TransitionManager.go(scene, customTransition)
+//            }
+//        })
 //    }
 
-    //Вызываем при уничтожении иерархии представлений фрагмента.
-    //Обнуляем _binding для предотвращения утечек памяти.
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null // Освобождаем _binding
-    }
-}
-
-
-//Метод, запускающий анимацию модуля 28 (вариант 2)
+    //Метод, запускающий анимацию (вариант 2)
 //    private fun startHomeScreenAnimation() {
 //        val homeFragmentRoot = binding.root
 //
@@ -259,37 +260,28 @@ class HomeFragment : Fragment() {
 //            binding.searchView.isIconified = false
 //        }
 //    }
+    //Метод, запускающий анимацию (вариант 3)
+    private fun startCustomAnimation() {
+        // Устанавливаем начальные значения прозрачности
+        binding.searchView.alpha = 0f
+        binding.mainRecycler.alpha = 0f
 
+        // Анимация для SearchView
+        val searchViewAnimator = ObjectAnimator.ofFloat(binding.searchView, "alpha", 0f, 1f)
+        searchViewAnimator.duration = 500 // Длительность анимации в миллисекундах
+        searchViewAnimator.interpolator = AccelerateDecelerateInterpolator() // Интерполяция
 
-//Метод, запускающий анимацию модуля 28 (вариант 1)
-//    private fun startHomeScreenAnimation(view: View) {
-//        val homeFragmentRoot = binding.root // Получаем root view из binding
-//
-//        view.viewTreeObserver.addOnGlobalLayoutListener(object :
-//            ViewTreeObserver.OnGlobalLayoutListener {
-//            override fun onGlobalLayout() {
-//                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-//
-//                val scene = Scene(
-//                    homeFragmentRoot as ViewGroup, // Явное приведение к ViewGroup
-//                    LayoutInflater.from(requireContext())
-//                        .inflate(R.layout.merge_home_screen_content, homeFragmentRoot as ViewGroup, false) // Явное приведение к ViewGroup
-//                )
-//
-//                val searchSlide = Slide(Gravity.TOP).addTarget(binding.searchView)
-//                val recyclerSlide = Slide(Gravity.BOTTOM).addTarget(binding.mainRecycler)
-//
-//                val customTransition = TransitionSet().apply {
-//                    duration = 500
-//                    addTransition(recyclerSlide)
-//                    addTransition(searchSlide)
-//                }
-//                TransitionManager.go(scene, customTransition)
-//            }
-//        })
-//    }
+        // Анимация для RecyclerView
+        val recyclerViewAnimator = ObjectAnimator.ofFloat(binding.mainRecycler, "alpha", 0f, 1f)
+        recyclerViewAnimator.duration = 500 // Длительность анимации в миллисекундах
+        recyclerViewAnimator.interpolator = AccelerateDecelerateInterpolator() // Интерполяция
 
-
-
+        // Запускаем анимации последовательно
+        searchViewAnimator.start()
+        searchViewAnimator.doOnEnd {
+            recyclerViewAnimator.start()
+        }
+    }
+}
 
 

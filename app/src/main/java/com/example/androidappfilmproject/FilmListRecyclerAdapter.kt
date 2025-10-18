@@ -37,31 +37,30 @@ class FilmListRecyclerAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(film: Film) {
-            // Очистка старого постера
-            Glide.with(itemView).clear(binding.poster)
-            binding.poster.setImageDrawable(null)
 
+//            binding.title.text = film.title
+//            binding.poster.setImageResource(film.poster)
+//            binding.description.text = film.description
+
+            // Для модуля 28:
+            //Устанавливаем заголовок
             binding.title.text = film.title
+            //Устанавливаем постер
+            //Указываем контейнер, в котором будет "жить" наша картинка
             Glide.with(itemView)
+                //Загружаем сам ресурс
                 .load(film.poster)
+                //Центруем изображение
                 .centerCrop()
+                //Указываем ImageView, куда будем загружать изображение
                 .into(binding.poster)
+            //Устанавливаем описание
             binding.description.text = film.description
-
-            val key = film.title // или film.id.toString(), если id уникален
-            val progress = (film.rating * 10).toInt().coerceIn(0, 100)
-
-            if (!animatedKeys.contains(key)) {
-                // первый раз для этого фильма — анимируем
-                binding.ratingDonut.setProgressAnimated(progress, 2000L)
-                animatedKeys.add(key)
-            } else {
-                // после анимации — ставим статично, чтобы при скролле не дергало
-                binding.ratingDonut.setProgress(progress)
-            }
         }
     }
 }
+
+
 // Вариант 3
 //class FilmListRecyclerAdapter(
 //
