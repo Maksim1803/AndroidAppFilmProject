@@ -12,7 +12,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewbinding.ViewBinding
 import com.example.androidappfilmproject.databinding.FragmentHomeBinding
 import java.util.Locale
 
@@ -198,27 +197,27 @@ class HomeFragment : Fragment() {
     }
 
     //Метод, запускающий анимацию модуля 28 (вариант 3)
-    private fun startHomeScreenAnimation(view: View) {
-        // Устанавливаем начальные значения прозрачности
-        binding.searchView.alpha = 0f
-        binding.mainRecycler.alpha = 0f
-
-        // Анимация для SearchView
-        val searchViewAnimator = ObjectAnimator.ofFloat(binding.searchView, "alpha", 0f, 1f)
-        searchViewAnimator.duration = 500 // Длительность анимации в миллисекундах
-        searchViewAnimator.interpolator = AccelerateDecelerateInterpolator() // Интерполяция
-
-        // Анимация для RecyclerView
-        val recyclerViewAnimator = ObjectAnimator.ofFloat(binding.mainRecycler, "alpha", 0f, 1f)
-        recyclerViewAnimator.duration = 500 // Длительность анимации в миллисекундах
-        recyclerViewAnimator.interpolator = AccelerateDecelerateInterpolator() // Интерполяция
-
-        // Запускаем анимации последовательно
-        searchViewAnimator.start()
-        searchViewAnimator.doOnEnd {
-            recyclerViewAnimator.start()
-        }
-    }
+//    private fun startHomeScreenAnimation(view: View) {
+//        // Устанавливаем начальные значения прозрачности
+//        binding.searchView.alpha = 0f
+//        binding.mainRecycler.alpha = 0f
+//
+//        // Анимация для SearchView
+//        val searchViewAnimator = ObjectAnimator.ofFloat(binding.searchView, "alpha", 0f, 1f)
+//        searchViewAnimator.duration = 500 // Длительность анимации в миллисекундах
+//        searchViewAnimator.interpolator = AccelerateDecelerateInterpolator() // Интерполяция
+//
+//        // Анимация для RecyclerView
+//        val recyclerViewAnimator = ObjectAnimator.ofFloat(binding.mainRecycler, "alpha", 0f, 1f)
+//        recyclerViewAnimator.duration = 500 // Длительность анимации в миллисекундах
+//        recyclerViewAnimator.interpolator = AccelerateDecelerateInterpolator() // Интерполяция
+//
+//        // Запускаем анимации последовательно
+//        searchViewAnimator.start()
+//        searchViewAnimator.doOnEnd {
+//            recyclerViewAnimator.start()
+//        }
+//    }
 
     //Вызываем при уничтожении иерархии представлений фрагмента.
     //Обнуляем _binding для предотвращения утечек памяти.
