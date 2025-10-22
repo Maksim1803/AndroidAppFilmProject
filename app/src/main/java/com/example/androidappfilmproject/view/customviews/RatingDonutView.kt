@@ -1,4 +1,4 @@
-package com.example.androidappfilmproject
+package com.example.androidappfilmproject.view.customviews
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -6,14 +6,15 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
-import android.graphics.Typeface
 import androidx.core.animation.doOnEnd
+import com.example.androidappfilmproject.R
 
 class RatingDonutView @JvmOverloads constructor(context: Context,
-attrs: AttributeSet? = null
+                                                attrs: AttributeSet? = null
 ) : View(context, attrs) {
     //Овал для рисования сегментов прогресс бара
     // Овал для рисования сегментов прогресс бара

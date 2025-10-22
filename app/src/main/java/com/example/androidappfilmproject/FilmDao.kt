@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.androidappfilmproject.domain.Film
 import kotlinx.coroutines.flow.Flow
 
 // Создаем интерфейс FilmDao, который определяет методы для доступа к базе данных

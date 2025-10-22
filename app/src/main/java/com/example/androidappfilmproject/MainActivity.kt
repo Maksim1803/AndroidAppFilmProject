@@ -5,6 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
+import com.example.androidappfilmproject.domain.Film
+import com.example.androidappfilmproject.view.fragments.FavoritesFragment
+import com.example.androidappfilmproject.view.fragments.HomeFragment
+import com.example.androidappfilmproject.view.fragments.SelectionsFragment
+import com.example.androidappfilmproject.view.fragments.SplashFragment
+import com.example.androidappfilmproject.view.fragments.WatchLaterFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

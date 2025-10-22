@@ -66,30 +66,30 @@ dependencies {
     // AdapterDelegate
     implementation ("com.hannesdorfmann:adapterdelegates4-kotlin-dsl:4.3.2")
     //MaterialDesign
-    implementation ("com.google.android.material:material:1.12.0")
+    implementation ("com.google.android.material:material:1.13.0")
     //Coordinator layout
     implementation ("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
 
     //Новые библиотеки для создания базы данных модуля 26
     // Room components
-    implementation ("androidx.room:room-runtime:2.7.2")
-    implementation ("androidx.room:room-ktx:2.7.2") // Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-paging:2.7.2")
-    annotationProcessor ("androidx.room:room-compiler:2.7.2")
+    implementation ("androidx.room:room-runtime:2.8.3")
+    implementation ("androidx.room:room-ktx:2.8.3") // Kotlin Extensions and Coroutines support for Room
+    implementation("androidx.room:room-paging:2.8.3")
+    annotationProcessor ("androidx.room:room-compiler:2.8.3")
     //kapt("androidx.room:room-compiler:2.7.2")
 
     // Lifecycle components
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.1")
-    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.9.1")
-    implementation ("androidx.lifecycle:lifecycle-common-java8:2.9.1")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.9.4")
+    implementation ("androidx.lifecycle:lifecycle-common-java8:2.9.4")
 
     // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
     //Новые библиотеки для создания анимации для модуля 28
     //Glide
-    implementation ("com.github.bumptech.glide:glide:4.16.0")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
+    implementation ("com.github.bumptech.glide:glide:5.0.5")
+    annotationProcessor ("com.github.bumptech.glide:compiler:5.0.5")
 }
 

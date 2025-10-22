@@ -1,4 +1,4 @@
-package com.example.androidappfilmproject
+package com.example.androidappfilmproject.domain
 
 import android.os.Parcelable
 import androidx.room.Entity

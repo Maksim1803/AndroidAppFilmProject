@@ -1,18 +1,21 @@
-package com.example.androidappfilmproject
+package com.example.androidappfilmproject.view.fragments
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.SearchView
-import androidx.core.animation.doOnEnd
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.androidappfilmproject.utils.AnimationHelper
+import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapter
+import com.example.androidappfilmproject.MainActivity
+import com.example.androidappfilmproject.R
+import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
 import com.example.androidappfilmproject.databinding.FragmentHomeBinding
+import com.example.androidappfilmproject.domain.Film
 import java.util.Locale
 
 class HomeFragment : Fragment() {
@@ -121,7 +124,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         //Запускаем анимацию модуля 29
-        AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 1)
+        AnimationHelper.Companion.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 1)
         // Для модуля 27 (кнопка поиска)
         binding.searchView.setOnClickListener {
             binding.searchView.isIconified = false
@@ -226,70 +229,3 @@ class HomeFragment : Fragment() {
         _binding = null // Освобождаем _binding
     }
 }
-
-
-//Метод, запускающий анимацию модуля 28 (вариант 2)
-//    private fun startHomeScreenAnimation() {
-//        val homeFragmentRoot = binding.root
-//
-//        // Создаем сцену из layout через биндинг
-//        val scene = Scene.getSceneForLayout(
-//            homeFragmentRoot,
-//            R.layout.merge_home_screen_content,
-//            requireContext()
-//        )
-//
-//        // Создаем анимацию выезда поля поиска сверху
-//        val searchSlide = Slide(Gravity.TOP).addTarget(binding.searchView)
-//        // Создаем анимацию выезда RecyclerView снизу
-//        val recyclerSlide = Slide(Gravity.BOTTOM).addTarget(binding.mainRecycler)
-//
-//        // Объединяем анимации
-//        val customTransition = TransitionSet().apply {
-//            duration = 500
-//            addTransition(recyclerSlide)
-//            addTransition(searchSlide)
-//        }
-//
-//        // Запускаем переход
-//        TransitionManager.go(scene, customTransition)
-//
-//        // Обработка клика по поисковому полю
-//        binding.searchView.setOnClickListener {
-//            binding.searchView.isIconified = false
-//        }
-//    }
-
-
-//Метод, запускающий анимацию модуля 28 (вариант 1)
-//    private fun startHomeScreenAnimation(view: View) {
-//        val homeFragmentRoot = binding.root // Получаем root view из binding
-//
-//        view.viewTreeObserver.addOnGlobalLayoutListener(object :
-//            ViewTreeObserver.OnGlobalLayoutListener {
-//            override fun onGlobalLayout() {
-//                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-//
-//                val scene = Scene(
-//                    homeFragmentRoot as ViewGroup, // Явное приведение к ViewGroup
-//                    LayoutInflater.from(requireContext())
-//                        .inflate(R.layout.merge_home_screen_content, homeFragmentRoot as ViewGroup, false) // Явное приведение к ViewGroup
-//                )
-//
-//                val searchSlide = Slide(Gravity.TOP).addTarget(binding.searchView)
-//                val recyclerSlide = Slide(Gravity.BOTTOM).addTarget(binding.mainRecycler)
-//
-//                val customTransition = TransitionSet().apply {
-//                    duration = 500
-//                    addTransition(recyclerSlide)
-//                    addTransition(searchSlide)
-//                }
-//                TransitionManager.go(scene, customTransition)
-//            }
-//        })
-//    }
-
-
-
-
-

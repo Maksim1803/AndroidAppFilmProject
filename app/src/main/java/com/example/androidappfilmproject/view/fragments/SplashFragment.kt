@@ -1,13 +1,15 @@
-package com.example.androidappfilmproject
+package com.example.androidappfilmproject.view.fragments
 
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.fragment.app.Fragment
+import com.example.androidappfilmproject.MainActivity
+import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.databinding.FragmentSplashBinding
 
 class SplashFragment : Fragment() {

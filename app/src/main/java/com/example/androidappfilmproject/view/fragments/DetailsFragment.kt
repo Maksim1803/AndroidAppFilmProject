@@ -1,96 +1,19 @@
-package com.example.androidappfilmproject
+package com.example.androidappfilmproject.view.fragments
 
-import android.app.Application
 import android.content.Intent
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
 import com.example.androidappfilmproject.domain.Film
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-
-//Класс для доступа к базе данных вариант 3 (рабочий)
-
-class App : Application() {
-
-    companion object {
-        lateinit var instance: App
-            private set
-        val favoriteFilms = HashSet<Film>() // Храним избранные фильмы в памяти
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        instance = this
-    }
-}
-//Класс для доступа к базе данных вариант 2
-//class App : Application() {
-//
-//    // Объявление переменной для хранения экземпляра базы данных, где
-//    // lateinit - указывает, что переменная будет инициализирована позже
-//    lateinit var db: AppDatabase // AppDatabase - тип переменной (класс - база данных)
-//        private set // обеспечивает доступ к переменной только для чтения извне класса
-//
-//    // Метод, вызываемый при создании приложения
-//    override fun onCreate() {
-//        super.onCreate() // Вызов родительского класса
-//        instance = this
-//        db = Room.databaseBuilder(
-//            applicationContext,
-//            AppDatabase::class.java,
-//            "film_database" // Имя базы данных
-//        ).build()
-//        // Запускаем корутину для добавления фильмов в базу данных
-//        CoroutineScope(Dispatchers.IO).launch {
-//            val filmDao = db.filmDao()
-//            // Проверяем, есть ли фильмы в базе данных
-//            if (filmDao.getAllFilms().firstOrNull()?.isEmpty() == true) {
-//                // Добавляем фильмы из filmsDataBase в базу данных
-//                HomeFragment().filmsDataBase.forEach { film ->
-//                    filmDao.insert(film)
-//                }
-//            }
-//        }
-//    }
-//
-//    // Статический объект для статических переменных и методов
-//    companion object {
-//        lateinit var instance: App // App - тип переменной (сам класс App)
-//            private set
-//    }
-//}
-
-//Класс для доступа к базе данных вариант 1
-//class App : Application() {
-//
-//    // Объявление переменной для хранения экземпляра базы данных, где
-//    // lateinit - указывает, что переменная будет инициализирована позже
-//    lateinit var db: AppDatabase // AppDatabase - тип переменной (класс - база данных)
-//        private set // обеспечивает доступ к переменной только для чтения извне класса
-//
-//    // Метод, вызываемый при создании приложения
-//    override fun onCreate() {
-//        super.onCreate() // Вызов родительского класса
-//        instance = this
-//        db = Room.databaseBuilder(
-//            applicationContext,
-//            AppDatabase::class.java,
-//            "film_database" // Имя базы данных
-//        ).build()
-//    }
-//    // Статический объект для статических переменных и методов
-//    companion object {
-//        lateinit var instance: App // App - тип переменной (сам класс App)
-//            private set
-//    }
-//}
 
 class DetailsFragment : Fragment() {
     // View Binding для доступа к элементам разметки фрагмента
@@ -113,8 +36,8 @@ class DetailsFragment : Fragment() {
         return binding.root // Возвращаем корневую View, полученную из binding
     }
 
-     //Вызываем onCreatedView(), когда иерархия представлений фрагмента была создана.
-     //Инициализируем UI-элементы и обработчики событий.
+    //Вызываем onCreatedView(), когда иерархия представлений фрагмента была создана.
+    //Инициализируем UI-элементы и обработчики событий.
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -167,12 +90,12 @@ class DetailsFragment : Fragment() {
         binding.detailsFab.setOnClickListener {
             film?.let {
                 val intent = Intent().apply {
-                    Intent.setAction = Intent.ACTION_SEND
+                    action = Intent.ACTION_SEND
                     putExtra(
                         Intent.EXTRA_TEXT,
                         "Check out this film: ${it.title}\n\n${it.description}"
                     )
-                    Intent.setType = "text/plain"
+                    type = "text/plain"
                 }
                 startActivity(Intent.createChooser(intent, "Share To:"))
             }
@@ -180,8 +103,8 @@ class DetailsFragment : Fragment() {
     }
 
 
-     //Обновляем UI-элементы фрагмента данными текущего фильма.
-     //Запускаем в корутине жизненного цикла View для безопасного доступа к UI.
+    //Обновляем UI-элементы фрагмента данными текущего фильма.
+    //Запускаем в корутине жизненного цикла View для безопасного доступа к UI.
 
     private fun setFilmsDetails() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -205,11 +128,12 @@ class DetailsFragment : Fragment() {
         }
     }
 
-     //Вызываем при уничтожении иерархии представлений фрагмента.
-     //Обнуляем _binding для предотвращения утечек памяти.
+    //Вызываем при уничтожении иерархии представлений фрагмента.
+    //Обнуляем _binding для предотвращения утечек памяти.
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
+

@@ -9,7 +9,7 @@
     android:visibility="invisible"
     tools:visibility="visible"
     android:background="@drawable/corner_background"
-    tools:context=".HomeFragment">
+    tools:context=".view.fragments.HomeFragment">
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_view"
