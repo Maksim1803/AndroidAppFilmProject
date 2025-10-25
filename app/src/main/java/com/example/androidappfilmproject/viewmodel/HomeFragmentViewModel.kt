@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.example.androidappfilmproject.domain.Film
 import com.example.androidappfilmproject.domain.Interactor
 
-class HomeFragmentViewModel(private val interactor: Interactor) : ViewModel() {
+class HomeFragmentViewModel(interactor: Interactor) : ViewModel() {
 
     val filmsListLiveData = MutableLiveData<List<Film>>()
 

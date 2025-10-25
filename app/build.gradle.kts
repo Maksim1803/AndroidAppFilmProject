@@ -1,6 +1,4 @@
-import com.android.build.gradle.internal.utils.isKotlinKaptPluginApplied
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.model.Kapt
 
 plugins {
     alias(libs.plugins.android.application)
