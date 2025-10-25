@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
     //плагин для чтения документации проекта
-    id ("org.jetbrains.dokka") version "2.1.0"
+//    id ("org.jetbrains.dokka") version "2.1.0"
 
 
     //    id ("kotlin-parcelize")
@@ -55,11 +55,11 @@ android {
 
 
 
-dokka {
-
-    // Конфигурация для dokka:
-
-    }
+//dokka {
+//
+//    // Конфигурация для dokka:
+//
+//    }
 
         dependencies {
 
