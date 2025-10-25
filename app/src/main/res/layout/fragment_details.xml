@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".DetailsFragment">
+    tools:context=".view.fragments.DetailsFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
@@ -85,7 +85,7 @@
         android:translationX="-120dp"
         android:translationY="-10dp"/>
 
-    <com.example.androidappfilmproject.RatingDonutView
+    <com.example.androidappfilmproject.view.customviews.RatingDonutView
         android:id="@+id/ratingDonut"
         android:layout_width="50dp"
         android:layout_height="50dp"

@@ -1,22 +1,29 @@
 package com.example.androidappfilmproject.view.fragments
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SearchView
+import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.appcompat.widget.SearchView
+import androidx.core.animation.doOnEnd
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.androidappfilmproject.utils.AnimationHelper
-import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapter
+import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.MainActivity
-import com.example.androidappfilmproject.R
-import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
 import com.example.androidappfilmproject.databinding.FragmentHomeBinding
 import com.example.androidappfilmproject.domain.Film
+import com.example.androidappfilmproject.utils.AnimationHelper
+import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapter
+import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
+import com.example.androidappfilmproject.viewmodel.HomeFragmentViewModel
 import java.util.Locale
+
 
 class HomeFragment : Fragment() {
 
@@ -25,91 +32,46 @@ class HomeFragment : Fragment() {
     // Не-null доступ к binding между onCreateView и onDestroyView
     private val binding get() = _binding!!
 
+    // Флаг, чтобы анимация запускалась только при первой загрузке
+    private var isDataLoadedAndAnimated = false
+
     // Адаптер для RecyclerView, который будет отображать список фильмов
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
 
-    // Список фильмов - имитатор базы данных
-    val filmsDataBase: List<Film> = listOf(
-        Film(
-            "Начало",
-            R.drawable.nachalo,
-            "Вору, который крадёт секреты с помощью технологии обмена снами, поручают задачу: внедрить идею в сознание гендиректора, но его трагическое прошлое может привести всё к катастрофе.",
-            9.7f
-        ),
-        Film(
-            "Грешники",
-            R.drawable.greshniki,
-            "Пытаясь оставить позади свою неспокойную жизнь, братья-близнецы возвращаются в родной город, и убеждаются, что здесь их ждёт ещё большее зло.",
-            5.7f
-        ),
-        Film(
-            "Один дома",
-            R.drawable.homealone,
-            "Американское семейство отправляется из Чикаго в Европу, но в спешке сборов бестолковые родители забывают дома одного из своих детей. Юное создание, однако, не теряется и демонстрирует чудеса изобретательности...",
-            8.7f
-        ),
-        Film(
-            "Под огнем",
-            R.drawable.podognem,
-            "Взвод «морских котиков» отправляется на опасную миссию в Ирак, и рассказывает о хаосе и братстве на войне, вспоминая об этом событии.",
-            5.3f
-        ),
-        Film(
-            "Субстанция",
-            R.drawable.substance,
-            "Увядающая знаменитость принимает препарат с чёрного рынка, который воспроизводит клетки и создаёт более молодую и привлекательную версию самой себя.",
-            6.7f
-        ),
-        Film(
-            "Запертый",
-            R.drawable.locked,
-            "Вор, забравшийся в роскошный внедорожник, понимает, что попал в изощрённую игру в психологический хоррор.",
-            7.5f
-        ),
-        Film(
-            "Компаньон",
-            R.drawable.companion,
-            "Отдых на выходных с друзьями превращается в хаос после того, как выясняется, что один из гостей не тот, за кого себя выдает.",
-            4.7f
-        ),
-        Film(
-            "Ущелье",
-            R.drawable.ushelie,
-            "Когда появляется зло, они должны действовать сообща, чтобы выжить и противостоять тому, что внутри.",
-            6.7f,
-        ),
-        Film(
-            "Интерстеллар",
-            R.drawable.interstellar,
-            "Когда человечество своим образом жизни пришло к продовольственному кризису, коллектив учёных отправляется сквозь черную дыру (которая соединяет области пространства-времени через большое расстояние) в путешествие, чтобы найти планету с подходящими для человечества условиями жизни.",
-            8.8f,
-        ),
-        Film(
-            "Хищник",
-            R.drawable.hishnik,
-            "Для освобождения американских граждан элитная группа спецназа направлена в джунгли. Там, видавшим многое бойцам, предстоит встретиться с невероятным ужасом.",
-            8.3f
-        ),
-        Film(
-            "Топган",
-            R.drawable.topgun,
-            "Очень крутой боевик с Томом Крузом в главной роли. ", 8.7f
-        ),
-        Film(
-            "Анора",
-            R.drawable.anora,
-            "Молодая стриптизерша из Бруклина знакомится с сыном олигарха и выходит за него замуж. Как только новость доходит до его родителей, её сказке приходит конец.",
-            5.5f
-        ),
-        Film(
-            "Индиана Джонс",
-            R.drawable.indianajones,
-            "Крутой, можно сказать христоматийный приключенческий боевик", 8.7f
-        ),
-    )
+    // Ленивая инициализация ViewModel
 
-    //Создаем и возвращаем иерархию представлений, связанную с фрагментом.
-    //Инициализируем View Binding.
+   // private val viewModel: HomeFragmentViewModel by viewModels()
+   // Ленивая инициализация ViewModel
+   private val viewModel: HomeFragmentViewModel by viewModels {
+   // Анонимный ViewModelProvider.Factory
+       object : ViewModelProvider.Factory {
+           override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+               if (modelClass.isAssignableFrom(HomeFragmentViewModel::class.java)) {
+
+                   // Безопасно получаем interactor через статический App.instance
+                   val interactor = App.instance.interactor
+
+                   @Suppress("UNCHECKED_CAST")
+                   // Предполагается, что HomeFragmentViewModel имеет конструктор (interactor: Interactor)
+                   return HomeFragmentViewModel(interactor) as T
+               }
+               throw IllegalArgumentException("Unknown ViewModel class")
+           }
+       }
+   }
+
+    // Переменная для хранения списка фильмов, который будет обновляться из ViewModel
+    private var filmsDataBase = listOf<Film>()
+        // Используем backing field для обновления списка и адаптера RecyclerView
+        set(value) {
+            // Если придет такое же значение, то мы выходим из метода
+            if (field == value) return
+            // Если пришло другое значение, то кладем его в переменную
+            field = value
+            // Обновляем RV адаптер
+            filmsAdapter.submitList(field) // Используем submitList вместо addItems, так как submitList более эффективен для DiffUtil
+        }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -118,69 +80,62 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    //Вызываем onCreatedView(), когда иерархия представлений фрагмента была создана.
-    //Инициализируем UI-элементы и обработчики событий.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //Запускаем анимацию модуля 29
-        AnimationHelper.Companion.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 1)
-        // Для модуля 27 (кнопка поиска)
+
+
+        AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 1)
+
         binding.searchView.setOnClickListener {
             binding.searchView.isIconified = false
         }
 
-        //Подключаем слушателя изменений введенного текста в поиск
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
-            androidx.appcompat.widget.SearchView.OnQueryTextListener {
-            //Этот метод отрабатывает при нажатии кнопки "поиск" на софт клавиатуре
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return true
             }
 
-            //Этот метод отрабатывает на каждое изменения текста
             override fun onQueryTextChange(newText: String): Boolean {
-                //Если ввод пуст то вставляем в адаптер всю БД
                 if (newText.isEmpty()) {
                     filmsAdapter.submitList(filmsDataBase)
                     return true
                 }
-                //Фильтруем список на поиск подходящих сочетаний
                 val result = filmsDataBase.filter {
-                    //Чтобы все работало правильно, нужно запросить имя фильма и приводить к нижнему регистру
                     it.title.lowercase(Locale.getDefault())
                         .contains(newText.lowercase(Locale.getDefault()))
                 }
-                //Добавляем в адаптер
                 filmsAdapter.submitList(result)
                 return true
             }
         })
 
-        //находим наш RV
         initRecycler()
-        //Кладем нашу БД в RV
-        filmsAdapter.submitList(filmsDataBase)
-        //Вызываем анимацию (модуль 28) после инициализации
-        //startHomeScreenAnimation(view)
 
 
-        //Реализация скрытия поиска при скролле вниз и отображения при скролле вверх
+        // Подписываемся на изменения LiveData из ViewModel
+        viewModel.filmsListLiveData.observe(viewLifecycleOwner) { films ->
+            filmsDataBase = films // Обновление списка
+
+            // Вызов метода startHomeScreenAnimation() отвечающего за анимацию при запуске программы
+            if (!isDataLoadedAndAnimated && films.isNotEmpty()) {
+                startHomeScreenAnimation()
+                isDataLoadedAndAnimated = true
+            }
+        }
+
         binding.mainRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0 && binding.searchView.isVisible) {
-                    // Скролл вниз
                     binding.searchView.visibility = View.GONE
                 } else if (dy < 0 && !binding.searchView.isVisible) {
-                    // Скролл вверх
                     binding.searchView.visibility = View.VISIBLE
                 }
             }
         })
     }
 
-    //Инициализируем RecyclerView: устанавливаем адаптер, LayoutManager и декоратор для отступов
     private fun initRecycler() {
         binding.mainRecycler.apply {
             filmsAdapter =
@@ -189,16 +144,37 @@ class HomeFragment : Fragment() {
                         (requireActivity() as MainActivity).launchDetailsFragment(film)
                     }
                 })
-            //Присваиваем адаптер
             adapter = filmsAdapter
-            //Присвоим layoutmanager
             layoutManager = LinearLayoutManager(requireContext())
-            //Применяем декоратор для отступов
             val decorator = TopSpacingItemDecoration(8)
             addItemDecoration(decorator)
         }
     }
 
+    // Метод, запускающий анимацию экрана при первом запуске программы
+    private fun startHomeScreenAnimation() {
+        binding.searchView.alpha = 0f
+        binding.mainRecycler.alpha = 0f
+
+        val searchViewAnimator = ObjectAnimator.ofFloat(binding.searchView, "alpha", 0f, 1f)
+        searchViewAnimator.duration = 500
+        searchViewAnimator.interpolator = AccelerateDecelerateInterpolator()
+
+        val recyclerViewAnimator = ObjectAnimator.ofFloat(binding.mainRecycler, "alpha", 0f, 1f)
+        recyclerViewAnimator.duration = 500
+        recyclerViewAnimator.interpolator = AccelerateDecelerateInterpolator()
+
+        searchViewAnimator.start()
+        searchViewAnimator.doOnEnd {
+            recyclerViewAnimator.start()
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}
     //Метод, запускающий анимацию модуля 28 (вариант 3)
 //    private fun startHomeScreenAnimation(view: View) {
 //        // Устанавливаем начальные значения прозрачности
@@ -222,10 +198,3 @@ class HomeFragment : Fragment() {
 //        }
 //    }
 
-    //Вызываем при уничтожении иерархии представлений фрагмента.
-    //Обнуляем _binding для предотвращения утечек памяти.
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null // Освобождаем _binding
-    }
-}

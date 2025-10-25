@@ -1,6 +1,7 @@
 package com.example.androidappfilmproject.view.fragments
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -42,16 +43,35 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Получаем объект фильма из аргументов фрагмента
+//        // Получаем объект фильма из аргументов фрагмента
+//        val args = arguments
+//        film = args?.getParcelable<Film>("film")
+//        // Если фильм не был передан, показываем ошибку и закрываем Activity
+//        if (film == null) {
+//            Snackbar.make(binding.root, "Ошибка: Фильм не найден", Snackbar.LENGTH_SHORT).show()
+//            activity?.finish()
+//            return
+//        }
+
+        // Получаем аргументы
         val args = arguments
-        film = args?.getParcelable<Film>("film")
+
+        // Исправление модуля 33: безопасное получение Parcelable
+        film = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // ✅ НОВЫЙ МЕТОД (для API 33+): явно передаем класс Film
+            args?.getParcelable("film", Film::class.java)
+        } else {
+            // Старый метод (для API < 33): используем @Suppress, чтобы убрать предупреждение
+            @Suppress("DEPRECATION")
+            args?.getParcelable("film")
+        }
+
         // Если фильм не был передан, показываем ошибку и закрываем Activity
         if (film == null) {
             Snackbar.make(binding.root, "Ошибка: Фильм не найден", Snackbar.LENGTH_SHORT).show()
             activity?.finish()
             return
         }
-
         // Настраиваем Toolbar для отображения навигации "назад"
         (activity as? AppCompatActivity)?.setSupportActionBar(binding.detailsToolbar)
         (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)

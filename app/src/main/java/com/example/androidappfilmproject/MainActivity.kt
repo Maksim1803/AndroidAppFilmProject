@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
 import com.example.androidappfilmproject.domain.Film
+import com.example.androidappfilmproject.view.fragments.DetailsFragment
 import com.example.androidappfilmproject.view.fragments.FavoritesFragment
 import com.example.androidappfilmproject.view.fragments.HomeFragment
 import com.example.androidappfilmproject.view.fragments.SelectionsFragment
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         val bundle = Bundle().apply {
             putParcelable("film", film)
         }
-        val fragment = DetailsFragment().apply {
+        val fragment  = DetailsFragment().apply {
             arguments = bundle
         }
     // Заменяем текущий фрагмент на DetailsFragment
@@ -82,7 +83,7 @@ class MainActivity : AppCompatActivity() {
     }
     // Инициализация навигации по нижнему меню
     private fun initNavigation() {
-        binding.bottomNavigation?.setOnNavigationItemSelectedListener { item ->
+        binding.bottomNavigation?.setOnItemSelectedListener { item ->
             when (item.itemId) {
 
                 R.id.home -> {
