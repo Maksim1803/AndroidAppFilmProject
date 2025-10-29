@@ -141,13 +141,3 @@ class MainActivity : AppCompatActivity() {
 //    fun onClickToast5(view: View) {
 //        Toast.makeText(this, "Настройки для корректной работы", Toast.LENGTH_SHORT).show()
 //    }
-
-
-
-
-
-
-
-
-
-
