@@ -111,6 +111,11 @@ android {
             implementation("androidx.activity:activity-ktx:1.11.0")// Для activityViewModels() в активностях (если нужно)
             implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")// Для ViewModelScope и других KTX расширений
             implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.4")// Для LiveData KTX расширений
+
+            //Новые библиотеки для работы с БД для модуля 35
+            implementation("com.squareup.retrofit2:retrofit:3.0.0") //рертофит
+            implementation("com.squareup.retrofit2:converter-gson:3.0.0") //конвертер
+            implementation("com.squareup.okhttp3:logging-interceptor:5.3.0") //логгер
         }
 
 

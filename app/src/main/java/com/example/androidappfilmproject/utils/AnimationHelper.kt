@@ -1,6 +1,5 @@
 package com.example.androidappfilmproject.utils
 
-import android.animation.Animator
 import android.app.Activity
 import android.view.View
 import android.view.ViewAnimationUtils
@@ -8,7 +7,6 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import java.util.concurrent.Executors
 import kotlin.math.hypot
 import kotlin.math.roundToInt
-import kotlin.time.Duration
 
 // Вариант без биндингов:
  class AnimationHelper {
