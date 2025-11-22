@@ -11,42 +11,40 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.MainActivity
-import com.example.androidappfilmproject.databinding.FragmentFavoritesBinding
+import com.example.androidappfilmproject.databinding.FragmentDemoBinding
 import com.example.androidappfilmproject.domain.Film
-import com.example.androidappfilmproject.utils.AnimationHelper
 import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapterNew
 import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
-import com.example.androidappfilmproject.viewmodel.FavoritesFragmentViewModel
+import com.example.androidappfilmproject.viewmodel.DemoFragmentViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-// Создаем класс FavoritesFragment, который отвечает за отображение списка избранных фильмов.
-class FavoritesFragment : Fragment() {
-
+// Создаем класс DemoFragment, который отвечает за отображение
+// демонстрационного списка фильмов.
+class DemoFragment : Fragment() {
     // Переменная для хранения экземпляра биндинга (nullable)
-    private var _binding: FragmentFavoritesBinding? = null
-    // Свойство для доступа к биндингу, которое гарантирует,
-    // что он не будет null после onCreateView
+    private var _binding: FragmentDemoBinding? = null
+    // Свойство для доступа к биндингу, которое гарантирует, что он не будет null после onCreateView
     private val binding get() = _binding!!
 
-    // Адаптер для RecyclerView
-    private lateinit var filmsAdapter: FilmListRecyclerAdapterNew
-
     // Инициализация ViewModel с помощью делегата viewModels и кастомной фабрики
-    private val viewModel: FavoritesFragmentViewModel by viewModels {
+    private val viewModel: DemoFragmentViewModel by viewModels {
         object : ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                if (modelClass.isAssignableFrom(FavoritesFragmentViewModel::class.java)) {
+                if (modelClass.isAssignableFrom(DemoFragmentViewModel::class.java)) {
                     // Получаем Interactor из синглтона App
                     val interactor = App.instance.interactor
                     @Suppress("UNCHECKED_CAST")
-                    // Создаем экземпляр FavoritesFragmentViewModel
-                    return FavoritesFragmentViewModel(interactor) as T
+                    // Создаем экземпляр DemoFragmentViewModel
+                    return DemoFragmentViewModel(interactor) as T
                 }
                 throw IllegalArgumentException("Unknown ViewModel class")
             }
         }
     }
+
+    // Адаптер для RecyclerView
+    private lateinit var filmsAdapter: FilmListRecyclerAdapterNew
 
     // Метод для создания и возвращения View фрагмента
     override fun onCreateView(
@@ -54,8 +52,7 @@ class FavoritesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // Инициализируем биндинг
-        _binding = FragmentFavoritesBinding.inflate(inflater, container, false)
-        // Возвращаем корневой View макета
+        _binding = FragmentDemoBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -63,36 +60,31 @@ class FavoritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //Запускаем анимацию появления фрагмента
-        AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 2)
-
-        // Инициализация адаптера RecyclerView с обработчиками кликов
+        // Инициализируем адаптер RecyclerView
         filmsAdapter = FilmListRecyclerAdapterNew(object : FilmListRecyclerAdapterNew.OnItemClickListener {
             // Обработчик клика по элементу списка
             override fun click(film: Film) {
                 // Запускаем фрагмент с деталями фильма
-                (requireActivity() as MainActivity).launchDetailsFragment(film)
+                (requireActivity() as MainActivity).launchLocalDetailsFragment(film)
             }
 
             // Обработчик клика по иконке "избранное"
             override fun onFavoriteClick(film: Film) {
-                // Сообщаем ViewModel о клике
-                viewModel.onFavoriteClicked(film)
+                // Можно добавить обработку, если нужно
             }
         })
 
-        // Настройка RecyclerView
-        binding.favoritesRecycler.apply {
+        // Настраиваем RecyclerView
+        binding.demoRecycler.apply {
             adapter = filmsAdapter
             layoutManager = LinearLayoutManager(requireContext())
             // Добавляем отступы между элементами
-            val decorator = TopSpacingItemDecoration(8)
-            addItemDecoration(decorator)
+            addItemDecoration(TopSpacingItemDecoration(8))
         }
 
-        // Запускаем корутину для наблюдения за потоком избранных фильмов из ViewModel
+        // Запускаем корутину для наблюдения за потоком фильмов из ViewModel
         lifecycleScope.launch {
-            viewModel.favoriteFilms.collectLatest { films ->
+            viewModel.films.collectLatest { films ->
                 // Передаем список фильмов в адаптер
                 filmsAdapter.submitList(films)
             }
@@ -102,7 +94,7 @@ class FavoritesFragment : Fragment() {
     // Метод, вызываемый при уничтожении View фрагмента
     override fun onDestroyView() {
         super.onDestroyView()
-        // Очищаем ссылку на биндинг для предотвращения утечек памяти
+        // Очищаем ссылку на биндинг, чтобы избежать утечек памяти
         _binding = null
     }
 }

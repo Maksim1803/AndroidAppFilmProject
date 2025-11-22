@@ -3,36 +3,41 @@ package com.example.androidappfilmproject
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
 import com.example.androidappfilmproject.domain.Film
+import com.example.androidappfilmproject.view.fragments.DemoFragment
 import com.example.androidappfilmproject.view.fragments.DetailsFragment
 import com.example.androidappfilmproject.view.fragments.FavoritesFragment
 import com.example.androidappfilmproject.view.fragments.HomeFragment
+import com.example.androidappfilmproject.view.fragments.LocalDetailsFragment
 import com.example.androidappfilmproject.view.fragments.SelectionsFragment
 import com.example.androidappfilmproject.view.fragments.SplashFragment
 import com.example.androidappfilmproject.view.fragments.WatchLaterFragment
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+// Класс MainActivity, который является главным в приложении.
 class MainActivity : AppCompatActivity() {
 
-    // Объявляем переменную binding
+    // Объявляем переменную для хранения экземпляра биндинга
     private lateinit var binding: ActivityMainBinding
 
+    // Метод, вызываемый при создании активности
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Очистка кеша Glide (один раз при старте приложения)
         Glide.get(this).clearMemory()
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             Glide.get(this@MainActivity).clearDiskCache()
         }
-        // Инициализируем binding
+        // Инициализируем биндинг
         binding = ActivityMainBinding.inflate(layoutInflater)
+        // Устанавливаем макет для активности
         setContentView(binding.root)
-        // Запускаем нижнее навигационное меню
+        // Запускаем инициализацию нижнего навигационного меню
         initNavigation()
 
         // Запускаем фрагмент при старте
@@ -40,55 +45,71 @@ class MainActivity : AppCompatActivity() {
             setFragmentBackground(R.drawable.corner_background)
             supportFragmentManager
                 .beginTransaction()
-                .add(it.id, SplashFragment())
+                .add(it.id, SplashFragment()) // Добавляем SplashFragment в контейнер
              // .addToBackStack(null)
                 .commit()
         }
     }
 
-    // Запускаем фоновый ресурс для контейнера фрагмента
+    // Метод для установки фонового ресурса для контейнера фрагмента
     private fun setFragmentBackground(colorResId: Int) {
         binding.fragmentPlaceholder?.setBackgroundResource(colorResId)
     }
 
-    // Запускаем фрагмент с деталями фильма
+    // Метод для запуска фрагмента с деталями фильма
     fun launchDetailsFragment(film: Film) {
         val bundle = Bundle().apply {
-            putParcelable("film", film)
+            putParcelable("film", film) // Кладем фильм в Bundle
         }
         val fragment  = DetailsFragment().apply {
-            arguments = bundle
+            arguments = bundle // Передаем Bundle в фрагмент
         }
     // Заменяем текущий фрагмент на DetailsFragment
         binding.fragmentPlaceholder?.let {
             supportFragmentManager
                 .beginTransaction()
                 .replace(it.id, fragment)
-                .addToBackStack(null)
+                .addToBackStack(null) // Добавляем транзакцию в back stack
                 .commit()
         }
     }
 
-    //Ищем фрагмент по тэгу, если он есть то возвращаем его, если нет - то null
+    // Метод для запуска фрагмента с деталями фильма из локальной базы данных
+    fun launchLocalDetailsFragment(film: Film) {
+        val bundle = Bundle().apply {
+            putParcelable("film", film) // Кладем фильм в Bundle
+        }
+        val fragment = LocalDetailsFragment().apply {
+            arguments = bundle // Передаем Bundle в фрагмент
+        }
+        binding.fragmentPlaceholder?.let {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(it.id, fragment)
+                .addToBackStack(null) // Добавляем транзакцию в back stack
+                .commit()
+        }
+    }
+
+    // Метод для проверки существования фрагмента по тегу
     private fun checkFragmentExistence(tag: String): Fragment? =
         supportFragmentManager.findFragmentByTag(tag)
 
-    //Запускаем метод смены фрагментов при нажатии на иконки нижнего меню
+    // Метод для смены фрагментов
     private fun changeFragment(fragment: Fragment, tag: String) {
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.fragment_placeholder, fragment, tag)
-            .addToBackStack(null)
+            .replace(R.id.fragment_placeholder, fragment, tag) // Заменяем фрагмент в контейнере
             .commit()
     }
-    // Инициализация навигации по нижнему меню
+    // Метод для инициализации навигации по нижнему меню
     private fun initNavigation() {
         binding.bottomNavigation?.setOnItemSelectedListener { item ->
             when (item.itemId) {
 
                 R.id.home -> {
                     val tag = "home"
-                    val fragment = checkFragmentExistence(tag) ?: HomeFragment()
+                    val fragment = checkFragmentExistence(tag) ?: HomeFragment() // Если фрагмент не существует, создаем новый
                     changeFragment(fragment, tag)
                     true
                 }
@@ -114,30 +135,15 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
 
+                R.id.demo -> {
+                    val tag = "demo"
+                    val fragment = checkFragmentExistence(tag) ?: DemoFragment()
+                    changeFragment(fragment, tag)
+                    true
+                }
+
                 else -> false
             }
         }
     }
 }
-
-//Может пригодится...
-
-//    fun onClickToast(view: View) {
-//        Toast.makeText(this, "Меню кинофильмов", Toast.LENGTH_SHORT).show()
-//    }
-//
-//    fun onClickToast2(view: View) {
-//        Toast.makeText(this, "Избранные кинофильмы", Toast.LENGTH_SHORT).show()
-//    }
-//
-//    fun onClickToast3(view: View) {
-//        Toast.makeText(this, "Кинофильмы для просмотра попозже", Toast.LENGTH_SHORT).show()
-//    }
-//
-//    fun onClickToast4(view: View) {
-//        Toast.makeText(this, "Кинофильмы в подборке", Toast.LENGTH_SHORT).show()
-//    }
-//
-//    fun onClickToast5(view: View) {
-//        Toast.makeText(this, "Настройки для корректной работы", Toast.LENGTH_SHORT).show()
-//    }

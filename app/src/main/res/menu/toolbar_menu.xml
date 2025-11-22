@@ -2,11 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-<!--    <item-->
-<!--        android:id="@+id/funny"-->
-<!--        android:icon="@drawable/baseline_arrow_downward_24"-->
-<!--        android:title="@string/menu_funny_title"-->
-<!--        app:showAsAction="ifRoom" />-->
+    <item
+        android:id="@+id/search"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="Search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView" />
 
     <item
         android:id="@+id/settings"

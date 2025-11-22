@@ -5,21 +5,24 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
-//Отредактировалось как надо, начиная с модуля 25
+// Создаем класс Film, который представляет собой модель данных фильма в приложении.
+// Он использует алгоритм Parcelable для передачи между компонентами и аннотацию
+// Entity для сохранения в базе данных Room.
 @Parcelize
-// Создание базы данных избранных фильмов для модуля 26
-@Entity(tableName = "film_table") // Имя таблицы
-
-data class Film( // Класс представляет таблицу в базе данных
-
+@Entity(tableName = "film_table") // Указываем имя таблицы в базе данных
+data class Film(
+    // Название фильма
     val title: String,
-    val poster: Int,
+    // Ссылка на постер фильма
+    val poster: String,
+    // Описание фильма
     val description: String,
-    var rating: Float = 0f,
+    // Рейтинг фильма
+    var rating: Double = 0.0,
+    // Флаг, указывающий, находится ли фильм в избранном
     var isInFavorites: Boolean = false,
-    // Поле id с аннотацией @PrimaryKey необходимо для
-    // уникальной идентификации каждой записи в базе данных
-    @PrimaryKey(autoGenerate = true)//
-    val id: Int = 0,
+    // Уникальный идентификатор фильма, является первичным ключом в базе данных.
+    @PrimaryKey
+    val id: Int,
 
 ) : Parcelable

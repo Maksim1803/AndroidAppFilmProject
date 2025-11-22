@@ -1,231 +1,79 @@
 package com.example.androidappfilmproject
 
 import android.app.Application
+import androidx.room.Room
+import com.example.androidappfilmproject.data.ApiConstants
 import com.example.androidappfilmproject.data.MainRepository
-import com.example.androidappfilmproject.domain.Film
+import com.example.androidappfilmproject.data.TmdbApi
 import com.example.androidappfilmproject.domain.Interactor
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
+// Создаем класс App, который является точкой входа в приложение
+// и отвечает за инициализацию основных компонентов.
 class App : Application() {
-    lateinit var repo: MainRepository
+    // Поле для хранения экземпляра базы данных
+    lateinit var db: AppDatabase
+    // Поле для хранения экземпляра репозитория
+    private lateinit var repo: MainRepository
+    // Поле для хранения экземпляра интерактора
     lateinit var interactor: Interactor
+    // Поле для хранения экземпляра Retrofit сервиса
+    private lateinit var retrofitService: TmdbApi
 
+    // Метод, вызываемый при создании приложения
     override fun onCreate() {
         super.onCreate()
-        //Инициализируем экземпляр App, через который будем получать доступ к остальным переменным
+        // Сохраняем экземпляр класса App в статическом поле
         instance = this
-        //Инициализируем репозиторий
-        repo = MainRepository()
-        //Инициализируем интерактор
-        interactor = Interactor(repo)
+
+        // Создаем пул потоков для работы с базой данных Room
+        val dbExecutor = Executors.newSingleThreadExecutor()
+
+        // Инициализируем базу данных Room
+        db = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            "film_db"
+        )
+        .setQueryExecutor(dbExecutor) // Указываем исполнителя для запросов
+        .setTransactionExecutor(dbExecutor) // Указываем исполнителя для транзакций
+        .fallbackToDestructiveMigration() // При миграции базы данных, если не найден путь миграции, база данных будет пересоздана
+        .build()
+
+        // Создаем и настраиваем OkHttpClient для сетевых запросов
+        val okHttpClient = OkHttpClient.Builder()
+            .callTimeout(30, TimeUnit.SECONDS) // Устанавливаем таймаут для вызова
+            .readTimeout(30, TimeUnit.SECONDS) // Устанавливаем таймаут для чтения
+            .addInterceptor(HttpLoggingInterceptor().apply { // Добавляем интерцептор для логирования
+                if (BuildConfig.DEBUG) {
+                    level = HttpLoggingInterceptor.Level.BASIC
+                }
+            })
+            .build()
+
+        // Создаем и настраиваем Retrofit
+        val retrofit = Retrofit.Builder()
+            .baseUrl(ApiConstants.BASE_URL) // Устанавливаем базовый URL
+            .addConverterFactory(GsonConverterFactory.create()) // Добавляем конвертер для Gson
+            .client(okHttpClient) // Устанавливаем OkHttpClient
+            .build()
+
+        // Создаем экземпляр нашего Retrofit сервиса
+        retrofitService = retrofit.create(TmdbApi::class.java)
+        // Инициализируем репозиторий
+        repo = MainRepository(db, retrofitService)
+        // Инициализируем интерактор
+        interactor = Interactor(repo, retrofitService)
     }
 
+    // Создаем companion object для хранения статического экземпляра класса App
     companion object {
-        //Здесь статически хранится ссылка на экземпляр App
         lateinit var instance: App
-            //Приватный сеттер, чтобы нельзя было в эту переменную присвоить что-либо другое
             private set
-
-        // Добавляем статическое свойство для избранных фильмов
-        val favoriteFilms: MutableList<Film> = mutableListOf()
     }
 }
-
-
-//Класс для доступа к базе данных вариант 3 (рабочий)
-
-//class App : Application() {
-
-//    companion object {
-//        lateinit var instance: App
-//            private set
-//        val favoriteFilms = HashSet<Film>() // Храним избранные фильмы в памяти
-//    }
-//
-//    override fun onCreate() {
-//        super.onCreate()
-//        instance = this
-//    }
-//}
-//Класс для доступа к базе данных вариант 2
-//class App : Application() {
-//
-//    // Объявление переменной для хранения экземпляра базы данных, где
-//    // lateinit - указывает, что переменная будет инициализирована позже
-//    lateinit var db: AppDatabase // AppDatabase - тип переменной (класс - база данных)
-//        private set // обеспечивает доступ к переменной только для чтения извне класса
-//
-//    // Метод, вызываемый при создании приложения
-//    override fun onCreate() {
-//        super.onCreate() // Вызов родительского класса
-//        instance = this
-//        db = Room.databaseBuilder(
-//            applicationContext,
-//            AppDatabase::class.java,
-//            "film_database" // Имя базы данных
-//        ).build()
-//        // Запускаем корутину для добавления фильмов в базу данных
-//        CoroutineScope(Dispatchers.IO).launch {
-//            val filmDao = db.filmDao()
-//            // Проверяем, есть ли фильмы в базе данных
-//            if (filmDao.getAllFilms().firstOrNull()?.isEmpty() == true) {
-//                // Добавляем фильмы из filmsDataBase в базу данных
-//                HomeFragment().filmsDataBase.forEach { film ->
-//                    filmDao.insert(film)
-//                }
-//            }
-//        }
-//    }
-//
-//    // Статический объект для статических переменных и методов
-//    companion object {
-//        lateinit var instance: App // App - тип переменной (сам класс App)
-//            private set
-//    }
-//}
-
-//Класс для доступа к базе данных вариант 1
-//class App : Application() {
-//
-//    // Объявление переменной для хранения экземпляра базы данных, где
-//    // lateinit - указывает, что переменная будет инициализирована позже
-//    lateinit var db: AppDatabase // AppDatabase - тип переменной (класс - база данных)
-//        private set // обеспечивает доступ к переменной только для чтения извне класса
-//
-//    // Метод, вызываемый при создании приложения
-//    override fun onCreate() {
-//        super.onCreate() // Вызов родительского класса
-//        instance = this
-//        db = Room.databaseBuilder(
-//            applicationContext,
-//            AppDatabase::class.java,
-//            "film_database" // Имя базы данных
-//        ).build()
-//    }
-//    // Статический объект для статических переменных и методов
-//    companion object {
-//        lateinit var instance: App // App - тип переменной (сам класс App)
-//            private set
-//    }
-//}
-
-//class DetailsFragment : Fragment() {
-//    // View Binding для доступа к элементам разметки фрагмента
-//    private var _binding: FragmentDetailsBinding? = null
-//    // Не-null доступ к binding между onCreateView и onDestroyView
-//    private val binding get() = _binding!!
-//
-//    // Переменная для хранения объекта фильма, который будет отображаться
-//    private var film: Film? = null
-//
-//
-//    //Создаем и возвращаем иерархию представлений, связанную с фрагментом.
-//    //Инициализируем View Binding.
-//
-//    override fun onCreateView(
-//        inflater: LayoutInflater, container: ViewGroup?,
-//        savedInstanceState: Bundle?
-//    ): View? {
-//        _binding = FragmentDetailsBinding.inflate(inflater, container, false)
-//        return binding.root // Возвращаем корневую View, полученную из binding
-//    }
-//
-//     //Вызываем onCreatedView(), когда иерархия представлений фрагмента была создана.
-//     //Инициализируем UI-элементы и обработчики событий.
-//
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//
-//        // Получаем объект фильма из аргументов фрагмента
-//        val args = arguments
-//        film = args?.getParcelable<Film>("film")
-//        // Если фильм не был передан, показываем ошибку и закрываем Activity
-//        if (film == null) {
-//            Snackbar.make(binding.root, "Ошибка: Фильм не найден", Snackbar.LENGTH_SHORT).show()
-//            activity?.finish()
-//            return
-//        }
-//
-//        // Настраиваем Toolbar для отображения навигации "назад"
-//        (activity as? AppCompatActivity)?.setSupportActionBar(binding.detailsToolbar)
-//        (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-//
-//        // Обновляем детали фильма на UI
-//        setFilmsDetails()
-//
-//        // Устанавливаем обработчик кликов для кнопки "Избранное"
-//        binding.favoriteButton.setOnClickListener {
-//            film?.let {
-//                if (!it.isInFavorites) {
-//                    // Добавляем фильм в избранное
-//                    it.isInFavorites = true
-//                    binding.favoriteButton.setImageResource(R.drawable.baseline_favorite_24)
-//                    Snackbar.make(binding.root, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
-//                } else {
-//                    // Удаляем фильм из избранного
-//                    it.isInFavorites = false
-//                    binding.favoriteButton.setImageResource(R.drawable.baseline_favorite_border_24)
-//                    Snackbar.make(binding.root, "Удалено из избранного", Snackbar.LENGTH_SHORT).show()
-//                }
-//            }
-//        }
-//
-//        // Устанавливаем обработчик кликов для кнопки "Посмотреть позже"
-//        binding.watchLaterButton.setOnClickListener {
-//            Snackbar.make(binding.root, "Добавлено в список 'Посмотреть позже'", Snackbar.LENGTH_SHORT).show()
-//        }
-//
-//        // Применяем scaleType для постера фильма
-//        binding.detailsPoster.apply {
-//            this.scaleType = ImageView.ScaleType.CENTER_CROP
-//        }
-//
-//        // Устанавливаем обработчик кликов для кнопки "Поделиться"
-//        binding.detailsFab.setOnClickListener {
-//            film?.let {
-//                val intent = Intent().apply {
-//                    Intent.setAction = Intent.ACTION_SEND
-//                    putExtra(
-//                        Intent.EXTRA_TEXT,
-//                        "Check out this film: ${it.title}\n\n${it.description}"
-//                    )
-//                    Intent.setType = "text/plain"
-//                }
-//                startActivity(Intent.createChooser(intent, "Share To:"))
-//            }
-//        }
-//    }
-
-
-//Обновляем UI-элементы фрагмента данными текущего фильма.
-//Запускаем в корутине жизненного цикла View для безопасного доступа к UI.
-
-//    private fun setFilmsDetails() {
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            film?.let { // Проверяем, что фильм не null
-//                binding.apply { // Применяем операции к элементам через binding
-//                    detailsToolbar.title = it.title // Устанавливаем заголовок Toolbar
-//                    detailsPoster.setImageResource(it.poster) // Устанавливаем изображение постера
-//                    detailsDescription.text = it.description // Устанавливаем описание фильма
-//
-//                    // Устанавливаем иконку избранного в зависимости от статуса фильма
-//                    favoriteButton.setImageResource(
-//                        if (it.isInFavorites) R.drawable.baseline_favorite_24
-//                        else R.drawable.baseline_favorite_border_24
-//                    )
-//
-//                    // Вычисляем и анимируем прогресс рейтинга
-//                    val progress = (it.rating * 10).toInt().coerceIn(0, 100)
-//                    ratingDonut.setProgressAnimated(progress, 2500L)
-//                }
-//            }
-//        }
-//    }
-//
-//     //Вызываем при уничтожении иерархии представлений фрагмента.
-//     //Обнуляем _binding для предотвращения утечек памяти.
-//
-//    override fun onDestroyView() {
-//        super.onDestroyView()
-//        _binding = null
-//    }
-//}

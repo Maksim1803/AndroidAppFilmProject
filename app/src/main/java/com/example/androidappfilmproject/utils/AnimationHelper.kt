@@ -8,44 +8,53 @@ import java.util.concurrent.Executors
 import kotlin.math.hypot
 import kotlin.math.roundToInt
 
-// Вариант без биндингов:
- class AnimationHelper {
+// Создаем класс-помощник для работы с анимациями.
+class AnimationHelper {
 
+    // Создаем companion object, чтобы методы были доступны без создания экземпляра класса.
     companion object {
-        //Переменная для того, что бы круг проявления расходился именно от иконки меню навигации
+        // Константа, определяющая количество элементов в нижнем меню навигации.
         private const val menuItems = 4
 
-        //В метод у нас приходит 3 параметра:
-        //1 - наше rootView, которое одновременно является и контейнером и объектом анимации
-        //2 - активити, для того чтобы вернуть выполнение нового треда в UI поток
-        //3 - позиция в меню навигации, что бы круг проявления расходился именно от иконки меню навигации
+        /**
+         * Метод для выполнения анимации кругового появления (Circular Reveal) для фрагмента.
+         *
+         * @param rootView Корневое представление (View) фрагмента, которое будет анимировано.
+         * @param activity Текущая активность, необходимая для выполнения кода в UI-потоке.
+         * @param position Позиция элемента в меню навигации, от которого начнется анимация.
+         */
         fun performFragmentCircularRevealAnimation(rootView: View, activity: Activity, position: Int) {
+            // Создаем и запускаем новый поток, чтобы дождаться, пока View будет присоединено к окну.
             Executors.newSingleThreadExecutor().execute {
                 while (true) {
+                    // Проверяем, присоединено ли View к окну.
                     if (rootView.isAttachedToWindow) {
+                        // Если да, выполняем код в UI-потоке.
                         activity.runOnUiThread {
+                            // Рассчитываем центральную точку элемента меню, от которого начнется анимация.
                             val itemCenter = rootView.width / (menuItems * 2)
                             val step = (itemCenter * 2) * (position - 1) + itemCenter
 
+                            // Координаты центра анимации.
                             val x = step
                             val y = rootView.y.roundToInt() + rootView.height
 
+                            // Начальный и конечный радиусы для анимации.
                             val startRadius = 0
-                            val endRadius =
-                                hypot(rootView.width.toDouble(), rootView.height.toDouble())
+                            val endRadius = hypot(rootView.width.toDouble(), rootView.height.toDouble())
 
+                            // Создаем и настраиваем анимацию кругового появления.
                             ViewAnimationUtils.createCircularReveal(
                                 rootView, x, y, startRadius.toFloat(), endRadius.toFloat()
                             ).apply {
-                                // Вместо Animator.setDuration = 500 (modul_32)
-                                // используем this.duration = 500 или просто duration = 500
-                                duration = 500L // Длительность всегда должна быть Long
-
-                                interpolator = AccelerateDecelerateInterpolator()
-                                start()
+                                duration = 500L // Длительность анимации.
+                                interpolator = AccelerateDecelerateInterpolator() // Интерполятор для плавности.
+                                start() // Запускаем анимацию.
                             }
+                            // Делаем View видимым.
                             rootView.visibility = View.VISIBLE
                         }
+                        // Выходим из цикла и завершаем поток.
                         return@execute
                     }
                 }
