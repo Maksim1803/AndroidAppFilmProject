@@ -65,6 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:elevation="11dp"
+            android:contentDescription="@string/favorite_icon_content_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_favorite_border" />
