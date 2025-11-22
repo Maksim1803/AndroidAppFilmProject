@@ -2,12 +2,11 @@ package com.example.androidappfilmproject.domain
 
 import androidx.paging.PagingData
 import com.example.androidappfilmproject.data.MainRepository
-import com.example.androidappfilmproject.data.TmdbApi
 import kotlinx.coroutines.flow.Flow
 
 // Создаем класс Interactor, который является посредником между ViewModel и Repository.
 // Он содержит определяет какой источник данных использовать.
-class Interactor(private val repo: MainRepository, private val retrofitService: TmdbApi) {
+class Interactor(private val repo: MainRepository) {
     // Метод для получения списка фильмов.
     fun getFilms(): Flow<PagingData<Film>> {
         return repo.getFilms()

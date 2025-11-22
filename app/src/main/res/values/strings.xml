@@ -18,4 +18,7 @@
     <string name="search">Search</string>
     <string name="film_poster_content_description">Постер фильма</string>
     <string name="demo">Демо</string>
+    <string name="share">Поделиться</string>
+    <string name="add_to_favorites">Добавить в избранное</string>
+    <string name="add_to_watch_later">Добавить в "Посмотреть позже"</string>
 </resources>

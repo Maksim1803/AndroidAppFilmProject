@@ -28,19 +28,6 @@ class MainRepository(private val appDatabase: AppDatabase, private val tmdbApi: 
         ).flow
     }
 
-    fun getPopularFilms(): Flow<PagingData<Film>> {
-        return Pager(
-            config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-            pagingSourceFactory = {
-                FilmPagingSource(
-                    tmdbApi = tmdbApi,
-                    apiKey = BuildConfig.TMDB_API_KEY,
-                    language = "ru-RU"
-                )
-            }
-        ).flow
-    }
-
     // Метод для получения результатов поиска фильмов.
     fun getSearchResult(query: String): Flow<PagingData<Film>> {
         return Pager(

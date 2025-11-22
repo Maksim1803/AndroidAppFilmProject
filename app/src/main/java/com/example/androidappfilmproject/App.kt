@@ -68,7 +68,7 @@ class App : Application() {
         // Инициализируем репозиторий
         repo = MainRepository(db, retrofitService)
         // Инициализируем интерактор
-        interactor = Interactor(repo, retrofitService)
+        interactor = Interactor(repo)
     }
 
     // Создаем companion object для хранения статического экземпляра класса App

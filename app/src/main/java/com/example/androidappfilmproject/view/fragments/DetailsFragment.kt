@@ -130,7 +130,7 @@ class DetailsFragment : Fragment() {
                     .load(resourceId)
                     .centerCrop()
                     .into(detailsPoster)
-            } catch (e: NumberFormatException) {
+            } catch (_: NumberFormatException) {
                 // Если не получилось как ресурс, загружаем по URL.
                 Glide.with(this@DetailsFragment)
                     .load(ApiConstants.IMAGES_URL + "w780" + film.poster)
