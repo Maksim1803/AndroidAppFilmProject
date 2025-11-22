@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.androidappfilmproject.domain.Film
 import com.example.androidappfilmproject.domain.Interactor
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 // Создаем класс DetailsFragmentViewModel, который является ViewModel для DetailsFragment.

@@ -41,10 +41,6 @@ interface FilmDao {
     @Query("SELECT * FROM film_table")
     fun getFilmsPagingSource(): PagingSource<Int, Film>
 
-    // Метод для получения всех избранных фильмов.
-    @Query("SELECT * FROM film_table WHERE isInFavorites = 1")
-    fun getFavoriteFilms(): Flow<List<Film>>
-
     // Метод для получения фильма по его ID.
     @Query("SELECT * FROM film_table WHERE id = :id")
     fun getFilmById(id: Int): Flow<Film>

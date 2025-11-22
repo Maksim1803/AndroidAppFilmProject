@@ -6,7 +6,7 @@ import com.example.androidappfilmproject.data.TmdbApi
 import kotlinx.coroutines.flow.Flow
 
 // Создаем класс Interactor, который является посредником между ViewModel и Repository.
-// Он содержит бизнес-логику и определяет, какой источник данных использовать.
+// Он содержит определяет какой источник данных использовать.
 class Interactor(private val repo: MainRepository, private val retrofitService: TmdbApi) {
     // Метод для получения списка фильмов.
     fun getFilms(): Flow<PagingData<Film>> {
@@ -16,7 +16,7 @@ class Interactor(private val repo: MainRepository, private val retrofitService: 
     // Метод для получения результатов поиска.
     fun getSearchResult(query: String): Flow<PagingData<Film>> {
         return if (query.isBlank()) { // Если запрос пустой, возвращаем все фильмы.
-            repo.getFilms()
+            getFilms()
         } else {
             repo.getSearchResult(query) // Иначе выполняем поиск.
         }
@@ -30,11 +30,6 @@ class Interactor(private val repo: MainRepository, private val retrofitService: 
     // Метод для получения избранных фильмов с пагинацией.
     fun getFavoriteFilmsPaging(): Flow<PagingData<Film>> {
         return repo.getFavoriteFilmsPaging()
-    }
-
-    // Метод для получения списка всех избранных фильмов.
-    fun getFavoriteFilms(): Flow<List<Film>> {
-        return repo.getFavoriteFilms()
     }
 
     // Метод для получения фильма по ID.

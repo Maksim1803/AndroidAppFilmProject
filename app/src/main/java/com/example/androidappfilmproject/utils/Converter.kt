@@ -10,10 +10,10 @@ object Converter {
     //в формат, используемый в приложении (Film).
         fun convertApiListToDtoList(list: List<TmdbFilm>?): List<Film> {
         val result = mutableListOf<Film>()
-        list?.forEach {
+        list?.forEach {           
             result.add(Film(
                 title = it.title,
-                poster = it.posterPath ?: "",
+                poster = it.posterPath,
                 description = it.overview,
                 rating = it.voteAverage,
                 id = it.id,

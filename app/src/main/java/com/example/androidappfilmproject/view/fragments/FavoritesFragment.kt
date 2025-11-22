@@ -14,7 +14,7 @@ import com.example.androidappfilmproject.MainActivity
 import com.example.androidappfilmproject.databinding.FragmentFavoritesBinding
 import com.example.androidappfilmproject.domain.Film
 import com.example.androidappfilmproject.utils.AnimationHelper
-import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapterNew
+import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapter
 import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
 import com.example.androidappfilmproject.viewmodel.FavoritesFragmentViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -30,7 +30,7 @@ class FavoritesFragment : Fragment() {
     private val binding get() = _binding!!
 
     // Адаптер для RecyclerView
-    private lateinit var filmsAdapter: FilmListRecyclerAdapterNew
+    private lateinit var filmsAdapter: FilmListRecyclerAdapter
 
     // Инициализация ViewModel с помощью делегата viewModels и кастомной фабрики
     private val viewModel: FavoritesFragmentViewModel by viewModels {
@@ -67,17 +67,11 @@ class FavoritesFragment : Fragment() {
         AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 2)
 
         // Инициализация адаптера RecyclerView с обработчиками кликов
-        filmsAdapter = FilmListRecyclerAdapterNew(object : FilmListRecyclerAdapterNew.OnItemClickListener {
+        filmsAdapter = FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
             // Обработчик клика по элементу списка
             override fun click(film: Film) {
                 // Запускаем фрагмент с деталями фильма
                 (requireActivity() as MainActivity).launchDetailsFragment(film)
-            }
-
-            // Обработчик клика по иконке "избранное"
-            override fun onFavoriteClick(film: Film) {
-                // Сообщаем ViewModel о клике
-                viewModel.onFavoriteClicked(film)
             }
         })
 
@@ -94,7 +88,7 @@ class FavoritesFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.favoriteFilms.collectLatest { films ->
                 // Передаем список фильмов в адаптер
-                filmsAdapter.submitList(films)
+                filmsAdapter.submitData(films)
             }
         }
     }

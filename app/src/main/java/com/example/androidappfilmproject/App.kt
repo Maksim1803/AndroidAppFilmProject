@@ -42,7 +42,7 @@ class App : Application() {
         )
         .setQueryExecutor(dbExecutor) // Указываем исполнителя для запросов
         .setTransactionExecutor(dbExecutor) // Указываем исполнителя для транзакций
-        .fallbackToDestructiveMigration() // При миграции базы данных, если не найден путь миграции, база данных будет пересоздана
+        .fallbackToDestructiveMigration(true) // При миграции базы данных, если не найден путь миграции, база данных будет пересоздана
         .build()
 
         // Создаем и настраиваем OkHttpClient для сетевых запросов

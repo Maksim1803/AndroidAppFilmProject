@@ -10,7 +10,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.launch
 
 // Создаем класс HomeFragmentViewModel, который является ViewModel для HomeFragment.
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -27,13 +26,5 @@ class HomeFragmentViewModel(private val interactor: Interactor) : ViewModel() {
     // Метод для установки нового поискового запроса.
     fun setQuery(newQuery: String) {
         query.value = newQuery
-    }
-
-    // Метод для обработки клика по иконке "избранное".
-    fun onFavoriteClicked(film: Film) {
-        // Запускаем корутину для переключения статуса "избранное" у фильма.
-        viewModelScope.launch {
-            interactor.toggleFavoriteStatus(film)
-        }
     }
 }

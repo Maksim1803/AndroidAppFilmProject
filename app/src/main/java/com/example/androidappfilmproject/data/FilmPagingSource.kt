@@ -22,7 +22,7 @@ class FilmPagingSource(
             val films = response.body()?.tmdbFilms?.map { // Преобразуем полученные данные в список объектов Film.
                 Film(
                     title = it.title,
-                    poster = it.posterPath ?: "",
+                    poster = it.posterPath,
                     description = it.overview,
                     rating = it.voteAverage,
                     id = it.id

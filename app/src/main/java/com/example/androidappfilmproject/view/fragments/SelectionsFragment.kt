@@ -17,7 +17,7 @@ class SelectionsFragment : Fragment() {
 
     // Метод для создания и возвращения View фрагмента
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         // Инициализируем биндинг
         _binding = FragmentSelectionsBinding.inflate(inflater, container, false)
