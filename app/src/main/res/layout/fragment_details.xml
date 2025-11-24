@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".DetailsFragment">
+    tools:context=".view.fragments.DetailsFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
@@ -38,6 +38,7 @@
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 android:background="@color/colorBlue"
+                android:contentDescription="@string/film_poster_content_description"
                 android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_launcher_foreground"
@@ -52,6 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="26dp"
+        android:contentDescription="@string/share"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|right"
         app:srcCompat="@drawable/ic_baseline_share_24"
@@ -64,6 +66,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="26dp"
+        android:contentDescription="@string/add_to_favorites"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|right"
         android:src="@drawable/baseline_favorite_border_24"
@@ -77,6 +80,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="26dp"
+        android:contentDescription="@string/add_to_watch_later"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
         android:src="@drawable/baseline_watch_later_24"
@@ -85,7 +89,7 @@
         android:translationX="-120dp"
         android:translationY="-10dp"/>
 
-    <com.example.androidappfilmproject.RatingDonutView
+    <com.example.androidappfilmproject.view.customviews.RatingDonutView
         android:id="@+id/ratingDonut"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -113,6 +117,3 @@
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-
-

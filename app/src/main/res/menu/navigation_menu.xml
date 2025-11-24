@@ -21,4 +21,9 @@
         android:icon="@drawable/baseline_video_library_24"
         android:title="@string/menu_selections_title"
         app:showAsAction="withText" />
+    <item
+        android:id="@+id/demo"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="@string/demo"
+        app:showAsAction="withText" />
 </menu>
