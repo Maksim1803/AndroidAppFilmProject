@@ -7,7 +7,8 @@ import com.example.androidappfilmproject.utils.Converter
 import retrofit2.HttpException
 import java.io.IOException
 
-// Создаем класс SearchPagingSource, который является источником данных для Paging 3 для поиска фильмов.
+// Создаем класс SearchPagingSource, который является источником данных для Paging 3
+// для поиска фильмов.
 class SearchPagingSource(
     private val tmdbApi: TmdbApi, // API для работы с сетью
     private val apiKey: String, // Ключ API

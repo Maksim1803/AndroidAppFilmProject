@@ -10,7 +10,8 @@ import com.example.androidappfilmproject.domain.Film
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-// Создаем класс MainRepository, который является единой точкой доступа к данным (из сети или из базы данных).
+// Создаем класс MainRepository, который является единой точкой доступа к данным
+// (из сети или из базы данных).
 class MainRepository(private val appDatabase: AppDatabase, private val tmdbApi: TmdbApi) {
     // Метод для получения списка фильмов с использованием Paging 3.
     fun getFilms(): Flow<PagingData<Film>> {
@@ -44,7 +45,8 @@ class MainRepository(private val appDatabase: AppDatabase, private val tmdbApi: 
     // Метод для переключения статуса "избранное" у фильма.
     suspend fun toggleFavoriteStatus(film: Film) {
         val updatedFilm = film.copy(isInFavorites = !film.isInFavorites)
-        appDatabase.filmDao().insert(updatedFilm) // Вставляем обновленный фильм в базу данных.
+    // Вставляем обновленный фильм в базу данных.
+        appDatabase.filmDao().insert(updatedFilm)
     }
 
     // Метод для получения избранных фильмов с использованием Paging 3.

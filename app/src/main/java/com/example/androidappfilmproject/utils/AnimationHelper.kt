@@ -16,13 +16,13 @@ class AnimationHelper {
         // Константа, определяющая количество элементов в нижнем меню навигации.
         private const val menuItems = 4
 
-        /**
-         * Метод для выполнения анимации кругового появления (Circular Reveal) для фрагмента.
-         *
-         * @param rootView Корневое представление (View) фрагмента, которое будет анимировано.
-         * @param activity Текущая активность, необходимая для выполнения кода в UI-потоке.
-         * @param position Позиция элемента в меню навигации, от которого начнется анимация.
-         */
+
+         // Метод для выполнения анимации кругового появления (Circular Reveal) для фрагмента:
+
+         // @param rootView Корневое представление (View) фрагмента, которое будет анимировано.
+         // @param activity Текущая активность, необходимая для выполнения кода в UI-потоке.
+         // @param position Позиция элемента в меню навигации, от которого начнется анимация.
+
         fun performFragmentCircularRevealAnimation(rootView: View, activity: Activity, position: Int) {
             // Создаем и запускаем новый поток, чтобы дождаться, пока View будет присоединено к окну.
             Executors.newSingleThreadExecutor().execute {
