@@ -6,11 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.MainActivity
 import com.example.androidappfilmproject.databinding.FragmentHomeBinding
 import com.example.androidappfilmproject.domain.Film
@@ -20,6 +17,7 @@ import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecorati
 import com.example.androidappfilmproject.viewmodel.HomeFragmentViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 // Создаем класс HomeFragment, который отвечает за отображение главного экрана,
 // включая список фильмов и строку поиска.
@@ -35,22 +33,8 @@ class HomeFragment : Fragment() {
     // Адаптер для RecyclerView, который будет отображать список фильмов.
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
 
-    // Инициализация ViewModel с помощью делегата viewModels и кастомной фабрики.
-    // ViewModel переживает пересоздание фрагмента, сохраняя его состояние.
-    private val viewModel: HomeFragmentViewModel by viewModels {
-        object : ViewModelProvider.Factory {
-            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                if (modelClass.isAssignableFrom(HomeFragmentViewModel::class.java)) {
-                    // Получаем Interactor из синглтона App для доступа к работе.
-                    val interactor = App.instance.interactor
-                    @Suppress("UNCHECKED_CAST")
-                    // Создаем экземпляр HomeFragmentViewModel.
-                    return HomeFragmentViewModel(interactor) as T
-                }
-                throw IllegalArgumentException("Unknown ViewModel class")
-            }
-        }
-    }
+    // ViewModel для данного фрагмента, внедряемая с помощью Koin.
+    private val viewModel: HomeFragmentViewModel by viewModel()
 
     // Метод для создания и возвращения View фрагмента.
     override fun onCreateView(
