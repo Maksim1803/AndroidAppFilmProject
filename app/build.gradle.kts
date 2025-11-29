@@ -84,15 +84,15 @@ dependencies {
 
     //Новые библиотеки для создания базы данных модуля 26
     // Room components
-    implementation("androidx.room:room-runtime:2.8.3")
-    implementation("androidx.room:room-ktx:2.8.3") // Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-paging:2.8.3")
-    kapt("androidx.room:room-compiler:2.8.3")
+    implementation("androidx.room:room-runtime:2.8.4")
+    implementation("androidx.room:room-ktx:2.8.4") // Kotlin Extensions and Coroutines support for Room
+    implementation("androidx.room:room-paging:2.8.4")
+    kapt("androidx.room:room-compiler:2.8.4")
 
     // Lifecycle components
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.4")
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.9.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.10.0")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
@@ -105,14 +105,17 @@ dependencies {
 
     //Новые библиотеки для создания анимации для модуля 33
     implementation("androidx.fragment:fragment-ktx:1.8.9")// Для viewModels() во фрагментах
-    implementation("androidx.activity:activity-ktx:1.11.0")// Для activityViewModels() в активностях (если нужно)
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")// Для ViewModelScope и других KTX расширений
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.4")// Для LiveData KTX расширений
+    implementation("androidx.activity:activity-ktx:1.12.0")// Для activityViewModels() в активностях (если нужно)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")// Для ViewModelScope и других KTX расширений
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")// Для LiveData KTX расширений
 
     //Новые библиотеки для работы с БД для модуля 35
     implementation("com.squareup.retrofit2:retrofit:3.0.0") //рертофит
     implementation("com.squareup.retrofit2:converter-gson:3.0.0") //конвертер
-    implementation("com.squareup.okhttp3:logging-interceptor:5.3.0") //логгер
+    implementation("com.squareup.okhttp3:logging-interceptor:5.3.2") //логгер
 
     implementation(libs.androidx.paging.runtime.ktx)
+    //Библиотека Koin для модуля 36
+    implementation("io.insert-koin:koin-android:3.5.3")
+
 }

@@ -1,5 +1,6 @@
 package com.example.androidappfilmproject.data
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -12,18 +13,21 @@ import kotlinx.coroutines.flow.flow
 
 // Создаем класс MainRepository, который является единой точкой доступа к данным
 // (из сети или из базы данных).
+@OptIn(ExperimentalPagingApi::class)
 class MainRepository(private val appDatabase: AppDatabase, private val tmdbApi: TmdbApi) {
     // Метод для получения списка фильмов с использованием Paging 3.
     fun getFilms(): Flow<PagingData<Film>> {
+        val filmRemoteMediator = FilmRemoteMediator(
+            tmdbApi = tmdbApi,
+            appDatabase = appDatabase,
+            apiKey = BuildConfig.TMDB_API_KEY,
+            language = "ru-RU"
+        )
+
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-            pagingSourceFactory = {
-                FilmPagingSource(
-                    tmdbApi = tmdbApi,
-                    apiKey = BuildConfig.TMDB_API_KEY,
-                    language = "ru-RU"
-                )
-            }
+            remoteMediator = filmRemoteMediator,
+            pagingSourceFactory = { appDatabase.filmDao().getFilmsPagingSource() }
         ).flow
     }
 
