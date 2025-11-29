@@ -1,22 +1,28 @@
-import com.android.build.gradle.internal.utils.isKotlinKaptPluginApplied
-import org.jetbrains.kotlin.gradle.model.Kapt
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
-    //    id ("kotlin-parcelize")
-    //kotlin("kapt")
+    id("kotlin-kapt")
+}
 
+// Load properties from local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
 }
 
 android {
     namespace = "com.example.androidappfilmproject"
     compileSdk = 36
 
-    buildFeatures  {
+    buildFeatures {
         viewBinding = true
-
+        buildConfig = true
     }
 
     defaultConfig {
@@ -27,6 +33,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Make the API key available in BuildConfig
+        buildConfigField("String", "TMDB_API_KEY", "\"${localProperties.getProperty("tmdb.api_key") ?: ""}\"")
     }
 
     buildTypes {
@@ -39,11 +48,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    // Новый синтаксис для kotlin (модуль 33): Используем compilerOptions DSL
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
     }
 }
 
@@ -62,34 +74,45 @@ dependencies {
 
     //Новые библиотеки
     // RecyclerView
-    implementation ("androidx.recyclerview:recyclerview:1.4.0")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
     // AdapterDelegate
-    implementation ("com.hannesdorfmann:adapterdelegates4-kotlin-dsl:4.3.2")
+    implementation("com.hannesdorfmann:adapterdelegates4-kotlin-dsl:4.3.2")
     //MaterialDesign
-    implementation ("com.google.android.material:material:1.12.0")
+    implementation("com.google.android.material:material:1.13.0")
     //Coordinator layout
-    implementation ("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
 
     //Новые библиотеки для создания базы данных модуля 26
     // Room components
-    implementation ("androidx.room:room-runtime:2.7.2")
-    implementation ("androidx.room:room-ktx:2.7.2") // Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-paging:2.7.2")
-    annotationProcessor ("androidx.room:room-compiler:2.7.2")
-    //kapt("androidx.room:room-compiler:2.7.2")
+    implementation("androidx.room:room-runtime:2.8.3")
+    implementation("androidx.room:room-ktx:2.8.3") // Kotlin Extensions and Coroutines support for Room
+    implementation("androidx.room:room-paging:2.8.3")
+    kapt("androidx.room:room-compiler:2.8.3")
 
     // Lifecycle components
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.1")
-    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.9.1")
-    implementation ("androidx.lifecycle:lifecycle-common-java8:2.9.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.4")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.9.4")
 
     // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
     //Новые библиотеки для создания анимации для модуля 28
     //Glide
-    implementation ("com.github.bumptech.glide:glide:4.16.0")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("com.github.bumptech.glide:glide:5.0.5")
+    kapt("com.github.bumptech.glide:compiler:5.0.5")
 
+    //Новые библиотеки для создания анимации для модуля 33
+    implementation("androidx.fragment:fragment-ktx:1.8.9")// Для viewModels() во фрагментах
+    implementation("androidx.activity:activity-ktx:1.11.0")// Для activityViewModels() в активностях (если нужно)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")// Для ViewModelScope и других KTX расширений
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.4")// Для LiveData KTX расширений
+
+    //Новые библиотеки для работы с БД для модуля 35
+    implementation("com.squareup.retrofit2:retrofit:3.0.0") //рертофит
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0") //конвертер
+    implementation("com.squareup.okhttp3:logging-interceptor:5.3.0") //логгер
+
+    implementation(libs.androidx.paging.runtime.ktx)
 }

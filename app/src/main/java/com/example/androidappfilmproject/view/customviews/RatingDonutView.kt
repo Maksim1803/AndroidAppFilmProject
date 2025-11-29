@@ -1,4 +1,4 @@
-package com.example.androidappfilmproject
+package com.example.androidappfilmproject.view.customviews
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -6,17 +6,18 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
-import android.graphics.Typeface
 import androidx.core.animation.doOnEnd
+import com.example.androidappfilmproject.R
 
+// Создаем класс, отвечающий за кастомный view для отображения рейтинга в виде кольцевой диаграммы
 class RatingDonutView @JvmOverloads constructor(context: Context,
-attrs: AttributeSet? = null
+                                                attrs: AttributeSet? = null
 ) : View(context, attrs) {
     //Овал для рисования сегментов прогресс бара
-    // Овал для рисования сегментов прогресс бара
     private val oval = RectF()
 
     // Размеры и центр
@@ -77,6 +78,7 @@ attrs: AttributeSet? = null
         }
     }
 
+    // Метод для инициализации красок
     private fun initPaints() {
         // фон
         circlePaint.apply {
@@ -106,12 +108,14 @@ attrs: AttributeSet? = null
         updatePaintColors()
     }
 
+    // Метод для обновления цвета красок в зависимости от прогресса
     private fun updatePaintColors() {
         val color = getPaintColor(currentProgress)
         strokePaint.color = color
         digitPaint.color = color
     }
 
+    // Метод для измерения размеров view
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
         val widthSize = MeasureSpec.getSize(widthMeasureSpec)
@@ -127,12 +131,14 @@ attrs: AttributeSet? = null
         setMeasuredDimension(minSide, minSide)
     }
 
+    // Метод для выбора размера в зависимости от режима
     private fun chooseDimension(mode: Int, size: Int) =
         when (mode) {
             MeasureSpec.AT_MOST, MeasureSpec.EXACTLY -> size
             else -> 300
         }
 
+    // Метод, вызываемый при изменении размеров view
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         radius = (width.coerceAtMost(height) / 2f)
         // масштаб текста в зависимости от размера
@@ -140,12 +146,14 @@ attrs: AttributeSet? = null
         digitPaint.textSize = scaleSize
     }
 
+    // Метод для отрисовки view
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         drawRating(canvas)
         drawText(canvas)
     }
 
+    // Метод для отрисовки кольца рейтинга
     private fun drawRating(canvas: Canvas) {
         val scale = radius * 0.8f
         canvas.save()
@@ -162,6 +170,7 @@ attrs: AttributeSet? = null
         canvas.restore()
     }
 
+    // Метод для отрисовки текста с рейтингом
     private fun drawText(canvas: Canvas) {
         val message = String.format("%.1f", currentProgress / 10f)
         // измеряем ширину текста
@@ -172,6 +181,7 @@ attrs: AttributeSet? = null
         canvas.drawText(message, centerX - textWidth / 2f, centerY + textHeight / 4f, digitPaint)
     }
 
+    // Метод для получения цвета в зависимости от прогресса
     private fun getPaintColor(progress: Int): Int = when (progress) {
         in 0..25 -> Color.parseColor("#e84258")
         in 26..50 -> Color.parseColor("#fd8060")
@@ -179,9 +189,10 @@ attrs: AttributeSet? = null
         else -> Color.parseColor("#b0d8a4")
     }
 
+    // Метод для конвертации прогресса в градусы
     private fun convertProgressToDegrees(progress: Int): Float = progress * 3.6f
 
-    /** Установить прогресс без анимации (0..100) */
+    // Метод для установки прогресса без анимации (0..100)
     fun setProgress(pr: Int) {
         animator?.cancel()
         targetProgress = pr.coerceIn(0, 100)
@@ -190,7 +201,7 @@ attrs: AttributeSet? = null
         invalidate()
     }
 
-    /** Установить прогресс с анимацией */
+    // Метод для установки прогресса с анимацией
     fun setProgressAnimated(pr: Int, durationMs: Long = 600L) {
         animator?.cancel()
         targetProgress = pr.coerceIn(0, 100)
@@ -212,6 +223,7 @@ attrs: AttributeSet? = null
         }
     }
 
+    // Метод, вызываемый при отсоединении view от окна
     override fun onDetachedFromWindow() {
         animator?.cancel()
         super.onDetachedFromWindow()
