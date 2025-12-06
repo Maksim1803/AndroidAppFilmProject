@@ -3,8 +3,6 @@ package com.example.androidappfilmproject
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import com.bumptech.glide.Glide
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
 import com.example.androidappfilmproject.domain.Film
 import com.example.androidappfilmproject.view.fragments.DemoFragment
@@ -15,8 +13,6 @@ import com.example.androidappfilmproject.view.fragments.LocalDetailsFragment
 import com.example.androidappfilmproject.view.fragments.SelectionsFragment
 import com.example.androidappfilmproject.view.fragments.SplashFragment
 import com.example.androidappfilmproject.view.fragments.WatchLaterFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 // Класс MainActivity, который является главным в приложении.
 class MainActivity : AppCompatActivity() {
@@ -28,11 +24,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Очистка кеша Glide (один раз при старте приложения)
-        Glide.get(this).clearMemory()
-        lifecycleScope.launch(Dispatchers.IO) {
-            Glide.get(this@MainActivity).clearDiskCache()
-        }
         // Инициализируем биндинг
         binding = ActivityMainBinding.inflate(layoutInflater)
         // Устанавливаем макет для активности

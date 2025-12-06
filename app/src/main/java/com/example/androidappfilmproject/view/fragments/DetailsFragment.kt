@@ -82,12 +82,16 @@ class DetailsFragment : Fragment() {
         (activity as? AppCompatActivity)?.setSupportActionBar(binding.detailsToolbar)
         (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // Запускаем корутину для наблюдения за потоком фильма из ViewModel
+        // Немедленно устанавливаем данные, чтобы убрать задержку
+        currentFilm = filmFromArgs
+        setFilmsDetails(filmFromArgs)
+
+        // Запускаем корутину для наблюдения за потоком фильма из ViewModel для отслеживания изменений (например, статуса "избранное")
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.getFilmById(filmFromArgs.id).collectLatest { film ->
-                // Обновляем текущий фильм и UI
+                // Обновляем текущий фильм и UI, когда приходят обновления из БД
                 currentFilm = film
-                setFilmsDetails(film)
+                film?.let { setFilmsDetails(it) }
             }
         }
 
@@ -113,6 +117,20 @@ class DetailsFragment : Fragment() {
             Snackbar.make(binding.root, "Добавлено в список 'Посмотреть позже'", Snackbar.LENGTH_SHORT).show()
         }
 
+        // Устанавливаем обработчик для кнопки "поделиться"
+        binding.detailsFab.setOnClickListener {
+            currentFilm?.let { film ->
+                val intent = Intent()
+                intent.action = Intent.ACTION_SEND
+                intent.putExtra(
+                    Intent.EXTRA_TEXT,
+                    "Check out this film: ${film.title}\n\n${film.description}"
+                )
+                intent.type = "text/plain"
+                startActivity(Intent.createChooser(intent, "Share To:"))
+            }
+        }
+
         // Настраиваем отображение постера
         binding.detailsPoster.apply {
             this.scaleType = ImageView.ScaleType.CENTER_CROP
@@ -135,10 +153,13 @@ class DetailsFragment : Fragment() {
                         .error(R.drawable.no_poster)
                         .centerCrop()
                         .into(detailsPoster)
-                } catch (e: NumberFormatException) {
+                } catch (_: NumberFormatException) {
                     // Загружаем из сети, если это фильм из API
+                    val fullUrl = ApiConstants.IMAGES_URL + "w780/" + posterPath.removePrefix("/")
+                    val thumbnailUrl = ApiConstants.IMAGES_URL + "w342/" + posterPath.removePrefix("/")
                     Glide.with(this@DetailsFragment)
-                        .load(ApiConstants.IMAGES_URL + "w780" + posterPath)
+                        .load(fullUrl)
+                        .thumbnail(Glide.with(this@DetailsFragment).load(thumbnailUrl))
                         .error(R.drawable.no_poster)
                         .centerCrop()
                         .into(detailsPoster)
@@ -160,18 +181,6 @@ class DetailsFragment : Fragment() {
             // Устанавливаем прогресс для кольцевого индикатора рейтинга
             val progress = (film.rating * 10).toInt().coerceIn(0, 100)
             ratingDonut.setProgress(progress)
-
-            // Устанавливаем обработчик для кнопки "поделиться"
-            detailsFab.setOnClickListener {
-                val intent = Intent()
-                intent.action = Intent.ACTION_SEND
-                intent.putExtra(
-                    Intent.EXTRA_TEXT,
-                    "Check out this film: ${film.title}\n\n${film.description}"
-                )
-                intent.type = "text/plain"
-                startActivity(Intent.createChooser(intent, "Share To:"))
-            }
         }
     }
 
