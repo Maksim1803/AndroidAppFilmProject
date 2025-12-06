@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.MainActivity
@@ -17,89 +18,81 @@ import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecorati
 import com.example.androidappfilmproject.viewmodel.HomeFragmentViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
-// Создаем класс HomeFragment, который отвечает за отображение главного экрана,
-// включая список фильмов и строку поиска.
+// Создаем класс HomeFragment, который отвечает за отображение
+// главного экрана со списком фильмов.
 class HomeFragment : Fragment() {
 
-    // Переменная для хранения экземпляра биндинга (nullable).
-    // Нужна, чтобы избежать утечек памяти в onDestroyView.
+    // Переменная для хранения экземпляра биндинга (nullable)
     private var _binding: FragmentHomeBinding? = null
-    // Свойство для доступа к биндингу, которое гарантирует,
-    // что он не будет null после onCreateView.
+    // Свойство для доступа к биндингу, которое гарантирует, что он не будет null после onCreateView
     private val binding get() = _binding!!
 
-    // Адаптер для RecyclerView, который будет отображать список фильмов.
+    // Адаптер для RecyclerView
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
 
-    // ViewModel для данного фрагмента, внедряемая с помощью Koin.
-    private val viewModel: HomeFragmentViewModel by viewModel()
+    // Инициализация ViewModel с помощью делегата viewModels
+    private val viewModel: HomeFragmentViewModel by viewModels()
 
-    // Метод для создания и возвращения View фрагмента.
+    // Метод для создания и возвращения View фрагмента
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Инициализируем биндинг для доступа к элементам макета.
+        // Инициализируем биндинг
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    // Метод, вызываемый после создания View.
-    // Здесь происходит основная настройка UI и подписка на данные.
+    // Метод, вызываемый после создания View
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Запускаем анимацию появления фрагмента для более плавного перехода.
+        //Запускаем анимацию появления фрагмента
         AnimationHelper.performFragmentCircularRevealAnimation(
             binding.root, requireActivity(), 1
         )
 
-        // Инициализируем SearchView для поиска фильмов.
+        //Инициализируем SearchView
         initSearchView()
-        // Инициализируем RecyclerView для отображения списка фильмов.
+        //Инициализируем RecyclerView
         initRecycler()
 
-        // Запускаем корутину для наблюдения за потоком фильмов из ViewModel.
-        // collectLatest автоматически отменяет предыдущий сбор данных при поступлении новых.
+        // Запускаем корутину для наблюдения за потоком фильмов из ViewModel
         lifecycleScope.launch {
             viewModel.films.collectLatest { films ->
-                // Передаем PagingData в адаптер для отображения.
+                // Передаем PagingData в адаптер
                 filmsAdapter.submitData(films)
             }
         }
     }
 
-    // Метод, вызываемый при остановке фрагмента.
+    // Метод, вызываемый при остановке фрагмента
     override fun onStop() {
         super.onStop()
-        // Очищаем поисковый запрос, чтобы при возвращении на экран
-        // не отображались результаты предыдущего поиска.
+        // Сбрасываем поисковый запрос, чтобы при возвращении на экран список не был отфильтрован
         binding.searchView.setQuery("", false)
     }
 
-    // Метод для инициализации SearchView.
+    // Метод для инициализации SearchView
     private fun initSearchView() {
+        // Устанавливаем слушатель клика, чтобы разворачивать поле поиска
         binding.searchView.setOnClickListener {
             binding.searchView.isIconified = false
         }
 
-        // Устанавливаем слушатель для обработки событий в SearchView.
+        // Устанавливаем слушатель для отслеживания изменений текста в поле поиска
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            // Этот метод вызывается, когда пользователь нажимает кнопку "поиск" на клавиатуре.
-            // В данном случае нам не нужно ничего делать, поэтому возвращаем true.
+            // Этот метод нам не нужен, но его нужно реализовать
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return true
             }
 
-            // Этот метод вызывается при каждом изменении текста в поисковой строке.
+            // Метод, который вызывается при каждом изменении текста
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Проверяем, добавлен ли фрагмент к своей активности, чтобы избежать вызовов
-                // после того, как фрагмент был отсоединен.
+                // Проверяем, присоединен ли фрагмент к Activity
                 if (isAdded) {
-                    // Передаем новый поисковый запрос в ViewModel.
-                    // Если newText равен null, передаем пустую строку.
+                    // Передаем новый поисковый запрос в ViewModel
                     viewModel.setQuery(newText ?: "")
                 }
                 return true
@@ -107,30 +100,40 @@ class HomeFragment : Fragment() {
         })
     }
 
-    // Метод для инициализации RecyclerView.
+    // Метод для инициализации RecyclerView
     private fun initRecycler() {
+        // Настраиваем RecyclerView
         binding.mainRecycler.apply {
-            // Инициализируем адаптер с обработчиком кликов.
+            // Инициализируем адаптер с обработчиками кликов
             filmsAdapter = FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
-                // Обработчик клика по элементу списка.
+                // Обработчик клика по элементу списка
                 override fun click(film: Film) {
-                    // Запускаем фрагмент с деталями фильма.
+                    // Запускаем фрагмент с деталями фильма
                     (requireActivity() as MainActivity).launchDetailsFragment(film)
                 }
+
+                // Обработчик клика по иконке "избранное"
+                override fun onFavoriteClick(film: Film) {
+                    // Вызываем метод ViewModel для изменения статуса "избранное"
+                    viewModel.onFavoriteClicked(film)
+                    // Обновляем список, чтобы отобразить изменения
+                    filmsAdapter.refresh()
+                }
             })
+            // Устанавливаем адаптер
             adapter = filmsAdapter
-            // Устанавливаем LayoutManager, который будет располагать элементы в виде вертикального списка.
+            // Устанавливаем LayoutManager
             layoutManager = LinearLayoutManager(requireContext())
-            // Добавляем отступы между элементами для лучшего визуального разделения.
+            // Добавляем отступы между элементами
             val decorator = TopSpacingItemDecoration(8)
             addItemDecoration(decorator)
         }
     }
 
-    // Метод, вызываемый при уничтожении View фрагмента.
+    // Метод, вызываемый при уничтожении View фрагмента
     override fun onDestroyView() {
         super.onDestroyView()
-        // Очищаем ссылку на биндинг, чтобы избежать утечек памяти.
+        // Очищаем ссылку на биндинг, чтобы избежать утечек памяти
         _binding = null
     }
 }

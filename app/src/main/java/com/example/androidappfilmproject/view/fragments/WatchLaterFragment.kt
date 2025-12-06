@@ -8,11 +8,13 @@ import androidx.fragment.app.Fragment
 import com.example.androidappfilmproject.utils.AnimationHelper
 import com.example.androidappfilmproject.databinding.FragmentWatchLaterBinding
 
-// Создаем класс WatchLaterFragment, который отвечает за отображение экрана "Посмотреть позже".
+// Создаем класс WatchLaterFragment, который отвечает за отображение
+// экрана "Посмотреть позже".
 class WatchLaterFragment : Fragment() {
     // Переменная для хранения экземпляра биндинга (nullable)
     private var _binding: FragmentWatchLaterBinding? = null
-    // Свойство для доступа к биндингу, которое гарантирует, что он не будет null после onCreateView
+    // Свойство для доступа к биндингу, которое гарантирует,
+    // что он не будет null после onCreateView
     private val binding get() = _binding!!
 
     // Метод для создания и возвращения View фрагмента

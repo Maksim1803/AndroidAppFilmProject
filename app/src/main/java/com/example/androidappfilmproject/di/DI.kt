@@ -51,6 +51,6 @@ object DI {
         single { Interactor(get()) }
 
         // ViewModel
-        viewModel { HomeFragmentViewModel(get()) }
+        viewModel { HomeFragmentViewModel() }
     }
 }

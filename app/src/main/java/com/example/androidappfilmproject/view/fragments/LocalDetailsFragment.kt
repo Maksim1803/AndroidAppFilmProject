@@ -84,17 +84,11 @@ class LocalDetailsFragment : Fragment() {
 
             // Загружаем постер фильма из ресурсов
             Glide.with(this@LocalDetailsFragment)
-                .load(film.poster.toInt())
+                .load(film.poster?.toInt())
                 .centerCrop()
                 .into(detailsPoster)
 
             detailsDescription.text = film.description
-
-            // Устанавливаем иконку для кнопки "избранное"
-            favoriteButton.setImageResource(
-                if (film.isInFavorites) R.drawable.baseline_favorite_24
-                else R.drawable.baseline_favorite_border_24
-            )
 
             // Устанавливаем прогресс для кольцевого индикатора рейтинга
             val progress = (film.rating * 10).toInt().coerceIn(0, 100)

@@ -8,7 +8,8 @@ import androidx.fragment.app.Fragment
 import com.example.androidappfilmproject.utils.AnimationHelper
 import com.example.androidappfilmproject.databinding.FragmentSelectionsBinding
 
-// Создаем класс SelectionsFragment, который отвечает за отображение экрана "Подборки".
+// Создаем класс SelectionsFragment, который отвечает за
+// отображение экрана "Подборки".
 class SelectionsFragment : Fragment() {
     // Переменная для хранения экземпляра биндинга (nullable)
     private var _binding: FragmentSelectionsBinding? = null

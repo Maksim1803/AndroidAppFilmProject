@@ -14,7 +14,7 @@ data class Film(
     // Название фильма
     val title: String,
     // Ссылка на постер фильма
-    val poster: String,
+    val poster: String?,
     // Описание фильма
     val description: String,
     // Рейтинг фильма

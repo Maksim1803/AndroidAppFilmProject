@@ -38,7 +38,7 @@ class FavoritesFragment : Fragment() {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                 if (modelClass.isAssignableFrom(FavoritesFragmentViewModel::class.java)) {
                     // Получаем Interactor из синглтона App
-                    val interactor = App.instance.interactor
+                    val interactor = App.instance.dagger.filmInteractor()
                     @Suppress("UNCHECKED_CAST")
                     // Создаем экземпляр FavoritesFragmentViewModel
                     return FavoritesFragmentViewModel(interactor) as T
@@ -72,6 +72,10 @@ class FavoritesFragment : Fragment() {
             override fun click(film: Film) {
                 // Запускаем фрагмент с деталями фильма
                 (requireActivity() as MainActivity).launchDetailsFragment(film)
+            }
+
+            override fun onFavoriteClick(film: Film) {
+                viewModel.onFavoriteClicked(film)
             }
         })
 
