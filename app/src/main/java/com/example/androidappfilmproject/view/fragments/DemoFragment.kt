@@ -20,11 +20,13 @@ import com.example.androidappfilmproject.viewmodel.DemoFragmentViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-// Создаем класс DemoFragment, который отвечает за отображение демонстрационного списка фильмов.
+// Создаем класс DemoFragment, который отвечает за отображение
+// демонстрационного списка фильмов.
 class DemoFragment : Fragment() {
     // Переменная для хранения экземпляра биндинга (nullable)
     private var _binding: FragmentDemoBinding? = null
-    // Свойство для доступа к биндингу, которое гарантирует, что он не будет null после onCreateView
+    // Свойство для доступа к биндингу, которое гарантирует,
+    // что он не будет null после onCreateView
     private val binding get() = _binding!!
 
     // Инициализация ViewModel с помощью делегата viewModels и кастомной фабрики
@@ -32,8 +34,8 @@ class DemoFragment : Fragment() {
         object : ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                 if (modelClass.isAssignableFrom(DemoFragmentViewModel::class.java)) {
-                    // Получаем Interactor из синглтона App
-                    val interactor = App.instance.interactor
+                    // Получаем Interactor из Dagger-компонента
+                    val interactor = App.instance.dagger.filmInteractor()
                     @Suppress("UNCHECKED_CAST")
                     // Создаем экземпляр DemoFragmentViewModel
                     return DemoFragmentViewModel(interactor) as T
@@ -66,6 +68,10 @@ class DemoFragment : Fragment() {
             override fun click(film: Film) {
                 // Запускаем фрагмент с деталями фильма
                 (requireActivity() as MainActivity).launchLocalDetailsFragment(film)
+            }
+
+            override fun onFavoriteClick(film: Film) {
+                //В демо-режиме эта функция не нужна, поэтому оставляем ее пустой
             }
         })
 

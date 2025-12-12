@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 import java.io.FileInputStream
@@ -115,7 +116,13 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:5.3.2") //логгер
 
     implementation(libs.androidx.paging.runtime.ktx)
+
     //Библиотека Koin для модуля 36
     implementation("io.insert-koin:koin-android:3.5.3")
+
+    // Библиотеки для модуля 37
+    implementation ("com.google.dagger:dagger:2.57.2")
+    kapt ("com.google.dagger:dagger-compiler:2.57.2")
+
 
 }
