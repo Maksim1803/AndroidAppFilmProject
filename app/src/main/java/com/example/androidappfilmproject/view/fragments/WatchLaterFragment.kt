@@ -9,7 +9,7 @@ import com.example.androidappfilmproject.utils.AnimationHelper
 import com.example.androidappfilmproject.databinding.FragmentWatchLaterBinding
 
 // Создаем класс WatchLaterFragment, который отвечает за отображение
-// экрана "Посмотреть позже".
+// экрана "Посмотреть позже"
 class WatchLaterFragment : Fragment() {
     // Переменная для хранения экземпляра биндинга (nullable)
     private var _binding: FragmentWatchLaterBinding? = null

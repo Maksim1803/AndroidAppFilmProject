@@ -14,7 +14,7 @@ class AnimationHelper {
     // Создаем companion object, чтобы методы были доступны без создания экземпляра класса.
     companion object {
         // Константа, определяющая количество элементов в нижнем меню навигации.
-        private const val menuItems = 4
+        private const val menuItems = 5
 
 
          // Метод для выполнения анимации кругового появления (Circular Reveal) для фрагмента:

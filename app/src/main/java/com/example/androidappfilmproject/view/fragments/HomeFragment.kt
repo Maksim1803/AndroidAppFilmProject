@@ -1,5 +1,6 @@
 package com.example.androidappfilmproject.view.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +8,13 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.MainActivity
 import com.example.androidappfilmproject.databinding.FragmentHomeBinding
 import com.example.androidappfilmproject.domain.Film
@@ -18,81 +24,96 @@ import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecorati
 import com.example.androidappfilmproject.viewmodel.HomeFragmentViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-// Создаем класс HomeFragment, который отвечает за отображение
-// главного экрана со списком фильмов.
+// Класс, отвечающий за отображение главного экрана приложения.
+// Содержит список фильмов, строку поиска и функциональность обновления списка.
 class HomeFragment : Fragment() {
 
-    // Переменная для хранения экземпляра биндинга (nullable)
     private var _binding: FragmentHomeBinding? = null
-    // Свойство для доступа к биндингу, которое гарантирует, что он не будет null после onCreateView
     private val binding get() = _binding!!
 
-    // Адаптер для RecyclerView
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
 
-    // Инициализация ViewModel с помощью делегата viewModels
-    private val viewModel: HomeFragmentViewModel by viewModels()
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    // Метод для создания и возвращения View фрагмента
+    private val viewModel: HomeFragmentViewModel by viewModels { viewModelFactory }
+
+    // Метод вызывается при присоединении фрагмента к контексту.
+    // Внедряет зависимости через Dagger.
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as App).dagger.inject(this)
+    }
+
+    // Метод создает и возвращает иерархию представлений, связанную с фрагментом.
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Инициализируем биндинг
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    // Метод, вызываемый после создания View
+    // Метод вызывается сразу после onCreateView().
+    // Здесь инициализируются UI-компоненты и настраиваются наблюдатели.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //Запускаем анимацию появления фрагмента
-        AnimationHelper.performFragmentCircularRevealAnimation(
-            binding.root, requireActivity(), 1
-        )
+        AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 1)
 
-        //Инициализируем SearchView
         initSearchView()
-        //Инициализируем RecyclerView
         initRecycler()
+        initPullToRefresh()
 
-        // Запускаем корутину для наблюдения за потоком фильмов из ViewModel
-        lifecycleScope.launch {
-            viewModel.films.collectLatest { films ->
-                // Передаем PagingData в адаптер
-                filmsAdapter.submitData(films)
+        // Наблюдение за потоком фильмов из ViewModel
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.films.collectLatest { films ->
+                    filmsAdapter.submitData(films)
+                }
+            }
+        }
+
+        // Наблюдение за состоянием загрузки данных для отображения/скрытия индикатора обновления
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                filmsAdapter.loadStateFlow.collectLatest { loadStates ->
+                    binding.pullToRefresh.isRefreshing = loadStates.refresh is LoadState.Loading
+                }
             }
         }
     }
 
-    // Метод, вызываемый при остановке фрагмента
+    // Метод инициализирует SwipeRefreshLayout для обновления списка фильмов.
+    private fun initPullToRefresh() {
+        binding.pullToRefresh.setOnRefreshListener {
+            filmsAdapter.refresh()
+        }
+    }
+
+    // Метод вызывается, когда фрагмент становится невидимым.
+    // Очищает строку поиска.
     override fun onStop() {
         super.onStop()
-        // Сбрасываем поисковый запрос, чтобы при возвращении на экран список не был отфильтрован
         binding.searchView.setQuery("", false)
     }
 
-    // Метод для инициализации SearchView
+    // Метод инициализирует SearchView для поиска фильмов.
+    // Устанавливает слушателей для обработки ввода текста.
     private fun initSearchView() {
-        // Устанавливаем слушатель клика, чтобы разворачивать поле поиска
         binding.searchView.setOnClickListener {
             binding.searchView.isIconified = false
         }
 
-        // Устанавливаем слушатель для отслеживания изменений текста в поле поиска
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            // Этот метод нам не нужен, но его нужно реализовать
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return true
             }
 
-            // Метод, который вызывается при каждом изменении текста
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Проверяем, присоединен ли фрагмент к Activity
                 if (isAdded) {
-                    // Передаем новый поисковый запрос в ViewModel
                     viewModel.setQuery(newText ?: "")
                 }
                 return true
@@ -100,40 +121,30 @@ class HomeFragment : Fragment() {
         })
     }
 
-    // Метод для инициализации RecyclerView
+    // Метод инициализирует RecyclerView для отображения списка фильмов.
+    // Настраивает адаптер, LayoutManager и декоратор элементов.
     private fun initRecycler() {
-        // Настраиваем RecyclerView
         binding.mainRecycler.apply {
-            // Инициализируем адаптер с обработчиками кликов
             filmsAdapter = FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
-                // Обработчик клика по элементу списка
                 override fun click(film: Film) {
-                    // Запускаем фрагмент с деталями фильма
                     (requireActivity() as MainActivity).launchDetailsFragment(film)
                 }
 
-                // Обработчик клика по иконке "избранное"
                 override fun onFavoriteClick(film: Film) {
-                    // Вызываем метод ViewModel для изменения статуса "избранное"
                     viewModel.onFavoriteClicked(film)
-                    // Обновляем список, чтобы отобразить изменения
-                    filmsAdapter.refresh()
                 }
             })
-            // Устанавливаем адаптер
             adapter = filmsAdapter
-            // Устанавливаем LayoutManager
             layoutManager = LinearLayoutManager(requireContext())
-            // Добавляем отступы между элементами
             val decorator = TopSpacingItemDecoration(8)
             addItemDecoration(decorator)
         }
     }
 
-    // Метод, вызываемый при уничтожении View фрагмента
+    // Метод вызывается при уничтожении представления фрагмента.
+    // Очищает ссылку на binding во избежание утечек памяти.
     override fun onDestroyView() {
         super.onDestroyView()
-        // Очищаем ссылку на биндинг, чтобы избежать утечек памяти
         _binding = null
     }
 }
