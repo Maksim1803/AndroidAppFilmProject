@@ -123,7 +123,7 @@ dependencies {
 
     //Новые библиотеки для создания анимации для модуля 33
     implementation("androidx.fragment:fragment-ktx:1.8.9")// Для viewModels() во фрагментах
-    implementation("androidx.activity:activity-ktx:1.12.0")// Для activityViewModels() в активностях (если нужно)
+    implementation("androidx.activity:activity-ktx:1.12.2")// Для activityViewModels() в активностях (если нужно)
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")// Для ViewModelScope и других KTX расширений
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")// Для LiveData KTX расширений
 
@@ -135,12 +135,12 @@ dependencies {
     implementation(libs.androidx.paging.runtime.ktx)
 
     //Библиотека Koin для модуля 36
-    implementation("io.insert-koin:koin-android:3.5.3")
+    implementation("io.insert-koin:koin-android:4.1.1")
 
-    // Библиотеки для модуля 37
+    //Библиотеки для модуля 37
     implementation ("com.google.dagger:dagger:2.57.2")
     kapt ("com.google.dagger:dagger-compiler:2.57.2")
 
-    // Библиотека для модуля 38. SwipeRefreshLayout (для fragment_home.xml)
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    //Библиотека для модуля 38. SwipeRefreshLayout (для fragment_home.xml)
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
 }

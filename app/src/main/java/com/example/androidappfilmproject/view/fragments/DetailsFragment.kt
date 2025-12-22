@@ -77,7 +77,7 @@ class DetailsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.getFilmById(filmFromArgs.id).collectLatest { film ->
                 currentFilm = film
-                film?.let { setFilmsDetails(it) }
+                film.let { setFilmsDetails(it) }
             }
         }
 

@@ -8,6 +8,7 @@
     android:visibility="invisible"
     tools:visibility="visible"
     tools:context=".view.fragments.SelectionsFragment">
+
     <RadioGroup
         android:id="@+id/radio_group"
         android:layout_width="match_parent"
