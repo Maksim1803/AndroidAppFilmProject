@@ -4,35 +4,39 @@ import android.content.Context
 import com.example.androidappfilmproject.di.modules.DatabaseModule
 import com.example.androidappfilmproject.di.modules.DomainModule
 import com.example.androidappfilmproject.di.modules.RemoteModule
-import com.example.androidappfilmproject.domain.FilmInteractor
-import com.example.androidappfilmproject.viewmodel.HomeFragmentViewModel
+import com.example.androidappfilmproject.di.modules.ViewModelModule
+import com.example.androidappfilmproject.view.fragments.DemoFragment
+import com.example.androidappfilmproject.view.fragments.DetailsFragment
+import com.example.androidappfilmproject.view.fragments.FavoritesFragment
+import com.example.androidappfilmproject.view.fragments.HomeFragment
+import com.example.androidappfilmproject.view.fragments.SelectionsFragment
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
-// Аннотация @Singleton указывает, что он управляет жизненным циклом Singleton-зависимостей.
+// Главный компонент Dagger для всего приложения.
+// Он связывает все модули и предоставляет методы для внедрения зависимостей.
 @Singleton
 @Component(
-    //Внедряем все модули, нужные для этого компонента
     modules = [
         RemoteModule::class,
         DatabaseModule::class,
-        DomainModule::class
+        DomainModule::class,
+        ViewModelModule::class
     ]
 )
-// Интерфейс главного Dagger-компонента приложения
 interface AppComponent {
+    // Методы для внедрения зависимостей во фрагменты
+    fun inject(homeFragment: HomeFragment)
+    fun inject(selectionsFragment: SelectionsFragment)
+    fun inject(demoFragment: DemoFragment)
+    fun inject(detailsFragment: DetailsFragment)
+    fun inject(favoritesFragment: FavoritesFragment) // Добавляем новый метод
 
-    // Метод внедряющий зависимости в HomeFragmentViewModel
-    fun inject(homeFragmentViewModel: HomeFragmentViewModel)
-
-    // Метод предоставляющий экземпляр FilmInteractor для доступа к нему через компонент
-    fun filmInteractor(): FilmInteractor
-
-    // Вложенный интерфейс для создания экземпляра компонента
+    // Фабрика для создания экземпляра AppComponent.
+    // Позволяет передать в граф зависимостей внешний экземпляр, в данном случае, Context.
     @Component.Factory
     interface Factory {
-        // Метод создающий экземпляр компонента и привязывающий Context к графу зависимостей
         fun create(@BindsInstance context: Context): AppComponent
     }
 }

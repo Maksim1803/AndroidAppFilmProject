@@ -5,14 +5,17 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.androidappfilmproject.domain.Film
-import com.example.androidappfilmproject.domain.FilmInteractor
+import com.example.androidappfilmproject.domain.Interactor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-// Создаем класс FavoritesFragmentViewModel, который является ViewModel для FavoritesFragment.
-class FavoritesFragmentViewModel(private val interactor: FilmInteractor) : ViewModel() {
+// Изменяем конструктор, чтобы он принимал наш новый единый Interactor и был готов к внедрению Dagger
+class FavoritesFragmentViewModel @Inject constructor(
+    private val interactor: Interactor
+) : ViewModel() {
 
-    // Flow, который предоставляет PagingData с избранными фильмами из Interactor.
+    // Метод для получения избранных фильмов из Interactor.
     val favoriteFilms: Flow<PagingData<Film>> = interactor.getFavoriteFilmsPaging().cachedIn(viewModelScope)
 
     // Метод для обработки клика по иконке "избранное".

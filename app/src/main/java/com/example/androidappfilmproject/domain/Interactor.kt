@@ -2,43 +2,45 @@ package com.example.androidappfilmproject.domain
 
 import androidx.paging.PagingData
 import com.example.androidappfilmproject.data.MainRepository
+import com.example.androidappfilmproject.data.preferences.PreferenceProvider
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
-// Создаем класс Interactor, который является посредником между ViewModel и Repository.
-// Он содержит определяет какой источник данных использовать.
-class Interactor @Inject constructor(private val repo: MainRepository): FilmInteractor {
-    // Метод для получения списка фильмов.
-    override fun getFilms(): Flow<PagingData<Film>> {
-        return repo.getFilms()
+class Interactor(
+    private val repo: MainRepository,
+    private val preferences: PreferenceProvider
+) {
+    // Работа с категориями (подборками)
+    fun getCategoryPreferenceFlow(): Flow<String> = preferences.categoryFlow
+
+    fun saveDefaultCategoryToPreferences(category: String) {
+        preferences.saveDefaultCategory(category)
     }
 
-    // Метод для получения результатов поиска.
-    override fun getSearchResult(query: String): Flow<PagingData<Film>> {
-        return if (query.isBlank()) { // Если запрос пустой, возвращаем все фильмы.
-            getFilms()
-        } else {
-            repo.getSearchResult(query) // Иначе выполняем поиск.
-        }
+    // Работа с данными (через репозиторий)
+
+    fun getPagedFilms(category: String): Flow<PagingData<Film>> {
+        return repo.getFilms(category)
     }
 
-    // Метод для переключения статуса "избранное" у фильма.
-    override suspend fun toggleFavoriteStatus(film: Film) {
-        repo.toggleFavoriteStatus(film)
+    fun getSearchResult(query: String): Flow<PagingData<Film>> {
+        return repo.getSearchResult(query)
     }
 
-    // Метод для получения избранных фильмов с пагинацией.
-    override fun getFavoriteFilmsPaging(): Flow<PagingData<Film>> {
+    // Добавляем недостающий метод для демо-режима
+    fun getAllFilmsFromDb(): Flow<List<Film>> {
+        return repo.getAllFilmsFromDb()
+    }
+
+    fun getFavoriteFilmsPaging(): Flow<PagingData<Film>> {
         return repo.getFavoriteFilmsPaging()
     }
 
-    // Метод для получения фильма по ID.
-    override fun getFilmById(id: Int): Flow<Film> {
+    fun getFilmById(id: Int): Flow<Film> {
         return repo.getFilmById(id)
     }
 
-    // Метод для получения всех фильмов из локальной базы данных (для демо-режима).
-    override fun getAllFilmsFromDb(): Flow<List<Film>> {
-        return repo.getAllFilmsFromDb()
+    suspend fun toggleFavoriteStatus(film: Film) {
+        val updatedFilm = film.copy(isInFavorites = !film.isInFavorites)
+        repo.updateFilm(updatedFilm)
     }
 }

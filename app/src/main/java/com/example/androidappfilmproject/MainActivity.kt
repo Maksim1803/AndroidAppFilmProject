@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.home -> {
                     val tag = "home"
-                    val fragment = checkFragmentExistence(tag) ?: HomeFragment() // Если фрагмент не существует, создаем новый
+                    val fragment = checkFragmentExistence(tag) ?: HomeFragment() // Если фрагмента нет, создаем новый
                     changeFragment(fragment, tag)
                     true
                 }

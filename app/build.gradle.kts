@@ -6,7 +6,7 @@ import java.io.FileInputStream
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.parcelize)
+    id("kotlin-parcelize") // Заменяем alias на id для надежности
     id("kotlin-kapt")
 }
 
@@ -17,9 +17,25 @@ if (localPropertiesFile.exists()) {
     localProperties.load(FileInputStream(localPropertiesFile))
 }
 
+// Load properties from keystore.properties
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("app/keystore.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.example.androidappfilmproject"
     compileSdk = 36
+
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
+        }
+    }
 
     buildFeatures {
         viewBinding = true
@@ -46,6 +62,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -124,5 +141,6 @@ dependencies {
     implementation ("com.google.dagger:dagger:2.57.2")
     kapt ("com.google.dagger:dagger-compiler:2.57.2")
 
-
+    // Библиотека для модуля 38. SwipeRefreshLayout (для fragment_home.xml)
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }

@@ -14,7 +14,8 @@ import com.example.androidappfilmproject.data.ApiConstants
 import com.example.androidappfilmproject.databinding.FilmItemBinding
 import com.example.androidappfilmproject.domain.Film
 
-// Создаем класс FilmListRecyclerAdapter, который является адаптером для RecyclerView и работает с PagingData.
+// Создаем класс FilmListRecyclerAdapter, который является адаптером для RecyclerView
+// работает с PagingData.
 class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
     PagingDataAdapter<Film, FilmListRecyclerAdapter.FilmViewHolder>(FilmDiffCallback()) {
 
