@@ -18,7 +18,7 @@ import java.io.IOException
 // сетью и базой данных.
 @OptIn(ExperimentalPagingApi::class)
 class FilmRemoteMediator(
-    private val context: Context, // Добавляем Context
+    context: Context, // Добавляем Context
     private val tmdbApi: TmdbApi,
     private val appDatabase: AppDatabase,
     private val category: String // Изменяем конструктор, чтобы принимать категорию

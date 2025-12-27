@@ -53,11 +53,6 @@ class Interactor(
         repo.updateFilm(updatedFilm)
     }
 
-    // Метод для добавления фильма в кэш (БД).
-    suspend fun addFilmToCache(film: Film) {
-        repo.updateFilm(film)
-    }
-
     // Метод для удаления фильма из кэша (БД).
     suspend fun removeFilmFromCache(film: Film) {
         repo.deleteFilm(film)
