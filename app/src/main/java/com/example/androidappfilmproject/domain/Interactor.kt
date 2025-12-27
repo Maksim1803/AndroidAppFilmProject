@@ -22,12 +22,12 @@ class Interactor(
 
     // Работа с данными (через репозиторий)
 
-    // Метод для получения списка фильмов.
+    // Метод для получения постраничного списка фильмов.
     fun getPagedFilms(category: String): Flow<PagingData<Film>> {
         return repo.getFilms(category)
     }
 
-    // Метод для получения результатов поиска.
+    // Метод для получения постраничных результатов поиска.
     fun getSearchResult(query: String): Flow<PagingData<Film>> {
         return repo.getSearchResult(query)
     }
@@ -37,7 +37,7 @@ class Interactor(
         return repo.getAllFilmsFromDb()
     }
 
-    // Метод для получения списка избранных фильмов.
+    // Метод для получения постраничного списка избранных фильмов.
     fun getFavoriteFilmsPaging(): Flow<PagingData<Film>> {
         return repo.getFavoriteFilmsPaging()
     }
@@ -51,5 +51,15 @@ class Interactor(
     suspend fun toggleFavoriteStatus(film: Film) {
         val updatedFilm = film.copy(isInFavorites = !film.isInFavorites)
         repo.updateFilm(updatedFilm)
+    }
+
+    // Метод для добавления фильма в кэш (БД).
+    suspend fun addFilmToCache(film: Film) {
+        repo.updateFilm(film)
+    }
+
+    // Метод для удаления фильма из кэша (БД).
+    suspend fun removeFilmFromCache(film: Film) {
+        repo.deleteFilm(film)
     }
 }

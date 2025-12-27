@@ -23,3 +23,4 @@ class SelectionsFragmentViewModel @Inject constructor(
         interactor.saveDefaultCategoryToPreferences(category)
     }
 }
+
