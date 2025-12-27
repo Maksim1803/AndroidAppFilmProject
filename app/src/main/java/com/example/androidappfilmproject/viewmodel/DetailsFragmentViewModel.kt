@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// Изменяем конструктор, чтобы он принимал наш новый единый Interactor и был готов к внедрению Dagger
+// Создаем класс DetailsFragmentViewModel, который является ViewModel для DetailsFragment.
 class DetailsFragmentViewModel @Inject constructor(
     private val interactor: Interactor
 ) : ViewModel() {

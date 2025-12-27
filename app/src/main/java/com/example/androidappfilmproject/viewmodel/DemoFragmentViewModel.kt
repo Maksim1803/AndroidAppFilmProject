@@ -6,7 +6,7 @@ import com.example.androidappfilmproject.domain.Interactor
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-// Изменяем конструктор, чтобы он принимал единый Interactor и был готов к внедрению Dagger
+// Создаем класс DemoFragmentViewModel, который является ViewModel для DemoFragment.
 class DemoFragmentViewModel @Inject constructor(
     interactor: Interactor
 ) : ViewModel() {

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// Создаем класс HomeFragmentViewModel, который является ViewModel для HomeFragment.
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeFragmentViewModel @Inject constructor(
     private val interactor: Interactor

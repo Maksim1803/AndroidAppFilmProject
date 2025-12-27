@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// Создаем класс FavoritesFragment, который отвечает за отображение списка избранных фильмов.
 class FavoritesFragment : Fragment() {
     private var _binding: FragmentFavoritesBinding? = null
     private val binding get() = _binding!!
@@ -35,12 +36,14 @@ class FavoritesFragment : Fragment() {
 
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
 
+    // Вызывается при присоединении фрагмента к контексту.
     override fun onAttach(context: Context) {
         super.onAttach(context)
         // Выполняем Dagger-инъекцию, чтобы получить viewModelFactory
         (requireActivity().application as App).dagger.inject(this)
     }
 
+    // Вызывается для создания иерархии представлений, связанной с фрагментом.
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -49,21 +52,26 @@ class FavoritesFragment : Fragment() {
         return binding.root
     }
 
+    // Вызывается сразу после того, как onCreateView() завершил свою работу.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 2)
 
+        // Инициализируем адаптер для RecyclerView.
         filmsAdapter = FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
+            // Обрабатываем клик по элементу списка.
             override fun click(film: Film) {
                 (requireActivity() as MainActivity).launchDetailsFragment(film)
             }
 
+            // Обрабатываем клик по кнопке "Избранное".
             override fun onFavoriteClick(film: Film) {
                 viewModel.onFavoriteClicked(film)
             }
         })
 
+        // Настраиваем RecyclerView.
         binding.favoritesRecycler.apply {
             adapter = filmsAdapter
             layoutManager = LinearLayoutManager(requireContext())
@@ -71,6 +79,7 @@ class FavoritesFragment : Fragment() {
             addItemDecoration(decorator)
         }
 
+        // Запускаем корутину для наблюдения за потоком данных из ViewModel.
         lifecycleScope.launch {
             viewModel.favoriteFilms.collectLatest { films ->
                 filmsAdapter.submitData(films)
@@ -78,6 +87,7 @@ class FavoritesFragment : Fragment() {
         }
     }
 
+    // Вызывается, когда иерархия представлений, связанная с фрагментом, удаляется.
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

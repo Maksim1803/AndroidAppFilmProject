@@ -25,6 +25,7 @@ class RemoteModule {
 
     @Provides
     @Singleton
+    // Метод предоставляет экземпляр HTTP-клиента OkHttpClient.
     fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
         .callTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
@@ -37,6 +38,7 @@ class RemoteModule {
 
     @Provides
     @Singleton
+    // Метод предоставляет экземпляр Retrofit (клиент для выполнения HTTP-запросов)
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
         .baseUrl(ApiConstants.BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
@@ -45,5 +47,6 @@ class RemoteModule {
 
     @Provides
     @Singleton
+    // Метод предоставляет экземпляр API-интерфейса TmdbApi, используя Retrofit
     fun provideTmdbApi(retrofit: Retrofit): TmdbApi = retrofit.create(TmdbApi::class.java)
 }

@@ -12,6 +12,8 @@ import com.example.androidappfilmproject.utils.Converter
 import retrofit2.HttpException
 import java.io.IOException
 
+// Создаем класс FilmRemoteMediator, который является посредником между Paging Library,
+// сетью и базой данных.
 @OptIn(ExperimentalPagingApi::class)
 class FilmRemoteMediator(
     private val tmdbApi: TmdbApi,
@@ -52,7 +54,7 @@ class FilmRemoteMediator(
                 }
                 filmDao.insertAll(films)
             }
-
+            // Возвращаем результат
             MediatorResult.Success(endOfPaginationReached = films.isEmpty())
         } catch (e: IOException) {
             MediatorResult.Error(e)

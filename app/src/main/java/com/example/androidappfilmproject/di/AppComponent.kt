@@ -16,8 +16,10 @@ import javax.inject.Singleton
 
 // Главный компонент Dagger для всего приложения.
 // Он связывает все модули и предоставляет методы для внедрения зависимостей.
+
 @Singleton
 @Component(
+    //Внедряем все модули, нужные для этого компонента
     modules = [
         RemoteModule::class,
         DatabaseModule::class,
