@@ -53,4 +53,11 @@ class HomeFragmentViewModel @Inject constructor(
             interactor.toggleFavoriteStatus(film)
         }
     }
+
+    // Метод для удаления фильма из кэша.
+    fun removeFilmFromCache(film: Film) {
+        viewModelScope.launch {
+            interactor.removeFilmFromCache(film)
+        }
+    }
 }

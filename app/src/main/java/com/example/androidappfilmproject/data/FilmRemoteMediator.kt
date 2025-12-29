@@ -1,5 +1,6 @@
 package com.example.androidappfilmproject.data
 
+import android.content.Context
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -9,6 +10,7 @@ import com.example.androidappfilmproject.AppDatabase
 import com.example.androidappfilmproject.BuildConfig
 import com.example.androidappfilmproject.domain.Film
 import com.example.androidappfilmproject.utils.Converter
+import com.example.androidappfilmproject.utils.NetworkChecker
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -16,14 +18,21 @@ import java.io.IOException
 // сетью и базой данных.
 @OptIn(ExperimentalPagingApi::class)
 class FilmRemoteMediator(
+    context: Context, // Добавляем Context
     private val tmdbApi: TmdbApi,
     private val appDatabase: AppDatabase,
     private val category: String // Изменяем конструктор, чтобы принимать категорию
 ) : RemoteMediator<Int, Film>() {
 
     private val filmDao = appDatabase.filmDao()
+    private val networkChecker = NetworkChecker(context)
 
     override suspend fun load(loadType: LoadType, state: PagingState<Int, Film>): MediatorResult {
+        // Проверяем наличие интернета
+        if (!networkChecker.isInternetAvailable()) {
+            return MediatorResult.Success(endOfPaginationReached = true)
+        }
+
         return try {
             val loadKey = when (loadType) {
                 LoadType.REFRESH -> 1
