@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+# Android Studio generated files
+/.idea/deploymentTargetSelector.xml
+/.idea/appInsightsSettings.xml
