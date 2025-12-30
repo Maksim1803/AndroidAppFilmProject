@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// Создаем класс HomeFragmentViewModel, который является ViewModel для HomeFragment.
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeFragmentViewModel @Inject constructor(
     private val interactor: Interactor
@@ -50,6 +51,13 @@ class HomeFragmentViewModel @Inject constructor(
     fun onFavoriteClicked(film: Film) {
         viewModelScope.launch {
             interactor.toggleFavoriteStatus(film)
+        }
+    }
+
+    // Метод для удаления фильма из кэша.
+    fun removeFilmFromCache(film: Film) {
+        viewModelScope.launch {
+            interactor.removeFilmFromCache(film)
         }
     }
 }

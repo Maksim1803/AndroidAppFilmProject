@@ -37,6 +37,11 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
             holder.itemView.setOnClickListener { _ ->
                 clickListener.click(it)
             }
+            // Устанавливаем слушатель долгого клика на сам элемент списка.
+            holder.itemView.setOnLongClickListener { _ ->
+                clickListener.longClick(it)
+                true
+            }
         }
     }
 
@@ -99,6 +104,8 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
         fun click(film: Film)
         // Метод для обработки клика по иконке "избранное".
         fun onFavoriteClick(film: Film)
+        // Метод для обработки долгого клика по элементу списка.
+        fun longClick(film: Film)
     }
 
     // Класс для вычисления различий между двумя списками.

@@ -1,5 +1,6 @@
 package com.example.androidappfilmproject.data
 
+import android.content.Context
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -10,13 +11,16 @@ import com.example.androidappfilmproject.domain.Film
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
+// Создаем класс MainRepository, который является единой точкой доступа к данным
+// (из сети или из базы данных).
 @OptIn(ExperimentalPagingApi::class)
-class MainRepository(private val appDatabase: AppDatabase, private val tmdbApi: TmdbApi) {
-    
-    // Изменяем метод, чтобы он принимал категорию
+class MainRepository(private val context: Context, private val appDatabase: AppDatabase, private val tmdbApi: TmdbApi) {
+
+    // Метод для получения списка фильмов с использованием Paging 3.
     fun getFilms(category: String): Flow<PagingData<Film>> {
         // Создаем FilmRemoteMediator с правильным конструктором, передавая ему категорию
         val filmRemoteMediator = FilmRemoteMediator(
+            context = context,
             tmdbApi = tmdbApi,
             appDatabase = appDatabase,
             category = category // Используем переданную категорию
@@ -29,6 +33,7 @@ class MainRepository(private val appDatabase: AppDatabase, private val tmdbApi: 
         ).flow
     }
 
+    // Метод для получения результатов поиска фильмов.
     fun getSearchResult(query: String): Flow<PagingData<Film>> {
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
@@ -36,10 +41,17 @@ class MainRepository(private val appDatabase: AppDatabase, private val tmdbApi: 
         ).flow
     }
 
+    // Обновляет (вставляет или заменяет) фильм в базе данных.
     suspend fun updateFilm(film: Film) {
         appDatabase.filmDao().insert(film)
     }
-    
+
+    // Удаляет фильм из базы данных.
+    suspend fun deleteFilm(film: Film) {
+        appDatabase.filmDao().delete(film)
+    }
+
+    // Метод для получения списка избранных фильмов с использованием Paging 3.
     fun getFavoriteFilmsPaging(): Flow<PagingData<Film>> {
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
@@ -47,14 +59,17 @@ class MainRepository(private val appDatabase: AppDatabase, private val tmdbApi: 
         ).flow
     }
 
+    // Метод для получения фильма по его ID из базы данных.
     fun getFilmById(id: Int): Flow<Film> {
         return appDatabase.filmDao().getFilmById(id)
     }
 
+    // Метод для получения всех фильмов из локальной базы данных (для Демо-режима).
     fun getAllFilmsFromDb(): Flow<List<Film>> {
         return flow { emit(filmsDataBase) }
     }
-    
+
+    // Список фильмов для Демо-режима.
     private val filmsDataBase: List<Film> = listOf(
         Film(
             id = 1,

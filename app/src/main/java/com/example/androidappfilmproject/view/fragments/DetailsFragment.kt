@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// Создаем класс DetailsFragment, который отвечает за отображение подробной информации о фильме.
 class DetailsFragment : Fragment() {
     private var _binding: FragmentDetailsBinding? = null
     private val binding get() = _binding!!
@@ -38,12 +39,14 @@ class DetailsFragment : Fragment() {
     // Получаем ViewModel с помощью Dagger-фабрики
     private val viewModel: DetailsFragmentViewModel by viewModels { viewModelFactory }
 
+    // Вызывается при присоединении фрагмента к контексту.
     override fun onAttach(context: Context) {
         super.onAttach(context)
         // Выполняем Dagger-инъекцию, чтобы получить viewModelFactory
         (requireActivity().application as App).dagger.inject(this)
     }
 
+    // Вызывается для создания иерархии представлений, связанной с фрагментом.
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -52,9 +55,11 @@ class DetailsFragment : Fragment() {
         return binding.root
     }
 
+    // Вызывается сразу после того, как onCreateView() завершил свою работу.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Получаем фильм из аргументов фрагмента.
         val filmFromArgs = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelable("film", Film::class.java)
         } else {
@@ -62,18 +67,22 @@ class DetailsFragment : Fragment() {
             arguments?.getParcelable("film")
         }
 
+        // Если фильм не найден, показываем ошибку и закрываем экран.
         if (filmFromArgs == null) {
             Snackbar.make(binding.root, "Ошибка: Фильм не найден", Snackbar.LENGTH_SHORT).show()
             activity?.finish()
             return
         }
 
+        // Настраиваем Toolbar.
         (activity as? AppCompatActivity)?.setSupportActionBar(binding.detailsToolbar)
         (activity as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        // Устанавливаем текущий фильм и отображаем его детали.
         currentFilm = filmFromArgs
         setFilmsDetails(filmFromArgs)
 
+        // Подписываемся на изменения фильма в базе данных.
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.getFilmById(filmFromArgs.id).collectLatest { film ->
                 currentFilm = film
@@ -81,6 +90,7 @@ class DetailsFragment : Fragment() {
             }
         }
 
+        // Обрабатываем нажатие на кнопку "Избранное".
         binding.favoriteButton.setOnClickListener {
             currentFilm?.let { film ->
                 val wasInFavorites = film.isInFavorites
@@ -96,10 +106,12 @@ class DetailsFragment : Fragment() {
             }
         }
 
+        // Обрабатываем нажатие на кнопку "Посмотреть позже".
         binding.watchLaterButton.setOnClickListener {
             Snackbar.make(binding.root, "Добавлено в список 'Посмотреть позже'", Snackbar.LENGTH_SHORT).show()
         }
 
+        // Обрабатываем нажатие на FAB для отправки фильма.
         binding.detailsFab.setOnClickListener {
             currentFilm?.let { film ->
                 val intent = Intent()
@@ -113,17 +125,21 @@ class DetailsFragment : Fragment() {
             }
         }
 
+        // Устанавливаем тип масштабирования для постера.
         binding.detailsPoster.apply {
             this.scaleType = ImageView.ScaleType.CENTER_CROP
         }
     }
 
+    // Метод для установки деталей фильма в UI.
     private fun setFilmsDetails(film: Film) {
         binding.apply {
             detailsToolbar.title = film.title
 
+            // Загружаем постер фильма.
             film.poster?.let { posterPath ->
                 try {
+                    // Если постер - это ресурс, загружаем его как ресурс.
                     val resourceId = posterPath.toInt()
                     Glide.with(this@DetailsFragment)
                         .load(resourceId)
@@ -131,6 +147,7 @@ class DetailsFragment : Fragment() {
                         .centerCrop()
                         .into(detailsPoster)
                 } catch (_: NumberFormatException) {
+                    // Если постер - это URL, загружаем его из сети.
                     val fullUrl = ApiConstants.IMAGES_URL + "w780/" + posterPath.removePrefix("/")
                     val thumbnailUrl = ApiConstants.IMAGES_URL + "w342/" + posterPath.removePrefix("/")
                     Glide.with(this@DetailsFragment)
@@ -140,23 +157,26 @@ class DetailsFragment : Fragment() {
                         .centerCrop()
                         .into(detailsPoster)
                 }
-            } ?: Glide.with(this@DetailsFragment)
+            } ?: Glide.with(this@DetailsFragment) // Если постера нет, показываем заглушку.
                 .load(R.drawable.no_poster)
                 .centerCrop()
                 .into(detailsPoster)
 
             detailsDescription.text = film.description
 
+            // Устанавливаем иконку "Избранное" в зависимости от статуса фильма.
             favoriteButton.setImageResource(
                 if (film.isInFavorites) R.drawable.baseline_favorite_24
                 else R.drawable.baseline_favorite_border_24
             )
 
+            // Устанавливаем прогресс рейтинга.
             val progress = (film.rating * 10).toInt().coerceIn(0, 100)
             ratingDonut.setProgress(progress)
         }
     }
 
+    // Вызывается, когда иерархия представлений, связанная с фрагментом, удаляется.
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
