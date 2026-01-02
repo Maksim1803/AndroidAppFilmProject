@@ -1,7 +1,7 @@
 package com.example.androidappfilmproject.utils
 
-import com.example.androidappfilmproject.data.Entity.TmdbFilm
-import com.example.androidappfilmproject.domain.Film
+import com.example.androidappfilmproject.data.entity.Film
+import com.example.androidappfilmproject.data.entity.TmdbFilm
 
 // Создаем object Converter для преобразования данных из одного формата в другой
 object Converter {

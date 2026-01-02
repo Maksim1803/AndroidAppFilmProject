@@ -1,6 +1,6 @@
 package com.example.androidappfilmproject.data
 
-import com.example.androidappfilmproject.data.Entity.TmdbResults
+import com.example.androidappfilmproject.data.entity.TmdbResults
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

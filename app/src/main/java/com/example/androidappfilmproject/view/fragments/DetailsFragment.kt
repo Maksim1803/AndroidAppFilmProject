@@ -17,8 +17,8 @@ import com.bumptech.glide.Glide
 import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.data.ApiConstants
+import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
-import com.example.androidappfilmproject.domain.Film
 import com.example.androidappfilmproject.viewmodel.DetailsFragmentViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
@@ -85,8 +85,10 @@ class DetailsFragment : Fragment() {
         // Подписываемся на изменения фильма в базе данных.
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.getFilmById(filmFromArgs.id).collectLatest { film ->
-                currentFilm = film
-                film.let { setFilmsDetails(it) }
+                if (film != null) { // Проверяем, что фильм не null
+                    currentFilm = film
+                    setFilmsDetails(film)
+                }
             }
         }
 
@@ -108,7 +110,7 @@ class DetailsFragment : Fragment() {
 
         // Обрабатываем нажатие на кнопку "Посмотреть позже".
         binding.watchLaterButton.setOnClickListener {
-            Snackbar.make(binding.root, "Добавлено в список 'Посмотреть позже'", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, "Добавлено в список \'Посмотреть позже\'", Snackbar.LENGTH_SHORT).show()
         }
 
         // Обрабатываем нажатие на FAB для отправки фильма.

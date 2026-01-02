@@ -12,8 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.MainActivity
+import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.databinding.FragmentFavoritesBinding
-import com.example.androidappfilmproject.domain.Film
 import com.example.androidappfilmproject.utils.AnimationHelper
 import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapter
 import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
@@ -68,6 +68,10 @@ class FavoritesFragment : Fragment() {
             // Обрабатываем клик по кнопке "Избранное".
             override fun onFavoriteClick(film: Film) {
                 viewModel.onFavoriteClicked(film)
+            }
+
+            override fun longClick(film: Film) {
+                //В этом фрагменте не используется
             }
         })
 

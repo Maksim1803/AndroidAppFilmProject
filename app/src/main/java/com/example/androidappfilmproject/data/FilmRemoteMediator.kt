@@ -6,9 +6,9 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.example.androidappfilmproject.AppDatabase
 import com.example.androidappfilmproject.BuildConfig
-import com.example.androidappfilmproject.domain.Film
+import com.example.androidappfilmproject.data.db.AppDatabase
+import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.utils.Converter
 import com.example.androidappfilmproject.utils.NetworkChecker
 import retrofit2.HttpException

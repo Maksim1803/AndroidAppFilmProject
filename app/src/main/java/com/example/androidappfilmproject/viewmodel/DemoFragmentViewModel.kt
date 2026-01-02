@@ -1,7 +1,7 @@
 package com.example.androidappfilmproject.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.androidappfilmproject.domain.Film
+import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.domain.Interactor
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

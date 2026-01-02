@@ -13,8 +13,8 @@ import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.MainActivity
+import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.databinding.FragmentDemoBinding
-import com.example.androidappfilmproject.domain.Film
 import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapter
 import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
 import com.example.androidappfilmproject.viewmodel.DemoFragmentViewModel
@@ -65,6 +65,10 @@ class DemoFragment : Fragment() {
             }
             // В демо-режиме эта функция не нужна.
             override fun onFavoriteClick(film: Film) {
+                // В демо-режиме эта функция не нужна
+            }
+
+            override fun longClick(film: Film) {
                 // В демо-режиме эта функция не нужна
             }
         })
