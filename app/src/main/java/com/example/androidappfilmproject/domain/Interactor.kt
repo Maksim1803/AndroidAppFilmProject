@@ -44,7 +44,7 @@ class Interactor(
     }
     
     // Метод для получения фильма по ID.
-    fun getFilmById(id: Int): Flow<Film> {
+    fun getFilmById(id: Int): Flow<Film?> {
         return repo.getFilmById(id)
     }
 

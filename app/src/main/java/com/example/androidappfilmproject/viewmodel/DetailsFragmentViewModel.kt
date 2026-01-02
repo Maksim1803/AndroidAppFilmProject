@@ -14,7 +14,7 @@ class DetailsFragmentViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Метод для получения фильма по ID.
-    fun getFilmById(id: Int): Flow<Film> {
+    fun getFilmById(id: Int): Flow<Film?> {
         return interactor.getFilmById(id)
     }
 

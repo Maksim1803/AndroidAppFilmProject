@@ -45,7 +45,7 @@ class MainRepository(private val context: Context, private val appDatabase: AppD
 
     // Обновляет (вставляет или заменяет) фильм в базе данных.
     suspend fun updateFilm(film: Film) {
-        filmDao.insert(film)
+        filmDao.update(film)
     }
 
     // Удаляет фильм из базы данных.
@@ -62,7 +62,7 @@ class MainRepository(private val context: Context, private val appDatabase: AppD
     }
 
     // Метод для получения фильма по его ID из базы данных.
-    fun getFilmById(id: Int): Flow<Film> {
+    fun getFilmById(id: Int): Flow<Film?> {
         return filmDao.getFilmById(id)
     }
 
