@@ -3,7 +3,7 @@ package com.example.androidappfilmproject.data
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.androidappfilmproject.BuildConfig
-import com.example.androidappfilmproject.domain.Film
+import com.example.androidappfilmproject.data.entity.Film
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -31,7 +31,8 @@ class SearchFilmPagingSource(
                     poster = it.posterPath,
                     description = it.overview,
                     rating = it.voteAverage,
-                    id = it.id
+                    id = it.id,
+                    isInFavorites = false
                 )
             } ?: emptyList()
             // Возвращаем страницу с данными

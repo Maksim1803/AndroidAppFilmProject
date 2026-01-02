@@ -15,8 +15,8 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.MainActivity
+import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.databinding.FragmentHomeBinding
-import com.example.androidappfilmproject.domain.Film
 import com.example.androidappfilmproject.utils.AnimationHelper
 import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapter
 import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration

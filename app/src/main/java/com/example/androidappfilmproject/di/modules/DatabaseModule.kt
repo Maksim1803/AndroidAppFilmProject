@@ -2,8 +2,8 @@ package com.example.androidappfilmproject.di.modules
 
 import android.content.Context
 import androidx.room.Room
-import com.example.androidappfilmproject.AppDatabase
-import com.example.androidappfilmproject.FilmDao
+import com.example.androidappfilmproject.data.db.AppDatabase
+import com.example.androidappfilmproject.data.dao.FilmDao
 import com.example.androidappfilmproject.data.MainRepository
 import com.example.androidappfilmproject.data.TmdbApi
 import dagger.Module

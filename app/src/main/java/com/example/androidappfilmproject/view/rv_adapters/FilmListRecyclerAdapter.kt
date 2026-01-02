@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.data.ApiConstants
+import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.databinding.FilmItemBinding
-import com.example.androidappfilmproject.domain.Film
 
 // Создаем класс FilmListRecyclerAdapter, который является адаптером для RecyclerView
 // работает с PagingData.

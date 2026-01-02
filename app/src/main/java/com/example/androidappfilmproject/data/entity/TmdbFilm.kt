@@ -1,4 +1,4 @@
-package com.example.androidappfilmproject.data.Entity
+package com.example.androidappfilmproject.data.entity
 
 import com.google.gson.annotations.SerializedName
 

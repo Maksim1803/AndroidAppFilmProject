@@ -3,8 +3,8 @@ package com.example.androidappfilmproject
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
-import com.example.androidappfilmproject.domain.Film
 import com.example.androidappfilmproject.view.fragments.DemoFragment
 import com.example.androidappfilmproject.view.fragments.DetailsFragment
 import com.example.androidappfilmproject.view.fragments.FavoritesFragment

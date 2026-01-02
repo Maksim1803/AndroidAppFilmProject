@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.androidappfilmproject.domain.Film
+import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.domain.Interactor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch

@@ -2,6 +2,7 @@ package com.example.androidappfilmproject.domain
 
 import androidx.paging.PagingData
 import com.example.androidappfilmproject.data.MainRepository
+import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.data.preferences.PreferenceProvider
 import kotlinx.coroutines.flow.Flow
 
