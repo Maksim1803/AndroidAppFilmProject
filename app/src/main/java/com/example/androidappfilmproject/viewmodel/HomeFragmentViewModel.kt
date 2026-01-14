@@ -24,6 +24,8 @@ class HomeFragmentViewModel @Inject constructor(
 ) : ViewModel() {
 
     // LiveData для списка фильмов из БД (Модуль 41)
+    // Используется как альтернативный способ получения данных (всех сразу),
+    // в то время как переменная 'films' ниже реализует постраничную загрузку (Paging).
     val filmsListLiveData: LiveData<List<Film>> = interactor.getFilmsFromDB()
 
     // LiveData для отображения прогресс-бара (Модуль 41)
@@ -34,6 +36,7 @@ class HomeFragmentViewModel @Inject constructor(
 
     // Flow для хранения текущей категории
     private val category = interactor.getCategoryPreferenceFlow()
+
     // Flow для хранения поискового запроса
     private val query = MutableStateFlow("")
 
