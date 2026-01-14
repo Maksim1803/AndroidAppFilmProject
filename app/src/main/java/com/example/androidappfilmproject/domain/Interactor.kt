@@ -1,5 +1,6 @@
 package com.example.androidappfilmproject.domain
 
+import androidx.lifecycle.LiveData
 import androidx.paging.PagingData
 import com.example.androidappfilmproject.data.MainRepository
 import com.example.androidappfilmproject.data.entity.Film
@@ -7,22 +8,24 @@ import com.example.androidappfilmproject.data.preferences.PreferenceProvider
 import kotlinx.coroutines.flow.Flow
 
 // Создаем класс Interactor, который является посредником между ViewModel и Repository.
-// Он содержит определяет какой источник данных использовать.
 class Interactor(
     private val repo: MainRepository,
     private val preferences: PreferenceProvider
 ) {
-    // Работа с категориями (подборками)
-    // Метод для получения потока с сохраненной категорией фильмов.
+    // Метод для получения списка фильмов из БД в виде LiveData (модуль 41)
+    fun getFilmsFromDB(): LiveData<List<Film>> = repo.getCachedFilmsFromDb()
+
+    // Работа с категориями
+    // Метод для выбора категории фильмов.
     fun getCategoryPreferenceFlow(): Flow<String> = preferences.categoryFlow
 
     // Метод для сохранения категории фильмов в SharedPreferences.
+    // Когда выбирается категория в настройках, метод записывает её в память телефона
     fun saveDefaultCategoryToPreferences(category: String) {
         preferences.saveDefaultCategory(category)
     }
 
     // Работа с данными (через репозиторий)
-
     // Метод для получения постраничного списка фильмов.
     fun getPagedFilms(category: String): Flow<PagingData<Film>> {
         return repo.getFilms(category)
@@ -42,19 +45,19 @@ class Interactor(
     fun getFavoriteFilmsPaging(): Flow<PagingData<Film>> {
         return repo.getFavoriteFilmsPaging()
     }
-    
+
     // Метод для получения фильма по ID.
     fun getFilmById(id: Int): Flow<Film?> {
         return repo.getFilmById(id)
     }
 
-    // Метод для переключения статуса "избранное" у фильма.
+    // Метод для обновления статуса избранного фильма.
     suspend fun toggleFavoriteStatus(film: Film) {
         val updatedFilm = film.copy(isInFavorites = !film.isInFavorites)
         repo.updateFilm(updatedFilm)
     }
 
-    // Метод для удаления фильма из кэша (БД).
+    // Метод для удаления фильма из кэша.
     suspend fun removeFilmFromCache(film: Film) {
         repo.deleteFilm(film)
     }

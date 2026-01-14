@@ -1,6 +1,7 @@
 package com.example.androidappfilmproject.data
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -12,7 +13,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 // Создаем класс MainRepository, который является единой точкой доступа к данным
-// (из сети или из базы данных).
 @OptIn(ExperimentalPagingApi::class)
 class MainRepository(private val context: Context, private val appDatabase: AppDatabase, private val tmdbApi: TmdbApi) {
 
@@ -20,12 +20,11 @@ class MainRepository(private val context: Context, private val appDatabase: AppD
 
     // Метод для получения списка фильмов с использованием Paging 3.
     fun getFilms(category: String): Flow<PagingData<Film>> {
-        // Создаем FilmRemoteMediator с правильным конструктором, передавая ему категорию
         val filmRemoteMediator = FilmRemoteMediator(
             context = context,
             tmdbApi = tmdbApi,
             appDatabase = appDatabase,
-            category = category // Используем переданную категорию
+            category = category
         )
 
         return Pager(
@@ -35,7 +34,10 @@ class MainRepository(private val context: Context, private val appDatabase: AppD
         ).flow
     }
 
-    // Метод для получения результатов поиска фильмов.
+    // Метод для получения LiveData со списком всех кэшированных фильмов (модуль 41).
+    fun getCachedFilmsFromDb(): LiveData<List<Film>> = filmDao.getCachedFilms()
+
+    // Метод для получения результатов поиска фильмов через Paging.
     fun getSearchResult(query: String): Flow<PagingData<Film>> {
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
@@ -43,17 +45,17 @@ class MainRepository(private val context: Context, private val appDatabase: AppD
         ).flow
     }
 
-    // Обновляет (вставляет или заменяет) фильм в базе данных.
+    // Метод для обновления данных фильма в БД.
     suspend fun updateFilm(film: Film) {
         filmDao.update(film)
     }
 
-    // Удаляет фильм из базы данных.
+    // Метод для удаления фильма из БД.
     suspend fun deleteFilm(film: Film) {
         filmDao.delete(film)
     }
 
-    // Метод для получения списка избранных фильмов с использованием Paging 3.
+    // Метод для получения списка избранных фильмов с пагинацией.
     fun getFavoriteFilmsPaging(): Flow<PagingData<Film>> {
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
@@ -61,12 +63,12 @@ class MainRepository(private val context: Context, private val appDatabase: AppD
         ).flow
     }
 
-    // Метод для получения фильма по его ID из базы данных.
+    // Метод для получения одного фильма по его идентификатору.
     fun getFilmById(id: Int): Flow<Film?> {
         return filmDao.getFilmById(id)
     }
 
-    // Метод для получения всех фильмов из локальной базы данных (для Демо-режима).
+    // Метод для получения всех статичных фильмов (используется в демо-режиме).
     fun getAllFilmsFromDb(): Flow<List<Film>> {
         return flowOf(filmsDataBase)
     }
