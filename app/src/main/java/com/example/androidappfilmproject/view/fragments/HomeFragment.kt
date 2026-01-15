@@ -67,17 +67,34 @@ class HomeFragment : Fragment() {
         initPullToRefresh()
         initSearchView()
 
-        // Запускаем корутину для наблюдения за потоком данных из ViewModel.
+        // 1. Запускаем корутину для наблюдения за потоком данных из ViewModel.
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.films.collectLatest { pagedData ->
                 filmsAdapter.submitData(pagedData)
             }
         }
 
-        // Наблюдаем за состоянием загрузки данных.
+        // 2. Наблюдаем за прогресс-баром через LiveData
+        viewModel.showProgressBar.observe(viewLifecycleOwner) { isVisible ->
+            binding.progressBar.isVisible = isVisible
+        }
+
+        // 3. Наблюдаем за ошибками через SingleLiveEvent
+        viewModel.errorEvent.observe(viewLifecycleOwner) { errorMessage ->
+            Snackbar.make(binding.root, errorMessage, Snackbar.LENGTH_LONG).show()
+        }
+
+        // Связываем состояние загрузки Paging с LiveData во ViewModel
         viewLifecycleOwner.lifecycleScope.launch {
             filmsAdapter.loadStateFlow.collectLatest { loadState ->
-                binding.progressBar.isVisible = loadState.refresh is LoadState.Loading
+                // Обновляем прогресс-бар во ViewModel
+                viewModel.showProgressBar.postValue(loadState.refresh is LoadState.Loading)
+                
+                // Если произошла ошибка - отправляем её в SingleLiveEvent
+                if (loadState.refresh is LoadState.Error) {
+                    val error = (loadState.refresh as LoadState.Error).error
+                    viewModel.errorEvent.postValue(error.localizedMessage ?: "Ошибка при загрузке данных")
+                }
             }
         }
     }
@@ -85,6 +102,7 @@ class HomeFragment : Fragment() {
     // Инициализируем RecyclerView.
     private fun initRecycler() {
         filmsAdapter = FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
+
             // Обрабатываем клик по элементу списка.
             override fun click(film: Film) {
                 (requireActivity() as MainActivity).launchDetailsFragment(film)
@@ -110,27 +128,28 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // Инициализируем SwipeRefreshLayout.
+    // Инициализируем метод тяни-обнови.
+    // Когда тянем список вниз, срабатывает слушатель setOnRefreshListener.
+    // Внутри него вызывается filmsAdapter.refresh(), что заставляет Paging Library
+    // заново запросить свежие данные с сервера.
     private fun initPullToRefresh() {
         binding.pullToRefresh.setOnRefreshListener {
             filmsAdapter.refresh()
-            binding.pullToRefresh.isRefreshing = false
+            binding.pullToRefresh.isRefreshing = false // анимация обновления выключается
         }
     }
 
-    // Инициализируем SearchView.
+    // Метод, настраивающий поле поиска в верхней части экрана.
     private fun initSearchView() {
         binding.searchView.setOnClickListener {
             binding.searchView.isIconified = false
         }
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            // Обрабатываем отправку запроса.
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return true
             }
-
-            // Обрабатываем изменение текста в поисковой строке.
+           // Метод, реагирующий на каждое изменение текста в строке поиска
             override fun onQueryTextChange(newText: String): Boolean {
                 if (newText.isNotBlank()) {
                     viewModel.setQuery(newText.lowercase(Locale.getDefault()))
@@ -142,7 +161,7 @@ class HomeFragment : Fragment() {
         })
     }
 
-    // Вызывается, когда иерархия представлений, связанная с фрагментом, удаляется.
+    // Очищает ресурсы, когда экран (View) фрагмента уничтожается.
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
