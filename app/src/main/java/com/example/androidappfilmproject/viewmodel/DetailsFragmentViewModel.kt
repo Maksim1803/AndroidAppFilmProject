@@ -42,7 +42,7 @@ class DetailsFragmentViewModel @Inject constructor(
             val inputStream = connection.getInputStream()
             // Декодируем поток в Bitmap
             BitmapFactory.decodeStream(inputStream)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // В случае ошибки (например, нет интернета или таймаут) возвращаем null.
             null
         }

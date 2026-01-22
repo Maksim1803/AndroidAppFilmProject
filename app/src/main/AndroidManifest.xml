@@ -19,8 +19,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android.supportsRtl="true"
-        android.theme="@style/Theme.AndroidAppFilmProject"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AndroidAppFilmProject"
         tools:targetApi="s">
         <activity
             android:name=".MainActivity"
