@@ -143,4 +143,8 @@ dependencies {
 
     //Библиотека для модуля 38. SwipeRefreshLayout (для fragment_home.xml)
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
+
+    //Библиотека для модуля 42 (Coroutines - корутины).
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 }

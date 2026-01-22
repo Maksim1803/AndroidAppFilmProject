@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-<!-- Разрешение на использование интернета -->
+    <!-- Разрешение на использование интернета -->
     <uses-permission android:name="android.permission.INTERNET" />
-<!-- Разрешение на проверку наличия сетевого подключения -->
+    <!-- Разрешение на проверку наличия сетевого подключения -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Разрешение на чтение данных из внешнего хранилища -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Разрешение на запись данных из внешнего хранилища -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
 
     <application
         android:name=".App"

@@ -1,14 +1,21 @@
 package com.example.androidappfilmproject.view.fragments
 
+import android.Manifest
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -21,8 +28,8 @@ import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
 import com.example.androidappfilmproject.viewmodel.DetailsFragmentViewModel
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 // Создаем класс DetailsFragment, который отвечает за отображение подробной информации о фильме.
@@ -127,6 +134,11 @@ class DetailsFragment : Fragment() {
             }
         }
 
+        // Кнопка скачивания постера
+        binding.detailsFabDownloadWp.setOnClickListener {
+            performAsyncLoadOfPoster()
+        }
+
         // Устанавливаем тип масштабирования для постера.
         binding.detailsPoster.apply {
             this.scaleType = ImageView.ScaleType.CENTER_CROP
@@ -175,6 +187,135 @@ class DetailsFragment : Fragment() {
             // Устанавливаем прогресс рейтинга.
             val progress = (film.rating * 10).toInt().coerceIn(0, 100)
             ratingDonut.setProgress(progress)
+        }
+    }
+
+    // Узнаем, было ли получено разрешение ранее
+    private fun checkPermission(): Boolean {
+        val result = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+        return result == PackageManager.PERMISSION_GRANTED
+    }
+
+    // Запрашиваем разрешение
+    private fun requestPermission() {
+        requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
+    }
+
+    // Слушаем ответ на запрос разрешений
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == 1) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                performAsyncLoadOfPoster()
+            } else {
+                Snackbar.make(binding.root, "Разрешение отклонено", Snackbar.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // Логика сохранения в галерею
+    private fun saveToGallery(bitmap: Bitmap) {
+        val film = currentFilm ?: return
+        // Проверяем версию системы
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Создаем объект для передачи данных
+            val contentValues = ContentValues().apply {
+                // Составляем информацию для файла (имя, тип, дата создания, куда сохранять и т.д.)
+                put(MediaStore.Images.Media.TITLE, film.title.handleSingleQuote())
+                put(
+                    MediaStore.Images.Media.DISPLAY_NAME,
+                    "${film.title.handleSingleQuote()}.jpg"
+                )
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                put(
+                    MediaStore.Images.Media.DATE_ADDED,
+                    System.currentTimeMillis() / 1000
+                )
+                put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/FilmsSearchApp")
+            }
+            // Получаем ссылку на объект Content resolver, который помогает передавать
+            // информацию из приложения вовне
+            val contentResolver = requireActivity().contentResolver
+            val uri = contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                contentValues
+            )
+            // Открываем канал для записи на диск
+            val outputStream = uri?.let { contentResolver.openOutputStream(it) }
+            // Передаем нашу картинку, может сделать компрессию
+            outputStream?.use {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+            }
+        } else {
+            // То же, но для более старых версий ОС
+            @Suppress("DEPRECATION")
+            MediaStore.Images.Media.insertImage(
+                requireActivity().contentResolver,
+                bitmap,
+                film.title.handleSingleQuote(),
+                film.description.handleSingleQuote()
+            )
+        }
+    }
+
+    // Кастомный метод для того, чтобы убирать кавычки.
+    private fun String.handleSingleQuote(): String {
+        return this.replace("'", "")
+    }
+
+    // Метод, который вызывается при нажатии на кнопку. 
+    private fun performAsyncLoadOfPoster() {
+        val film = currentFilm ?: return
+        // Проверяем есть ли разрешение (нужно для версий < Q)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && !checkPermission()) {
+            // Если нет, то запрашиваем и выходим из метода через стандартное окно
+            requestPermission()
+            return
+        }
+        
+        // Используем жизненный цикл фрагмента для запуска корутины
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Включаем Прогресс-бар
+            binding.progressBar.isVisible = true
+            
+            // Загружаем картинку
+            val posterPath = film.poster?.removePrefix("/")
+            // Используем "w185" (очень низкое качество) вместо "w500" или "original",
+            // чтобы файл загрузился даже при очень плохом интернете.
+            val fullUrl = ApiConstants.IMAGES_URL + "w500/" + posterPath
+            val bitmap = viewModel.loadWallpaper(fullUrl)
+            
+            // Отключаем Прогресс-бар
+            binding.progressBar.isVisible = false
+
+            if (bitmap != null) {
+                // Сохраняем в галерею
+                saveToGallery(bitmap)
+                // Выводим снекбар
+                Snackbar.make(
+                    binding.root,
+                    "Сохранено в Галерею",
+                    Snackbar.LENGTH_LONG
+                )
+                    .setAction("В ГАЛЕРЕЮ") {
+                        val intent = Intent()
+                        intent.action = Intent.ACTION_VIEW
+                        intent.type = "image/*"
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(intent)
+                    }
+                    .show()
+            } else {
+                // Обработка ошибки
+                Snackbar.make(
+                    binding.root,
+                    "Ошибка при загрузке изображения",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
