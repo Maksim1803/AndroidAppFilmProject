@@ -27,4 +27,10 @@
     <string name="radio_button_upcoming">Скоро</string>
     <string name="radio_button_playing">В кинотеатрах</string>
     <string name="radio_group_header">Подборка на главном экране:</string>
+    <!-- Добавлены строки для модуля 42 -->
+    <string name="permission_storage">Нет разрешения. Пожалуйста, предоставьте разрешение</string>
+    <string name="downloaded_to_gallery">"Сохранено в галерею"</string>
+    <string name="open">В галерею</string>
+
+
 </resources>

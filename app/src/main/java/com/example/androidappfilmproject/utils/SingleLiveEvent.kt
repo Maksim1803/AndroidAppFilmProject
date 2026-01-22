@@ -18,8 +18,14 @@ class SingleLiveEvent<T> : MutableLiveData<T>() {
     override fun observe(owner: LifecycleOwner, observer: Observer<in T>) {
 
         // Проверяем, есть ли уже активные наблюдатели.
+
         if (hasActiveObservers()) {
-            Log.w(TAG, "Multiple observers registered but only one will be notified of changes.")
+
+            // Всплывает, если случайно подписались на одну и ту же LiveData дважды
+            // в одном фрагменте/активити (например, в onViewCreated без учета жизненного цикла).
+            // или если на одно и то же событие пытаются одновременно реагировать несколько
+            // разных фрагментов.
+            Log.w(TAG, "Зарегистрировано несколько наблюдателей, но только один будет уведомлен об изменениях.")
         }
 
         // Подписываемся на внутреннюю LiveData.
@@ -39,7 +45,7 @@ class SingleLiveEvent<T> : MutableLiveData<T>() {
     }
 
 
-    //Используется для случаев, когда T — Void, чтобы сделать вызовы чище
+    // Используется для случаев, когда T — Void, чтобы сделать вызовы чище
     // Например, если бы создали событие без данных, просто для команды
     // «обновить экран» или «закрыть фрагмент» (подсвечен неиспользуемым)
     @MainThread
@@ -51,3 +57,4 @@ class SingleLiveEvent<T> : MutableLiveData<T>() {
         private const val TAG = "SingleLiveEvent"
     }
 }
+
