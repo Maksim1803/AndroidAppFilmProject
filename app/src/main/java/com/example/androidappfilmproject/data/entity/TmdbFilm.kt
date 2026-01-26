@@ -33,3 +33,15 @@ data class TmdbFilm(
     @SerializedName("vote_count")
     val voteCount: Int
 )
+
+// Экстеншн-функция для конвертации TmdbFilm в Film (DTO)
+fun TmdbFilm.toFilm(): Film {
+    return Film(
+        title = this.title,
+        poster = this.posterPath,
+        description = this.overview,
+        rating = this.voteAverage,
+        id = this.id,
+        isInFavorites = false
+    )
+}
