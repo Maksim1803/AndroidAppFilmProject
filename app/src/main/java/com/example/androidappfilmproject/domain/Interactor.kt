@@ -11,8 +11,6 @@ class Interactor(
     private val repo: MainRepository,
     private val preferences: PreferenceProvider
 ) {
-    // Метод для получения списка фильмов из БД в виде Flow
-    fun getFilmsFromDB(): Flow<List<Film>> = repo.getCachedFilmsFromDb()
 
     // Работа с категориями
     // Метод для выбора категории фильмов.

@@ -33,10 +33,7 @@ class MainRepository(private val context: Context, private val appDatabase: AppD
         ).flow
     }
 
-    // Метод для получения Flow со списком всех кэшированных фильмов.
-    fun getCachedFilmsFromDb(): Flow<List<Film>> = filmDao.getAllFilms()
-
-    // Метод для получения результатов поиска фильмов через Paging.
+   // Метод для получения результатов поиска фильмов через Paging.
     fun getSearchResult(query: String): Flow<PagingData<Film>> {
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
