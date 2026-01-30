@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.androidappfilmproject.BuildConfig
 import com.example.androidappfilmproject.data.entity.Film
+import com.example.androidappfilmproject.data.entity.toFilm
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -25,16 +26,9 @@ class SearchFilmPagingSource(
                 query = query,
                 page = page
             )
-            val films = response.body()?.tmdbFilms?.map { 
-                Film(
-                    title = it.title,
-                    poster = it.posterPath,
-                    description = it.overview,
-                    rating = it.voteAverage,
-                    id = it.id,
-                    isInFavorites = false
-                )
-            } ?: emptyList()
+            // Используем оператор map и метод расширения toFilm()
+            val films = response.body()?.tmdbFilms?.map { it.toFilm() } ?: emptyList()
+            
             // Возвращаем страницу с данными
             LoadResult.Page(
                 data = films,

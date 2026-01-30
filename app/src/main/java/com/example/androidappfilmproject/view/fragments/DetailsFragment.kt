@@ -283,9 +283,9 @@ class DetailsFragment : Fragment() {
             
             // Загружаем картинку
             val posterPath = film.poster?.removePrefix("/")
-            // Используем "w185" (очень низкое качество) вместо "w500" или "original",
-            // чтобы файл загрузился даже при очень плохом интернете.
-            val fullUrl = ApiConstants.IMAGES_URL + "w500/" + posterPath
+            // Используем "w185" (низкое качество на плохом интернете) вместо "w500"
+            // или "original",чтобы файл 100% загрузился.
+            val fullUrl = ApiConstants.IMAGES_URL + "w185/" + posterPath
             val bitmap = viewModel.loadWallpaper(fullUrl)
             
             // Отключаем Прогресс-бар

@@ -1,6 +1,5 @@
 package com.example.androidappfilmproject.data.dao
 
-import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
@@ -39,10 +38,6 @@ interface FilmDao {
     // Метод для получения всех фильмов из базы данных в виде Flow (поток данных).
     @Query("SELECT * FROM film_table")
     fun getAllFilms(): Flow<List<Film>>
-
-    // Метод для получения всех фильмов из базы данных в виде LiveData (Модуль 41).
-    @Query("SELECT * FROM film_table")
-    fun getCachedFilms(): LiveData<List<Film>>
 
     // Метод для получения всех фильмов для постраничной загрузки через Paging Library.
     @Query("SELECT * FROM film_table")

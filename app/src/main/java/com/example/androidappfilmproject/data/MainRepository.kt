@@ -1,7 +1,6 @@
 package com.example.androidappfilmproject.data
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -34,10 +33,7 @@ class MainRepository(private val context: Context, private val appDatabase: AppD
         ).flow
     }
 
-    // Метод для получения LiveData со списком всех кэшированных фильмов (модуль 41).
-    fun getCachedFilmsFromDb(): LiveData<List<Film>> = filmDao.getCachedFilms()
-
-    // Метод для получения результатов поиска фильмов через Paging.
+   // Метод для получения результатов поиска фильмов через Paging.
     fun getSearchResult(query: String): Flow<PagingData<Film>> {
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),

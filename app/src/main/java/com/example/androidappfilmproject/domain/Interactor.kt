@@ -1,6 +1,5 @@
 package com.example.androidappfilmproject.domain
 
-import androidx.lifecycle.LiveData
 import androidx.paging.PagingData
 import com.example.androidappfilmproject.data.MainRepository
 import com.example.androidappfilmproject.data.entity.Film
@@ -12,15 +11,12 @@ class Interactor(
     private val repo: MainRepository,
     private val preferences: PreferenceProvider
 ) {
-    // Метод для получения списка фильмов из БД в виде LiveData (модуль 41)
-    fun getFilmsFromDB(): LiveData<List<Film>> = repo.getCachedFilmsFromDb()
 
     // Работа с категориями
     // Метод для выбора категории фильмов.
     fun getCategoryPreferenceFlow(): Flow<String> = preferences.categoryFlow
 
     // Метод для сохранения категории фильмов в SharedPreferences.
-    // Когда выбирается категория в настройках, метод записывает её в память телефона
     fun saveDefaultCategoryToPreferences(category: String) {
         preferences.saveDefaultCategory(category)
     }

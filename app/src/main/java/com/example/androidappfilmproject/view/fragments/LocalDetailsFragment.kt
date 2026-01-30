@@ -69,6 +69,9 @@ class LocalDetailsFragment : Fragment() {
         binding.detailsFab.setOnClickListener {
             Snackbar.make(binding.root, disabledMessage, Snackbar.LENGTH_SHORT).show()
         }
+        binding.detailsFabDownloadWp.setOnClickListener {
+            Snackbar.make(binding.root, disabledMessage, Snackbar.LENGTH_SHORT).show()
+        }
 
         // Настраиваем отображение постера
         binding.detailsPoster.apply {
