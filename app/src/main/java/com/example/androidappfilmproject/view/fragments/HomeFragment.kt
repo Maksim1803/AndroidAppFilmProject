@@ -34,18 +34,22 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
+    // Внедряем нашу единую фабрику для ViewModel
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
+    // Получаем ViewModel с помощью Dagger-фабрики
     private val viewModel: HomeFragmentViewModel by viewModels { viewModelFactory }
 
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
 
+    // Вызывается при присоединении фрагмента к контексту.
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as App).dagger.inject(this)
     }
 
+    // Вызывается для создания иерархии представлений, связанной с фрагментом.
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -54,6 +58,7 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
+    // Вызывается сразу после того, как onCreateView() завершил свою работу.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -83,8 +88,10 @@ class HomeFragment : Fragment() {
                 // 3. Обработка состояний загрузки Paging
                 launch {
                     filmsAdapter.loadStateFlow.collectLatest { loadState ->
+                        // Обновляем прогресс-бар во ViewModel
                         viewModel.toggleProgressBar(loadState.refresh is LoadState.Loading)
-                        
+
+                        // Если произошла ошибка - отправляем её в SingleLiveEvent
                         if (loadState.refresh is LoadState.Error) {
                             val error = (loadState.refresh as LoadState.Error).error
                             Snackbar.make(binding.root, error.localizedMessage ?: "Ошибка", Snackbar.LENGTH_LONG).show()
@@ -95,16 +102,19 @@ class HomeFragment : Fragment() {
         }
     }
 
+    // Инициализируем RecyclerView.
     private fun initRecycler() {
         filmsAdapter = FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
             override fun click(film: Film) {
                 (requireActivity() as MainActivity).launchDetailsFragment(film)
             }
 
+            // Обрабатываем клик по иконке "избранное".
             override fun onFavoriteClick(film: Film) {
                 viewModel.onFavoriteClicked(film)
             }
 
+            // Обрабатываем долгий клик по элементу списка.
             override fun longClick(film: Film) {
                 viewModel.removeFilmFromCache(film)
                 Snackbar.make(binding.root, "Фильм \"${film.title}\" удален из кэша", Snackbar.LENGTH_SHORT).show()
@@ -119,13 +129,17 @@ class HomeFragment : Fragment() {
         }
     }
 
+    // Инициализируем метод тяни-обнови.
+    // Когда тянем список вниз, срабатывает слушатель setOnRefreshListener.
+    // Внутри него вызывается filmsAdapter.refresh(), что заставляет Paging Library
+    // заново запросить свежие данные с сервера.
     private fun initPullToRefresh() {
         binding.pullToRefresh.setOnRefreshListener {
             filmsAdapter.refresh()
             binding.pullToRefresh.isRefreshing = false
         }
     }
-
+    // Метод, настраивающий поле поиска в верхней части экрана.
     private fun initSearchView() {
         binding.searchView.setOnClickListener {
             binding.searchView.isIconified = false
@@ -135,6 +149,7 @@ class HomeFragment : Fragment() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return true
             }
+            // Метод, реагирующий на каждое изменение текста в строке поиска
             override fun onQueryTextChange(newText: String): Boolean {
                 if (newText.isNotBlank()) {
                     viewModel.setQuery(newText.lowercase(Locale.getDefault()))
@@ -145,7 +160,7 @@ class HomeFragment : Fragment() {
             }
         })
     }
-
+    // Очищает ресурсы, когда экран (View) фрагмента уничтожается.
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
