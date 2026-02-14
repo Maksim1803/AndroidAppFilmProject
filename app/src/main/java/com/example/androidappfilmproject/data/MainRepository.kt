@@ -35,9 +35,6 @@ class MainRepository(
     // Предоставляет поток состояния загрузки (скрываем Subject за интерфейсом Observable)
     fun getLoadingStatus(): Observable<Boolean> = loadingStatus.hide()
 
-    // Очищает кэш фильмов в локальной БД
-    fun clearCache(): Completable = Completable.fromAction { filmDao.deleteAll() }
-
     // Запрашивает список фильмов напрямую из API (без сохранения в БД)
     fun getFilmsFromApiRx(category: String): Observable<TmdbResults> {
         return tmdbApi.getFilmsObservable(

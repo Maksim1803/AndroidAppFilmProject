@@ -16,7 +16,7 @@ import java.io.IOException
 // Создаем класс для синхронизации данных из сети в локальную БД
 @OptIn(ExperimentalPagingApi::class)
 class FilmRemoteMediator(
-    private val context: Context,
+    context: Context, // Параметр используется только для инициализации networkChecker
     private val tmdbApi: TmdbApi,
     private val appDatabase: AppDatabase,
     private val category: String

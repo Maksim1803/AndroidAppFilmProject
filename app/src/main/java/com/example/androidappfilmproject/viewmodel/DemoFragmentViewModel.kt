@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 // Создаем класс DemoFragmentViewModel, который является ViewModel для DemoFragment.
 class DemoFragmentViewModel @Inject constructor(
-    private val interactor: Interactor
+    interactor: Interactor
 ) : ViewModel() {
 
     // Инициализируем BehaviorSubject для хранения поискового запроса
