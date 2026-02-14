@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     android:fitsSystemWindows="true"
     tools:context=".view.fragments.DetailsFragment">
 
@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/details_poster"
@@ -52,63 +52,64 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|end"
         android:layout_marginEnd="20dp"
-        android:translationY="-10dp">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:translationY="-10dp"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="bottom|end">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/watchLaterButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
+            android:contentDescription="@string/add_to_watch_later"
             android:src="@drawable/baseline_watch_later_24"
-            app:tint="@color/colorPrimaryDark"
             app:backgroundTint="@android:color/holo_orange_dark"
             app:fabSize="mini"
-            android:contentDescription="@string/add_to_watch_later" />
+            app:tint="@color/colorPrimaryDark" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/favoriteButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
+            android:contentDescription="@string/add_to_favorites"
             android:src="@drawable/baseline_favorite_border_24"
-            app:tint="@color/colorPrimaryDark"
             app:backgroundTint="@android:color/holo_orange_dark"
             app:fabSize="mini"
-            android:contentDescription="@string/add_to_favorites" />
+            app:tint="@color/colorPrimaryDark" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/details_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_baseline_share_24"
-            app:tint="@color/colorPrimaryDark"
+            android:contentDescription="@string/share"
             app:backgroundTint="@android:color/holo_orange_dark"
-            android:contentDescription="@string/share" />
+            app:srcCompat="@drawable/ic_baseline_share_24"
+            app:tint="@color/colorPrimaryDark" />
     </LinearLayout>
 
     <!--Левая группа кнопок (рейтинг и загрузка постера в галерею)-->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|start"
         android:layout_marginStart="20dp"
-        android:translationY="-10dp">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:translationY="-10dp"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="bottom|start">
 
-    <com.example.androidappfilmproject.view.customviews.RatingDonutView
-        android:id="@+id/ratingDonut"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        app:stroke="5dp"
-        app:animateOnLoad="false"
-        app:animationDuration="2000" />
+        <com.example.androidappfilmproject.view.customviews.RatingDonutView
+            android:id="@+id/ratingDonut"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:animateOnLoad="false"
+            app:animationDuration="2000"
+            app:stroke="5dp" />
+
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -118,22 +119,21 @@
                 android:id="@+id/details_fab_download_wp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:borderWidth="0dp"
                 android:backgroundTint="@color/colorOrange"
+                android:contentDescription="@string/downloaded_to_gallery"
+                app:borderWidth="0dp"
                 app:srcCompat="@drawable/ic_baseline_cloud_download_24"
-                app:tint="@color/colorPrimaryDark"
-                android:contentDescription="@string/downloaded_to_gallery" />
+                app:tint="@color/colorPrimaryDark" />
 
             <ProgressBar
                 android:id="@+id/progress_bar"
-                android:visibility="invisible"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center"
-                android:translationZ="10dp"/>
+                android:translationZ="10dp"
+                android:visibility="invisible" />
         </FrameLayout>
     </LinearLayout>
-
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
@@ -146,6 +146,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            android:lineSpacingExtra="4dp"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
             tools:text="@tools:sample/lorem/random" />
 
     </androidx.core.widget.NestedScrollView>

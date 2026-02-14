@@ -9,31 +9,32 @@ import com.example.androidappfilmproject.utils.AnimationHelper
 import com.example.androidappfilmproject.databinding.FragmentWatchLaterBinding
 
 // Создаем класс WatchLaterFragment, который отвечает за отображение
-// экрана "Посмотреть позже"
+// экрана "Посмотреть позже".
+
 class WatchLaterFragment : Fragment() {
-    // Переменная для хранения экземпляра биндинга (nullable)
+    
+    // Инициализируем ViewBinding для доступа к компонентам разметки
     private var _binding: FragmentWatchLaterBinding? = null
-    // Свойство для доступа к биндингу, которое гарантирует,
-    // что он не будет null после onCreateView
     private val binding get() = _binding!!
 
-    // Метод для создания и возвращения View фрагмента
+    // Создаем и возвращаем иерархию View из XML
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        // Инициализируем биндинг
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentWatchLaterBinding.inflate(inflater, container, false)
-        // Возвращаем корневой View для отображения фрагмента.
         return binding.root
     }
 
-    // Метод, вызываемый после создания View
+    // Инициализируем UI после создания View
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Выполняем анимацию кругового раскрытия фрагмента
-        AnimationHelper.performFragmentCircularRevealAnimation(
-            binding.watchLaterFragmentRoot,
-            requireActivity(),
-            3
-        )
+        
+        // Запускаем анимацию кругового появления (позиция 3 в нижнем меню)
+        AnimationHelper.performFragmentCircularRevealAnimation(binding.root,  3)
+    }
+
+    // Очищаем биндинг при уничтожении фрагмента для предотвращения утечек памяти
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

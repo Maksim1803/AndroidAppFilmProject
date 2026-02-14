@@ -7,7 +7,7 @@ import com.example.androidappfilmproject.data.entity.Film
 
 // Создаем класс AppDatabase, который представляет собой базу данных Room.
 // Указываем, какие сущности (таблицы) есть в базе данных и ее версию.
-@Database(entities = [Film::class], version = 1, exportSchema = false)
+@Database(entities = [Film::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     // Метод для получения экземпляра FilmDao,

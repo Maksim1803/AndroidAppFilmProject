@@ -1,7 +1,7 @@
 package com.example.androidappfilmproject.data
 
 import com.example.androidappfilmproject.data.entity.TmdbResults
-import retrofit2.Response
+import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -16,7 +16,7 @@ interface TmdbApi {
         @Query("api_key") apiKey: String, // Ключ API для доступа к TM DB
         @Query("language") language: String, // Язык результатов
         @Query("page") page: Int // Номер страницы для пагинации
-    ): Response<TmdbResults> // Возвращает Response с результатами Tmdb
+    ): TmdbResults // Возвращает результат напрямую (для корутин)
 
     // Метод для поиска фильмов по запросу.
     @GET("3/search/movie")
@@ -25,5 +25,14 @@ interface TmdbApi {
         @Query("language") language: String, // Язык результатов
         @Query("query") query: String, // Поисковый запрос
         @Query("page") page: Int // Номер страницы для пагинации
-    ): Response<TmdbResults> // Возвращает Response с результатами Tmdb
+    ): TmdbResults
+
+    // Оставляем методы Observable для тех мест, где используется RxJava (если нужно)
+    @GET("3/movie/{category}")
+    fun getFilmsObservable(
+        @Path("category") category: String,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String,
+        @Query("page") page: Int
+    ): Observable<TmdbResults>
 }

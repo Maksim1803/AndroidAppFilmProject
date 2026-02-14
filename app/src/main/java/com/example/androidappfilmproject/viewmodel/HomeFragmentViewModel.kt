@@ -3,70 +3,94 @@ package com.example.androidappfilmproject.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.rxjava3.cachedIn
 import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.domain.Interactor
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.BehaviorSubject
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-
-@OptIn(ExperimentalCoroutinesApi::class)
 // Создаем класс HomeFragmentViewModel, который является ViewModel для HomeFragment.
 class HomeFragmentViewModel @Inject constructor(
     private val interactor: Interactor
 ) : ViewModel() {
 
-    // Канал для передачи состояния прогресс-бара (подсказка 4)
-    private val _showProgressBar = Channel<Boolean>(Channel.CONFLATED)
-    val showProgressBar: Flow<Boolean> = _showProgressBar.receiveAsFlow()
+    // Инициализируем CompositeDisposable для управления подписками
+    private val compositeDisposable = CompositeDisposable()
 
-    // Flow для хранения текущей категории
-    private val category = interactor.getCategoryPreferenceFlow()
+    // Инициализируем BehaviorSubject для хранения поискового запроса
+    private val querySubject = BehaviorSubject.createDefault("")
 
-    // Flow для хранения поискового запроса
-    private val query = MutableStateFlow("")
+    // Инициализируем Observable для показа ProgressBar
+    val showProgressBar: Observable<Boolean> = interactor.loadingStatus
 
-    // Главный Flow для пагинации
-        val films: Flow<PagingData<Film>> = combine(category, query) { category, query ->
-        Pair(category, query)
-    }.flatMapLatest { (category, query) ->
-        if (query.isBlank()) {
-            interactor.getPagedFilms(category)
-        } else {
-            interactor.getSearchResult(query)
+    // Инициализируем Observable для получения списка фильмов
+    val films: Observable<PagingData<Film>>
+    
+    // Новый поток для рекомендации фильма
+    val recommendation: Observable<Film>
+
+    init {
+        val categoryObservable = interactor.getCategoryPreferenceObservable()
+            .distinctUntilChanged()
+
+        // Инициализируем поток рекомендации: берем первый фильм из списка
+        recommendation = categoryObservable
+            .switchMap { category ->
+                interactor.getRecommendation(category)
+                    .subscribeOn(Schedulers.io())
+                    .onErrorResumeNext { Observable.empty() }
+            }
+            .filter { it.isNotEmpty() }
+            .map { it.first() } // Берем самый популярный
+            .observeOn(AndroidSchedulers.mainThread())
+
+        // Основной поток фильмов
+        films = Observable.combineLatest(
+            categoryObservable,
+            querySubject.distinctUntilChanged()
+        ) { category, query ->
+            category to query
         }
-    }.cachedIn(viewModelScope)
+        .debounce(300, TimeUnit.MILLISECONDS)
+        .switchMap { (category, query) ->
+            if (query.isEmpty()) {
+                interactor.getPagedFilms(category)
+            } else {
+                interactor.getSearchResult(query)
+            }
+        }
+        .cachedIn(viewModelScope)
+    }
 
     // Метод для установки нового поискового запроса
     fun setQuery(newQuery: String) {
-        query.value = newQuery
+        querySubject.onNext(newQuery)
     }
 
-    // Метод для обработки клика по иконке "избранное".
+    // Метод для обработки клика по иконке "избранное"
     fun onFavoriteClicked(film: Film) {
-        viewModelScope.launch {
-            interactor.toggleFavoriteStatus(film)
-        }
+        val disposable = interactor.toggleFavoriteStatus(film).subscribe()
+        compositeDisposable.add(disposable)
     }
 
-    // Метод для удаления фильма из кэша.
+    // Метод для удаления фильма из кэша
     fun removeFilmFromCache(film: Film) {
-        viewModelScope.launch {
-            interactor.removeFilmFromCache(film)
-        }
+        val disposable = interactor.removeFilmFromCache(film).subscribe()
+        compositeDisposable.add(disposable)
     }
 
-    // Метод для обновления состояния прогресс-бара
+    // Метод для управления видимостью ProgressBar
     fun toggleProgressBar(isVisible: Boolean) {
-        viewModelScope.launch {
-            _showProgressBar.send(isVisible)
-        }
+        interactor.setLoadingStatus(isVisible)
+    }
+    // Вызывается при уничтожении ViewModel
+    override fun onCleared() {
+        super.onCleared()
+        compositeDisposable.clear()
     }
 }

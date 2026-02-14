@@ -1,7 +1,10 @@
 package com.example.androidappfilmproject
 
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
@@ -22,117 +25,111 @@ class MainActivity : AppCompatActivity() {
 
     // Метод, вызываемый при создании активности
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Включаем поддержку современного режима отрисовки
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         // Инициализируем биндинг
         binding = ActivityMainBinding.inflate(layoutInflater)
         // Устанавливаем макет для активности
         setContentView(binding.root)
+        
+        // Настраиваем отступы
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            insets
+        }
         // Запускаем инициализацию нижнего навигационного меню
         initNavigation()
 
-        // Запускаем фрагмент при старте
-        binding.fragmentPlaceholder?.let {
-            setFragmentBackground(R.drawable.corner_background)
+        // Запускаем SplashFragment в качестве начального экрана приветствия при первом запуске
+        if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
-                .add(it.id, SplashFragment()) // Добавляем SplashFragment в контейнер
-             // .addToBackStack(null)
+                .replace(R.id.fragment_placeholder, SplashFragment())
                 .commit()
         }
-    }
-
-    // Метод для установки фонового ресурса для контейнера фрагмента
-    private fun setFragmentBackground(colorResId: Int) {
-        binding.fragmentPlaceholder?.setBackgroundResource(colorResId)
     }
 
     // Метод для запуска фрагмента с деталями фильма
     fun launchDetailsFragment(film: Film) {
         val bundle = Bundle().apply {
-            putParcelable("film", film) // Кладем фильм в Bundle
+            putParcelable("film", film)
         }
-        val fragment  = DetailsFragment().apply {
-            arguments = bundle // Передаем Bundle в фрагмент
+        val fragment = DetailsFragment().apply {
+            arguments = bundle
         }
-    // Заменяем текущий фрагмент на DetailsFragment
-        binding.fragmentPlaceholder?.let {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(it.id, fragment)
-                .addToBackStack(null) // Добавляем транзакцию в back stack
-                .commit()
-        }
+        // Добавляем транзакцию в backstack и заменяем текущий фрагмент
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_placeholder, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     // Метод для запуска фрагмента с деталями фильма из локальной базы данных
     fun launchLocalDetailsFragment(film: Film) {
         val bundle = Bundle().apply {
-            putParcelable("film", film) // Кладем фильм в Bundle
+            putParcelable("film", film)
         }
         val fragment = LocalDetailsFragment().apply {
-            arguments = bundle // Передаем Bundle в фрагмент
+            arguments = bundle
         }
-        binding.fragmentPlaceholder?.let {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(it.id, fragment)
-                .addToBackStack(null) // Добавляем транзакцию в back stack
-                .commit()
-        }
+        // Добавляем транзакцию в backstack и заменяем текущий фрагмент
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_placeholder, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
-    // Метод для проверки существования фрагмента по тегу
+    // Метод для проверки существования фрагмента по заданному тегу
     private fun checkFragmentExistence(tag: String): Fragment? =
         supportFragmentManager.findFragmentByTag(tag)
 
-    // Метод для смены фрагментов
+    // Метод для изменения текущего фрагмента и добавления его в backstack
     private fun changeFragment(fragment: Fragment, tag: String) {
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.fragment_placeholder, fragment, tag) // Заменяем фрагмент в контейнере
+            .replace(R.id.fragment_placeholder, fragment, tag)
             .commit()
     }
-    // Метод для инициализации навигации по нижнему меню
-    private fun initNavigation() {
-        binding.bottomNavigation?.setOnItemSelectedListener { item ->
-            when (item.itemId) {
 
+    // Метод для инициализации нижнего навигационного меню
+    private fun initNavigation() {
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
                 R.id.home -> {
                     val tag = "home"
-                    val fragment = checkFragmentExistence(tag) ?: HomeFragment() // Если фрагмента нет, создаем новый
+                    val fragment = checkFragmentExistence(tag) ?: HomeFragment()
                     changeFragment(fragment, tag)
                     true
                 }
-
                 R.id.favorites -> {
                     val tag = "favorites"
                     val fragment = checkFragmentExistence(tag) ?: FavoritesFragment()
                     changeFragment(fragment, tag)
                     true
                 }
-
                 R.id.watch_later -> {
                     val tag = "watch_later"
                     val fragment = checkFragmentExistence(tag) ?: WatchLaterFragment()
                     changeFragment(fragment, tag)
                     true
                 }
-
                 R.id.selections -> {
                     val tag = "selections"
                     val fragment = checkFragmentExistence(tag) ?: SelectionsFragment()
                     changeFragment(fragment, tag)
                     true
                 }
-
                 R.id.demo -> {
                     val tag = "demo"
                     val fragment = checkFragmentExistence(tag) ?: DemoFragment()
                     changeFragment(fragment, tag)
                     true
                 }
-
                 else -> false
             }
         }

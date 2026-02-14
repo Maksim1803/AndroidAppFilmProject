@@ -5,14 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.App
@@ -24,32 +22,40 @@ import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapte
 import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
 import com.example.androidappfilmproject.viewmodel.HomeFragmentViewModel
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.rx3.asObservable
 import java.util.Locale
 import javax.inject.Inject
 
 // Создаем класс HomeFragment, который отвечает за отображение главного экрана.
 class HomeFragment : Fragment() {
+
+    // Инициализируем ViewBinding для доступа к компонентам макета
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    // Внедряем нашу единую фабрику для ViewModel
+    // Контейнер для хранения всех Rx-подписок (очищается при уничтожении экрана)
+    private val compositeDisposable = CompositeDisposable()
+
+    // Внедряем единую фабрику ViewModel через Dagger
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    // Получаем ViewModel с помощью Dagger-фабрики
+    // Получаем экземпляр ViewModel для этого фрагмента
     private val viewModel: HomeFragmentViewModel by viewModels { viewModelFactory }
 
+    // Адаптер для списка фильмов (PagingData)
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
 
-    // Вызывается при присоединении фрагмента к контексту.
+    // Вызывается при прикреплении фрагмента к Activity
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        // Выполняем инъекцию зависимостей
         (requireActivity().application as App).dagger.inject(this)
     }
 
-    // Вызывается для создания иерархии представлений, связанной с фрагментом.
+    // Создаем иерархию View из XML макета
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -58,63 +64,77 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    // Вызывается сразу после того, как onCreateView() завершил свою работу.
+    // Инициализируем UI и настраиваем подписки после создания View
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        AnimationHelper.performFragmentCircularRevealAnimation(binding.root, requireActivity(), 1)
+        // Запускаем анимацию кругового появления фрагмента
+        AnimationHelper.performFragmentCircularRevealAnimation(binding.root, 1)
 
-        initRecycler()
-        initPullToRefresh()
-        initSearchView()
+        initRecycler() // Настраиваем RecyclerView
+        initPullToRefresh() // Настраиваем обновление "тяни-вниз"
+        initSearchView() // Настраиваем поле поиска
 
-        // Используем один scope для всех подписок (подсказка 3)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // 1. Сбор данных для списка
-                launch {
-                    viewModel.films.collectLatest { pagedData ->
-                        filmsAdapter.submitData(pagedData)
+        // 1. Подписка на поток PagingData (список фильмов) из ViewModel
+        val filmsDisposable = viewModel.films
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { pagedData ->
+                // Отправляем новые страницы данных в адаптер
+                filmsAdapter.submitData(lifecycle, pagedData)
+            }
+        compositeDisposable.add(filmsDisposable)
+
+        // 2. Подписка на статус видимости прогресс-бара
+        val progressDisposable = viewModel.showProgressBar
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { isVisible ->
+                binding.progressBar.isVisible = isVisible
+            }
+        compositeDisposable.add(progressDisposable)
+
+        // 3. Подписка на рекомендации (фильм всплывающий при смене категории)
+        val recommendationDisposable = viewModel.recommendation
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { film ->
+                // Показываем Snackbar с названием рекомендованного фильма
+                Snackbar.make(binding.root, "Рекомендуем: ${film.title}", Snackbar.LENGTH_LONG)
+                    .setAction("Смотреть") {
+                        // Переход на детали при нажатии на кнопку в Snackbar
+                        (requireActivity() as MainActivity).launchDetailsFragment(film)
                     }
-                }
+                    .show()
+            }
+        compositeDisposable.add(recommendationDisposable)
 
-                // 2. Сбор состояния прогресс-бара из Channel/Flow (подсказка 4)
-                launch {
-                    viewModel.showProgressBar.collect { isVisible ->
-                        binding.progressBar.isVisible = isVisible
-                    }
-                }
+        // 4. Обработка состояний загрузки Paging (ошибки, пустые списки)
+        val loadStateDisposable = filmsAdapter.loadStateFlow
+            .asObservable()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { loadState ->
+                // Управляем прогресс-баром в зависимости от состояния загрузки
+                viewModel.toggleProgressBar(loadState.refresh is LoadState.Loading)
 
-                // 3. Обработка состояний загрузки Paging
-                launch {
-                    filmsAdapter.loadStateFlow.collectLatest { loadState ->
-                        // Обновляем прогресс-бар во ViewModel
-                        viewModel.toggleProgressBar(loadState.refresh is LoadState.Loading)
-
-                        // Если произошла ошибка - отправляем её в SingleLiveEvent
-                        if (loadState.refresh is LoadState.Error) {
-                            val error = (loadState.refresh as LoadState.Error).error
-                            Snackbar.make(binding.root, error.localizedMessage ?: "Ошибка", Snackbar.LENGTH_LONG).show()
-                        }
-                    }
+                // Если при загрузке произошла ошибка, выводим сообщение
+                if (loadState.refresh is LoadState.Error) {
+                    val error = (loadState.refresh as LoadState.Error).error
+                    Snackbar.make(binding.root, error.localizedMessage ?: "Ошибка загрузки", Snackbar.LENGTH_LONG).show()
                 }
             }
-        }
+        compositeDisposable.add(loadStateDisposable)
     }
 
-    // Инициализируем RecyclerView.
+    // Настройка списка (RecyclerView) и его адаптера
     private fun initRecycler() {
         filmsAdapter = FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
+            // Клик по карточке фильма
             override fun click(film: Film) {
                 (requireActivity() as MainActivity).launchDetailsFragment(film)
             }
-
-            // Обрабатываем клик по иконке "избранное".
+            // Клик по иконке сердечка
             override fun onFavoriteClick(film: Film) {
                 viewModel.onFavoriteClicked(film)
             }
-
-            // Обрабатываем долгий клик по элементу списка.
+            // Долгий клик для удаления из кэша
             override fun longClick(film: Film) {
                 viewModel.removeFilmFromCache(film)
                 Snackbar.make(binding.root, "Фильм \"${film.title}\" удален из кэша", Snackbar.LENGTH_SHORT).show()
@@ -124,45 +144,53 @@ class HomeFragment : Fragment() {
         binding.mainRecycler.apply {
             adapter = filmsAdapter
             layoutManager = LinearLayoutManager(requireContext())
-            val decorator = TopSpacingItemDecoration(8)
-            addItemDecoration(decorator)
+            // Добавляем отступы сверху для элементов списка
+            addItemDecoration(TopSpacingItemDecoration(8))
         }
     }
 
-    // Инициализируем метод тяни-обнови.
-    // Когда тянем список вниз, срабатывает слушатель setOnRefreshListener.
-    // Внутри него вызывается filmsAdapter.refresh(), что заставляет Paging Library
-    // заново запросить свежие данные с сервера.
+    // Настройка жеста обновления списка
     private fun initPullToRefresh() {
         binding.pullToRefresh.setOnRefreshListener {
+            // Принудительно обновляем данные в Paging адаптере
             filmsAdapter.refresh()
             binding.pullToRefresh.isRefreshing = false
         }
     }
-    // Метод, настраивающий поле поиска в верхней части экрана.
-    private fun initSearchView() {
-        binding.searchView.setOnClickListener {
-            binding.searchView.isIconified = false
-        }
 
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return true
-            }
-            // Метод, реагирующий на каждое изменение текста в строке поиска
+    // Настройка строки поиска
+    private fun initSearchView() {
+        // Поле поиска всегда развернуто по умолчанию
+        binding.searchViewHome.setIconifiedByDefault(false)
+        binding.searchViewHome.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = true
+            // Срабатывает при каждом изменении текста (с учетом debounce во ViewModel)
             override fun onQueryTextChange(newText: String): Boolean {
-                if (newText.isNotBlank()) {
-                    viewModel.setQuery(newText.lowercase(Locale.getDefault()))
-                } else {
-                    viewModel.setQuery("")
-                }
+                viewModel.setQuery(newText.lowercase(Locale.getDefault()))
                 return true
             }
         })
     }
-    // Очищает ресурсы, когда экран (View) фрагмента уничтожается.
+
+    // Вызывается, когда пользователь уходит с экрана
+    override fun onStop() {
+        super.onStop()
+        // Сбрасываем поисковый запрос, чтобы при возвращении не было конфликтов
+        viewModel.setQuery("")
+    }
+
+    // Вызывается при временной приостановке фрагмента
+    override fun onPause() {
+        super.onPause()
+        // Принудительно прячем клавиатуру, чтобы она не "висела" на других экранах
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.searchViewHome.windowToken, 0)
+    }
+
+    // Очистка ссылок и подписок при уничтожении фрагмента
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        compositeDisposable.clear() // Отписываемся от всех потоков данных
+        _binding = null // Очищаем биндинг для предотвращения утечек памяти
     }
 }

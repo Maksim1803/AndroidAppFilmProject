@@ -11,14 +11,13 @@
     tools:context=".view.fragments.HomeFragment">
 
     <androidx.appcompat.widget.SearchView
-        android:id="@+id/search_view"
+        android:id="@+id/search_view_home"
         android:background="@drawable/background_search_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         app:layout_constraintTop_toTopOf="parent"/>
 
-<!-- Ооборачиваем RecyclerView в SwipeRefreshLayout (Модуль 38) -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/pull_to_refresh"
         android:layout_width="0dp"
@@ -27,7 +26,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_view">
+        app:layout_constraintTop_toBottomOf="@id/search_view_home">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/main_recycler"
