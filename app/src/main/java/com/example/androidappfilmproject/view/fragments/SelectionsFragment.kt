@@ -20,22 +20,26 @@ import javax.inject.Inject
 // фильмов для отображения.
 // Взаимодействует с [SelectionsFragmentViewModel] для сохранения и получения выбранной категории.
 class SelectionsFragment : Fragment() {
+    
+    // Инициализируем ViewBinding
     private var _binding: FragmentSelectionsBinding? = null
     private val binding get() = _binding!!
 
+    // Внедряем фабрику ViewModel через Dagger
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
+    // Получаем ViewModel для работы с логикой выбора категорий
     private val viewModel: SelectionsFragmentViewModel by viewModels { viewModelFactory }
 
-    // Метод вызывается при присоединении фрагмента к контексту.
-    // Внедряет зависимости через Dagger.
+    // Вызывается при прикреплении фрагмента к Activity
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        // Выполняем инъекцию зависимостей
         (requireActivity().application as App).dagger.inject(this)
     }
 
-    // Метод создает и возвращает иерархию представлений, связанную с фрагментом.
+    // Создаем иерархию представлений из XML
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -45,18 +49,14 @@ class SelectionsFragment : Fragment() {
         return binding.root
     }
 
-    // Метод вызывается сразу после onCreateView().
-    // Здесь инициализируются UI-компоненты, настраиваются наблюдатели и слушатели.
+    // Инициализируем UI и настраиваем слушатели после создания View
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        AnimationHelper.performFragmentCircularRevealAnimation(
-            binding.root,
-            requireActivity(),
-            5
-        )
+        // Запускаем анимацию кругового появления (позиция 5 в нижнем меню)
+        AnimationHelper.performFragmentCircularRevealAnimation(binding.root,  5)
 
-        // Наблюдение за LiveData с выбранной категорией для обновления UI (RadioGroup)
+        // Наблюдаем за изменением выбранной категории в LiveData для обновления состояния кнопок
         viewModel.categoryPropertyLifeData.observe(viewLifecycleOwner, Observer<String> { cat ->
             when (cat) {
                 POPULAR_CATEGORY -> binding.radioGroup.check(R.id.radio_popular)
@@ -66,9 +66,10 @@ class SelectionsFragment : Fragment() {
             }
         })
 
-        // Слушатель для RadioGroup для сохранения выбранной категории
+        // Слушатель изменения выбора в группе кнопок
         binding.radioGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
+                // Сохраняем выбранную категорию в настройки через ViewModel
                 R.id.radio_popular -> viewModel.putCategoryProperty(POPULAR_CATEGORY)
                 R.id.radio_top_rated -> viewModel.putCategoryProperty(TOP_RATED_CATEGORY)
                 R.id.radio_upcoming -> viewModel.putCategoryProperty(UPCOMING_CATEGORY)
@@ -77,13 +78,13 @@ class SelectionsFragment : Fragment() {
         }
     }
 
-    // Метод вызывается при уничтожении представления фрагмента.
-    // Очищает ссылку на binding во избежание утечек памяти.
+    // Очистка биндинга при уничтожении View
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
+    // Константы для идентификации категорий фильмов в API и настройках
     companion object {
         private const val POPULAR_CATEGORY = "popular"
         private const val TOP_RATED_CATEGORY = "top_rated"

@@ -5,69 +5,89 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.rxjava3.observable
+import com.example.androidappfilmproject.BuildConfig
 import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.data.db.AppDatabase
 import com.example.androidappfilmproject.data.entity.Film
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import com.example.androidappfilmproject.data.entity.TmdbResults
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 // Создаем класс MainRepository, который является единой точкой доступа к данным
 @OptIn(ExperimentalPagingApi::class)
-class MainRepository(private val context: Context, private val appDatabase: AppDatabase, private val tmdbApi: TmdbApi) {
+class MainRepository(
+    private val context: Context,
+    private val appDatabase: AppDatabase,
+    private val tmdbApi: TmdbApi
+) {
 
+    // Инициализируем DAO для работы с таблицей фильмов
     private val filmDao = appDatabase.filmDao()
 
-    // Метод для получения списка фильмов с использованием Paging 3.
-    fun getFilms(category: String): Flow<PagingData<Film>> {
+    // Используем BehaviorSubject для хранения и передачи последнего состояния загрузки
+    private val loadingStatus = BehaviorSubject.createDefault(false)
+
+    // Обновляет текущее состояние загрузки
+    fun setLoadingStatus(isLoading: Boolean) = loadingStatus.onNext(isLoading)
+
+    // Предоставляет поток состояния загрузки (скрываем Subject за интерфейсом Observable)
+    fun getLoadingStatus(): Observable<Boolean> = loadingStatus.hide()
+
+    // Запрашивает список фильмов напрямую из API (без сохранения в БД)
+    fun getFilmsFromApiRx(category: String): Observable<TmdbResults> {
+        return tmdbApi.getFilmsObservable(
+            category = category,
+            apiKey = BuildConfig.TMDB_API_KEY,
+            language = "ru-RU",
+            page = 1
+        )
+    }
+
+    // Получает поток данных PagingData, используя RemoteMediator для синхронизации БД и Сети
+    fun getFilms(category: String): Observable<PagingData<Film>> {
         val filmRemoteMediator = FilmRemoteMediator(
             context = context,
             tmdbApi = tmdbApi,
             appDatabase = appDatabase,
             category = category
         )
-
+        // Возвращает поток данных PagingData с помощью Pager
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
             remoteMediator = filmRemoteMediator,
-            pagingSourceFactory = { filmDao.getFilmsPagingSource() }
-        ).flow
+            pagingSourceFactory = { filmDao.getFilmsPagingSource(category) }
+        ).observable
     }
 
-   // Метод для получения результатов поиска фильмов через Paging.
-    fun getSearchResult(query: String): Flow<PagingData<Film>> {
+    // Поиск фильмов через API с поддержкой пагинации (без кэширования в БД)
+    fun getSearchResult(query: String): Observable<PagingData<Film>> {
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
             pagingSourceFactory = { SearchFilmPagingSource(tmdbApi, query) }
-        ).flow
+        ).observable
     }
 
-    // Метод для обновления данных фильма в БД.
-    suspend fun updateFilm(film: Film) {
-        filmDao.update(film)
-    }
+    // Обновляет данные фильма в БД (например, статус "избранное")
+    fun updateFilm(film: Film): Completable = Completable.fromAction { filmDao.update(film) }
 
-    // Метод для удаления фильма из БД.
-    suspend fun deleteFilm(film: Film) {
-        filmDao.delete(film)
-    }
+    // Удаляет фильм из локальной БД
+    fun deleteFilm(film: Film): Completable = Completable.fromAction { filmDao.delete(film) }
 
-    // Метод для получения списка избранных фильмов с пагинацией.
-    fun getFavoriteFilmsPaging(): Flow<PagingData<Film>> {
+    // Получает список избранных фильмов из БД с поддержкой пагинации
+    fun getFavoriteFilmsPaging(): Observable<PagingData<Film>> {
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
             pagingSourceFactory = { filmDao.getFavoriteFilmsPagingSource() }
-        ).flow
+        ).observable
     }
 
-    // Метод для получения одного фильма по его идентификатору.
-    fun getFilmById(id: Int): Flow<Film?> {
-        return filmDao.getFilmById(id)
-    }
+    // Получает данные конкретного фильма по ID из БД
+    fun getFilmById(id: Int): Observable<Film> = filmDao.getFilmById(id)
 
-    // Метод для получения всех статичных фильмов (используется в демо-режиме).
-    fun getAllFilmsFromDb(): Flow<List<Film>> {
-        return flowOf(filmsDataBase)
-    }
+    // Метод для получения всех статичных фильмов (используется в демо-режиме
+    fun getAllFilmsFromDb(): Observable<List<Film>> = Observable.just(filmsDataBase)
 
     // Список фильмов для Демо-режима.
     private val filmsDataBase: List<Film> = listOf(
@@ -177,3 +197,4 @@ class MainRepository(private val context: Context, private val appDatabase: AppD
         )
     )
 }
+

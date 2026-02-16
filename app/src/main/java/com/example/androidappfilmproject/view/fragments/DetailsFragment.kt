@@ -19,7 +19,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.R
@@ -28,16 +27,19 @@ import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
 import com.example.androidappfilmproject.viewmodel.DetailsFragmentViewModel
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collectLatest
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import javax.inject.Inject
 
 // Создаем класс DetailsFragment, который отвечает за отображение подробной информации о фильме.
 class DetailsFragment : Fragment() {
+
+    //Инициализируем ViewBinding
     private var _binding: FragmentDetailsBinding? = null
     private val binding get() = _binding!!
 
     private var currentFilm: Film? = null
+    private val compositeDisposable = CompositeDisposable()
 
     // Внедряем нашу единую фабрику для ViewModel
     @Inject
@@ -89,15 +91,16 @@ class DetailsFragment : Fragment() {
         currentFilm = filmFromArgs
         setFilmsDetails(filmFromArgs)
 
-        // Подписываемся на изменения фильма в базе данных.
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.getFilmById(filmFromArgs.id).collectLatest { film ->
-                if (film != null) { // Проверяем, что фильм не null
-                    currentFilm = film
-                    setFilmsDetails(film)
-                }
-            }
-        }
+        // Подписываемся на изменения фильма в базе данных через RxJava.
+        val disposable = viewModel.getFilmById(filmFromArgs.id)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ film ->
+                currentFilm = film
+                setFilmsDetails(film)
+            }, {
+                // Обработка ошибки, если нужно
+            })
+        compositeDisposable.add(disposable)
 
         // Обрабатываем нажатие на кнопку "Избранное".
         binding.favoriteButton.setOnClickListener {
@@ -107,17 +110,23 @@ class DetailsFragment : Fragment() {
 
                 if (!wasInFavorites) {
                     binding.favoriteButton.setImageResource(R.drawable.baseline_favorite_24)
-                    Snackbar.make(binding.root, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, "Добавлено в избранное", Snackbar.LENGTH_SHORT)
+                        .show()
                 } else {
                     binding.favoriteButton.setImageResource(R.drawable.baseline_favorite_border_24)
-                    Snackbar.make(binding.root, "Удалено из избранного", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, "Удалено из избранного", Snackbar.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
 
         // Обрабатываем нажатие на кнопку "Посмотреть позже".
         binding.watchLaterButton.setOnClickListener {
-            Snackbar.make(binding.root, "Добавлено в список \'Посмотреть позже\'", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(
+                binding.root,
+                "Добавлено в список \'Посмотреть позже\'",
+                Snackbar.LENGTH_SHORT
+            ).show()
         }
 
         // Обрабатываем нажатие на FAB для отправки фильма.
@@ -163,7 +172,8 @@ class DetailsFragment : Fragment() {
                 } catch (_: NumberFormatException) {
                     // Если постер - это URL, загружаем его из сети.
                     val fullUrl = ApiConstants.IMAGES_URL + "w780/" + posterPath.removePrefix("/")
-                    val thumbnailUrl = ApiConstants.IMAGES_URL + "w342/" + posterPath.removePrefix("/")
+                    val thumbnailUrl =
+                        ApiConstants.IMAGES_URL + "w342/" + posterPath.removePrefix("/")
                     Glide.with(this@DetailsFragment)
                         .load(fullUrl)
                         .thumbnail(Glide.with(this@DetailsFragment).load(thumbnailUrl))
@@ -205,7 +215,11 @@ class DetailsFragment : Fragment() {
     }
 
     // Слушаем ответ на запрос разрешений
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         if (requestCode == 1) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 performAsyncLoadOfPoster()
@@ -275,31 +289,23 @@ class DetailsFragment : Fragment() {
             requestPermission()
             return
         }
-        
-        // Используем жизненный цикл фрагмента для запуска корутины
-        viewLifecycleOwner.lifecycleScope.launch {
-            // Включаем Прогресс-бар
-            binding.progressBar.isVisible = true
-            
-            // Загружаем картинку
-            val posterPath = film.poster?.removePrefix("/")
-            // Используем "w185" (низкое качество на плохом интернете) вместо "w500"
-            // или "original",чтобы файл 100% загрузился.
-            val fullUrl = ApiConstants.IMAGES_URL + "w185/" + posterPath
-            val bitmap = viewModel.loadWallpaper(fullUrl)
-            
-            // Отключаем Прогресс-бар
-            binding.progressBar.isVisible = false
 
-            if (bitmap != null) {
+        // Включаем Прогресс-бар
+        binding.progressBar.isVisible = true
+
+        // Загружаем картинку через RxJava
+        val posterPath = film.poster?.removePrefix("/")
+        val fullUrl = ApiConstants.IMAGES_URL + "w185/" + posterPath
+
+        val disposable = viewModel.loadWallpaper(fullUrl)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ bitmap ->
+                // Отключаем Прогресс-бар
+                binding.progressBar.isVisible = false
                 // Сохраняем в галерею
                 saveToGallery(bitmap)
                 // Выводим снекбар
-                Snackbar.make(
-                    binding.root,
-                    "Сохранено в Галерею",
-                    Snackbar.LENGTH_LONG
-                )
+                Snackbar.make(binding.root, "Сохранено в Галерею", Snackbar.LENGTH_LONG)
                     .setAction("В ГАЛЕРЕЮ") {
                         val intent = Intent()
                         intent.action = Intent.ACTION_VIEW
@@ -308,20 +314,23 @@ class DetailsFragment : Fragment() {
                         startActivity(intent)
                     }
                     .show()
-            } else {
+            }, {
+                // Отключаем Прогресс-бар
+                binding.progressBar.isVisible = false
                 // Обработка ошибки
                 Snackbar.make(
                     binding.root,
                     "Ошибка при загрузке изображения",
                     Snackbar.LENGTH_SHORT
                 ).show()
-            }
-        }
+            })
+        compositeDisposable.add(disposable)
     }
 
     // Вызывается, когда иерархия представлений, связанная с фрагментом, удаляется.
     override fun onDestroyView() {
         super.onDestroyView()
+        compositeDisposable.clear()
         _binding = null
     }
 }

@@ -11,59 +11,68 @@ import com.example.androidappfilmproject.data.db.AppDatabase
 import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.data.entity.toFilm
 import com.example.androidappfilmproject.utils.NetworkChecker
-import retrofit2.HttpException
 import java.io.IOException
 
+// Создаем класс для синхронизации данных из сети в локальную БД
 @OptIn(ExperimentalPagingApi::class)
 class FilmRemoteMediator(
-    context: Context,
+    context: Context, // Параметр используется только для инициализации networkChecker
     private val tmdbApi: TmdbApi,
     private val appDatabase: AppDatabase,
     private val category: String
 ) : RemoteMediator<Int, Film>() {
 
+    // Инициализируем DAO для доступа к таблице фильмов
     private val filmDao = appDatabase.filmDao()
+
+    // Инициализируем NetworkChecker для проверки состояния сети
     private val networkChecker = NetworkChecker(context)
 
+    // Метод для управления загрузкой данных при скролле или обновлении списка
     override suspend fun load(loadType: LoadType, state: PagingState<Int, Film>): MediatorResult {
+        // Проверка интернета
         if (!networkChecker.isInternetAvailable()) {
-            return MediatorResult.Success(endOfPaginationReached = true)
+            return MediatorResult.Error(IOException("Нет подключения к интернету"))
         }
 
+        // Основной блок обработки сетевого запроса и кэширования
         return try {
             val loadKey = when (loadType) {
                 LoadType.REFRESH -> 1
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     val lastItem = state.lastItemOrNull()
-                    if (lastItem == null) {
-                        1
-                    } else {
-                        (state.pages.sumOf { it.data.size } / state.config.pageSize) + 1
-                    }
+                    if (lastItem == null) 1 else (state.pages.sumOf { it.data.size } / state.config.pageSize) + 1
                 }
             }
 
+            // Выполняем сетевой запрос к TMDB API
             val response = tmdbApi.getFilms(
                 category = category,
                 apiKey = BuildConfig.TMDB_API_KEY,
                 language = "ru-RU",
                 page = loadKey
             )
-            
-            // Используем оператор map и метод расширения вместо Converter
-            val films = response.body()?.tmdbFilms?.map { it.toFilm() } ?: emptyList()
 
+            // Преобразуем DTO модели из сети в Entity модели для БД и назначаем категорию
+            val films = response.tmdbFilms.map {
+                it.toFilm().apply { this.category = this@FilmRemoteMediator.category }
+            }
+
+            // Только если данные успешно получены, работаем с БД
             appDatabase.withTransaction {
                 if (loadType == LoadType.REFRESH) {
-                    filmDao.deleteAll()
+                    // Очищаем только старые фильмы текущей категории
+                    filmDao.deleteByCategory(category)
                 }
+                // Сохраняем свежезагруженные фильмы в локальное хранилище
                 filmDao.insertAll(films)
             }
+
+            // Возвращаем результат: Success, указывая, достигнут ли конец списка
             MediatorResult.Success(endOfPaginationReached = films.isEmpty())
-        } catch (e: IOException) {
-            MediatorResult.Error(e)
-        } catch (e: HttpException) {
+        } catch (e: Exception) {
+            // Любая ошибка (timeout, 401, и т.д.) пробрасывается в UI
             MediatorResult.Error(e)
         }
     }

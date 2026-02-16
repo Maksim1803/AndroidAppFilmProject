@@ -1,10 +1,12 @@
 package com.example.androidappfilmproject.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.toLiveData
 import com.example.androidappfilmproject.domain.Interactor
-import kotlinx.coroutines.launch
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.BackpressureStrategy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import javax.inject.Inject
 
 // Класс отвечающий за обработку логики, связанной с выбором категории фильмов.
@@ -15,14 +17,16 @@ class SelectionsFragmentViewModel @Inject constructor(
 ) : ViewModel() {
 
     // LiveData, которая содержит текущую выбранную категорию фильмов.
-    // Преобразуется из Flow, предоставляемого Interactor, для удобной работы в UI слое.
-    val categoryPropertyLifeData = interactor.getCategoryPreferenceFlow().asLiveData()
+    // Используем Observable напрямую из интерактора и преобразуем в LiveData.
+    val categoryPropertyLifeData: LiveData<String> = interactor.getCategoryPreferenceObservable()
+        .toFlowable(BackpressureStrategy.LATEST)
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .toLiveData()
 
     // Метод сохраняет выбранную категорию фильмов в SharedPreferences.
     fun putCategoryProperty(category: String) {
-        // Выполняем запись в настройки в скоупе корутины
-        viewModelScope.launch {
-            interactor.saveDefaultCategoryToPreferences(category)
-        }
+        interactor.saveDefaultCategoryToPreferences(category)
     }
 }
+

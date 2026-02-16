@@ -18,30 +18,38 @@ class SearchFilmPagingSource(
     // Метод для загрузки данных
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Film> {
         val page = params.key ?: 1
+
         return try {
-            // Выполняем сетевой запрос для поиска фильмов
-            val response = tmdbApi.searchFilms(
+            val results = tmdbApi.searchFilms(
                 apiKey = BuildConfig.TMDB_API_KEY,
                 language = "ru-RU",
                 query = query,
                 page = page
             )
-            // Используем оператор map и метод расширения toFilm()
-            val films = response.body()?.tmdbFilms?.map { it.toFilm() } ?: emptyList()
-            
+
+            // Преобразуем DTO модели из сети в Entity модели для БД
+            val films = results.tmdbFilms.map { it.toFilm() }
+
             // Возвращаем страницу с данными
             LoadResult.Page(
                 data = films,
-                prevKey = if (page == 1) null else page - 1, // Ключ для предыдущей страницы
-                nextKey = if (films.isEmpty()) null else page + 1 // Ключ для следующей страницы
+                // Ключ для предыдущей страницы
+                prevKey = if (page == 1) null else page - 1,
+                // Ключ для следующей страницы
+                nextKey = if (films.isEmpty() || page >= results.totalPages) null else page + 1
             )
+
+            // Обрабатываем ошибки
         } catch (e: IOException) {
-            return LoadResult.Error(e) // Возвращаем ошибку в случае проблем с сетью
+            LoadResult.Error(e)
         } catch (e: HttpException) {
-            return LoadResult.Error(e) // Возвращаем ошибку в случае проблем с HTTP
+            LoadResult.Error(e)
+        } catch (e: Exception) {
+            LoadResult.Error(e)
         }
     }
-    // Метод для получения ключа для обновления данных
+
+    // Метод для определения ключа обновления
     override fun getRefreshKey(state: PagingState<Int, Film>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)

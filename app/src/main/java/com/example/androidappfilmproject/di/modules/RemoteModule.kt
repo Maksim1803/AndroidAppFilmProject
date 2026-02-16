@@ -10,6 +10,7 @@ import dagger.Provides
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -19,6 +20,7 @@ import javax.inject.Singleton
 class RemoteModule {
     @Provides
     @Singleton
+    // Метод предоставляет экземпляр Gson для сериализации/десериализации JSON.
     fun provideGson(): Gson = GsonBuilder()
         .setLenient()
         .create()
@@ -27,11 +29,14 @@ class RemoteModule {
     @Singleton
     // Метод предоставляет экземпляр HTTP-клиента OkHttpClient.
     fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
-        .callTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
+        // Увеличиваем таймауты для стабильности при слабом соединении
+        .callTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .connectTimeout(60, TimeUnit.SECONDS)
         .addInterceptor(HttpLoggingInterceptor().apply {
             if (BuildConfig.DEBUG) {
-                level = HttpLoggingInterceptor.Level.BASIC
+                // Используем уровень BODY для детальной отладки сетевых запросов
+                level = HttpLoggingInterceptor.Level.BODY
             }
         })
         .build()
@@ -39,9 +44,11 @@ class RemoteModule {
     @Provides
     @Singleton
     // Метод предоставляет экземпляр Retrofit (клиент для выполнения HTTP-запросов)
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
+    fun provideRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit = Retrofit.Builder()
         .baseUrl(ApiConstants.BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create(gson))
+        // Добавляем адаптер для RxJava 3, чтобы Retrofit мог возвращать Observable.
+        .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
         .client(okHttpClient)
         .build()
 
