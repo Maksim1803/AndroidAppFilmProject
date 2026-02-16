@@ -1,72 +1,95 @@
 package com.example.androidappfilmproject.data
 
+import android.content.Context
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.example.androidappfilmproject.AppDatabase
+import androidx.paging.rxjava3.observable
 import com.example.androidappfilmproject.BuildConfig
 import com.example.androidappfilmproject.R
-import com.example.androidappfilmproject.domain.Film
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import com.example.androidappfilmproject.data.db.AppDatabase
+import com.example.androidappfilmproject.data.entity.Film
+import com.example.androidappfilmproject.data.entity.TmdbResults
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 // Создаем класс MainRepository, который является единой точкой доступа к данным
-// (из сети или из базы данных).
-class MainRepository(private val appDatabase: AppDatabase, private val tmdbApi: TmdbApi) {
-    // Метод для получения списка фильмов с использованием Paging 3.
-    fun getFilms(): Flow<PagingData<Film>> {
+@OptIn(ExperimentalPagingApi::class)
+class MainRepository(
+    private val context: Context,
+    private val appDatabase: AppDatabase,
+    private val tmdbApi: TmdbApi
+) {
+
+    // Инициализируем DAO для работы с таблицей фильмов
+    private val filmDao = appDatabase.filmDao()
+
+    // Используем BehaviorSubject для хранения и передачи последнего состояния загрузки
+    private val loadingStatus = BehaviorSubject.createDefault(false)
+
+    // Обновляет текущее состояние загрузки
+    fun setLoadingStatus(isLoading: Boolean) = loadingStatus.onNext(isLoading)
+
+    // Предоставляет поток состояния загрузки (скрываем Subject за интерфейсом Observable)
+    fun getLoadingStatus(): Observable<Boolean> = loadingStatus.hide()
+
+    // Запрашивает список фильмов напрямую из API (без сохранения в БД)
+    fun getFilmsFromApiRx(category: String): Observable<TmdbResults> {
+        return tmdbApi.getFilmsObservable(
+            category = category,
+            apiKey = BuildConfig.TMDB_API_KEY,
+            language = "ru-RU",
+            page = 1
+        )
+    }
+
+    // Получает поток данных PagingData, используя RemoteMediator для синхронизации БД и Сети
+    fun getFilms(category: String): Observable<PagingData<Film>> {
+        val filmRemoteMediator = FilmRemoteMediator(
+            context = context,
+            tmdbApi = tmdbApi,
+            appDatabase = appDatabase,
+            category = category
+        )
+        // Возвращает поток данных PagingData с помощью Pager
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-            pagingSourceFactory = {
-                FilmPagingSource(
-                    tmdbApi = tmdbApi,
-                    apiKey = BuildConfig.TMDB_API_KEY,
-                    language = "ru-RU"
-                )
-            }
-        ).flow
+            remoteMediator = filmRemoteMediator,
+            pagingSourceFactory = { filmDao.getFilmsPagingSource(category) }
+        ).observable
     }
 
-    // Метод для получения результатов поиска фильмов.
-    fun getSearchResult(query: String): Flow<PagingData<Film>> {
+    // Поиск фильмов через API с поддержкой пагинации (без кэширования в БД)
+    fun getSearchResult(query: String): Observable<PagingData<Film>> {
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-            pagingSourceFactory = {
-                SearchPagingSource( // Используем PagingSource для поиска фильмов в сети.
-                    tmdbApi = tmdbApi,
-                    apiKey = BuildConfig.TMDB_API_KEY,
-                    language = "ru-RU",
-                    query = query
-                )
-            }
-        ).flow
+            pagingSourceFactory = { SearchFilmPagingSource(tmdbApi, query) }
+        ).observable
     }
 
-    // Метод для переключения статуса "избранное" у фильма.
-    suspend fun toggleFavoriteStatus(film: Film) {
-        val updatedFilm = film.copy(isInFavorites = !film.isInFavorites)
-    // Вставляем обновленный фильм в базу данных.
-        appDatabase.filmDao().insert(updatedFilm)
-    }
+    // Обновляет данные фильма в БД (например, статус "избранное")
+    fun updateFilm(film: Film): Completable = Completable.fromAction { filmDao.update(film) }
 
-    // Метод для получения избранных фильмов с использованием Paging 3.
-    fun getFavoriteFilmsPaging(): Flow<PagingData<Film>> {
+    // Удаляет фильм из локальной БД
+    fun deleteFilm(film: Film): Completable = Completable.fromAction { filmDao.delete(film) }
+
+    // Получает список избранных фильмов из БД с поддержкой пагинации
+    fun getFavoriteFilmsPaging(): Observable<PagingData<Film>> {
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-            pagingSourceFactory = { appDatabase.filmDao().getFavoriteFilmsPagingSource() } // Источник данных - база данных.
-        ).flow
+            pagingSourceFactory = { filmDao.getFavoriteFilmsPagingSource() }
+        ).observable
     }
 
-    // Метод для получения фильма по его ID.
-    fun getFilmById(id: Int): Flow<Film> {
-        return appDatabase.filmDao().getFilmById(id)
-    }
+    // Получает данные конкретного фильма по ID из БД
+    fun getFilmById(id: Int): Observable<Film> = filmDao.getFilmById(id)
 
-    // Метод для получения всех фильмов из локальной базы данных (для демонстрации).
-    fun getAllFilmsFromDb(): Flow<List<Film>> {
-        return flow { emit(filmsDataBase) }
-    }
-    // Список фильмов из приложения для вкладки "Демо" (локальная БД)
+    // Метод для получения всех статичных фильмов (используется в демо-режиме
+    fun getAllFilmsFromDb(): Observable<List<Film>> = Observable.just(filmsDataBase)
+
+    // Список фильмов для Демо-режима.
     private val filmsDataBase: List<Film> = listOf(
         Film(
             id = 1,
@@ -174,3 +197,4 @@ class MainRepository(private val appDatabase: AppDatabase, private val tmdbApi: 
         )
     )
 }
+

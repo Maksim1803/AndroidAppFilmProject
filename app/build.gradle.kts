@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 import java.io.FileInputStream
@@ -5,7 +7,7 @@ import java.io.FileInputStream
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.parcelize)
+    id("kotlin-parcelize")
     id("kotlin-kapt")
 }
 
@@ -16,9 +18,26 @@ if (localPropertiesFile.exists()) {
     localProperties.load(FileInputStream(localPropertiesFile))
 }
 
+// Load properties from keystore.properties
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("app/keystore.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.example.androidappfilmproject"
     compileSdk = 36
+
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            // Проверка на null для предотвращения ошибок сборки, если файл отсутствует
+            storeFile = if (keystoreProperties.containsKey("storeFile")) file(keystoreProperties["storeFile"] as String) else null
+            storePassword = keystoreProperties["storePassword"] as String
+        }
+    }
 
     buildFeatures {
         viewBinding = true
@@ -45,6 +64,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -84,19 +104,22 @@ dependencies {
 
     //Новые библиотеки для создания базы данных модуля 26
     // Room components
-    implementation("androidx.room:room-runtime:2.8.3")
-    implementation("androidx.room:room-ktx:2.8.3") // Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-paging:2.8.3")
-    kapt("androidx.room:room-compiler:2.8.3")
+    implementation("androidx.room:room-runtime:2.8.4")
+    implementation("androidx.room:room-ktx:2.8.4") // Kotlin Extensions and Coroutines support for Room
+    implementation("androidx.room:room-paging:2.8.4")
+    implementation("androidx.room:room-rxjava3:2.8.4")
+    kapt("androidx.room:room-compiler:2.8.4")
 
     // Lifecycle components
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.4")
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.9.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-reactivestreams-ktx:2.10.0")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.10.2") // Для asObservable()
 
     //Новые библиотеки для создания анимации для модуля 28
     //Glide
@@ -105,14 +128,35 @@ dependencies {
 
     //Новые библиотеки для создания анимации для модуля 33
     implementation("androidx.fragment:fragment-ktx:1.8.9")// Для viewModels() во фрагментах
-    implementation("androidx.activity:activity-ktx:1.11.0")// Для activityViewModels() в активностях (если нужно)
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")// Для ViewModelScope и других KTX расширений
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.9.4")// Для LiveData KTX расширений
+    implementation("androidx.activity:activity-ktx:1.12.3")// Для activityViewModels() в активностях (если нужно)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")// Для ViewModelScope и других KTX расширений
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")// Для LiveData KTX расширений
 
     //Новые библиотеки для работы с БД для модуля 35
     implementation("com.squareup.retrofit2:retrofit:3.0.0") //рертофит
     implementation("com.squareup.retrofit2:converter-gson:3.0.0") //конвертер
-    implementation("com.squareup.okhttp3:logging-interceptor:5.3.0") //логгер
+    implementation("com.squareup.retrofit2:adapter-rxjava3:3.0.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.3.2") //логгер
 
     implementation(libs.androidx.paging.runtime.ktx)
+    implementation("androidx.paging:paging-rxjava3:3.4.0")
+
+    //Библиотека Koin для модуля 4.1.1
+    implementation("io.insert-koin:koin-android:4.1.1")
+
+    //Библиотеки для модуля 37
+    implementation ("com.google.dagger:dagger:2.59.1")
+    kapt ("com.google.dagger:dagger-compiler:2.59.1")
+
+    //Библиотека для модуля 38. SwipeRefreshLayout (for fragment_home.xml)
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
+
+    //Библиотека для модуля 42 (Coroutines - корутины).
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+
+    //Библиотеки для модуля 44 (RxJava)
+    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
+    implementation("io.reactivex.rxjava3:rxjava:3.1.12")
+
 }

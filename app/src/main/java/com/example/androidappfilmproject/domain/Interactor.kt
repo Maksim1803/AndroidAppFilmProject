@@ -2,42 +2,63 @@ package com.example.androidappfilmproject.domain
 
 import androidx.paging.PagingData
 import com.example.androidappfilmproject.data.MainRepository
-import kotlinx.coroutines.flow.Flow
+import com.example.androidappfilmproject.data.entity.Film
+import com.example.androidappfilmproject.data.entity.toFilm
+import com.example.androidappfilmproject.data.preferences.PreferenceProvider
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
 
-// Создаем класс Interactor, который является посредником между ViewModel и Repository.
-// Он содержит определяет какой источник данных использовать.
-class Interactor(private val repo: MainRepository) {
-    // Метод для получения списка фильмов.
-    fun getFilms(): Flow<PagingData<Film>> {
-        return repo.getFilms()
+// Класс-интерфейс для взаимодействия с данными (посредником между ViewModel и Repository)
+class Interactor(
+    private val repo: MainRepository, // Инициализируем репозиторий
+    private val preferences: PreferenceProvider // Инициализируем PreferenceProvider
+) {
+
+    // Инициализируем Observable для получения состояния загрузки
+    val loadingStatus: Observable<Boolean> = repo.getLoadingStatus()
+
+    // Инициализируем метод для обновления состояния загрузки
+    fun setLoadingStatus(isLoading: Boolean) = repo.setLoadingStatus(isLoading)
+
+    // Метод для получения Observable для получения категории
+    fun getCategoryPreferenceObservable(): Observable<String> = preferences.getCategoryObservable()
+
+    // Метод для сохранения категории в SharedPreferences
+    fun saveDefaultCategoryToPreferences(category: String) {
+        preferences.saveDefaultCategory(category)
     }
 
-    // Метод для получения результатов поиска.
-    fun getSearchResult(query: String): Flow<PagingData<Film>> {
-        return if (query.isBlank()) { // Если запрос пустой, возвращаем все фильмы.
-            getFilms()
-        } else {
-            repo.getSearchResult(query) // Иначе выполняем поиск.
-        }
+    // Метод для конвертации ответа от API (TmdbResults DTO) в список объектов Film (Entity)
+    // с помощью оператора .map() RxJava.
+    fun getRecommendation(category: String): Observable<List<Film>> {
+        return repo.getFilmsFromApiRx(category)
+            .map { tmdbResults ->
+                // Используем оператор map для трансформации данных прямо в потоке
+                tmdbResults.tmdbFilms.map { it.toFilm() }
+            }
     }
 
-    // Метод для переключения статуса "избранное" у фильма.
-    suspend fun toggleFavoriteStatus(film: Film) {
-        repo.toggleFavoriteStatus(film)
-    }
+    // Метод для получения для постраничной загрузки фильмов
+    fun getPagedFilms(category: String): Observable<PagingData<Film>> = repo.getFilms(category)
 
-    // Метод для получения избранных фильмов с пагинацией.
-    fun getFavoriteFilmsPaging(): Flow<PagingData<Film>> {
-        return repo.getFavoriteFilmsPaging()
-    }
+    // Метод для получения постраничных результатов поиска.
+    fun getSearchResult(query: String): Observable<PagingData<Film>> = repo.getSearchResult(query)
+
+    // Метод для получения всех фильмов из базы данных (для демо-режима).
+    fun getAllFilmsFromDb(): Observable<List<Film>> = repo.getAllFilmsFromDb()
+
+    // Метод для получения постраничного списка избранных фильмов.
+    fun getFavoriteFilmsPaging(): Observable<PagingData<Film>> = repo.getFavoriteFilmsPaging()
 
     // Метод для получения фильма по ID.
-    fun getFilmById(id: Int): Flow<Film> {
-        return repo.getFilmById(id)
+    fun getFilmById(id: Int): Observable<Film> = repo.getFilmById(id)
+
+    // Метод для обновления статуса "избранное"
+    fun toggleFavoriteStatus(film: Film): Completable {
+        val updatedFilm = film.copy(isInFavorites = !film.isInFavorites)
+        return repo.updateFilm(updatedFilm)
     }
 
-    // Метод для получения всех фильмов из локальной базы данных (для демо-режима).
-    fun getAllFilmsFromDb(): Flow<List<Film>> {
-        return repo.getAllFilmsFromDb()
-    }
+    // Метод для удаления фильма из кэша
+    fun removeFilmFromCache(film: Film): Completable = repo.deleteFilm(film)
 }

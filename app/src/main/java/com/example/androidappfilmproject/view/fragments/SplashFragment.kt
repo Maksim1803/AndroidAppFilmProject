@@ -12,7 +12,8 @@ import com.example.androidappfilmproject.MainActivity
 import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.databinding.FragmentSplashBinding
 
-// Создаем класс SplashFragment, который отвечает за отображение заставки при запуске приложения.
+// Создаем класс SplashFragment, который отвечает за
+// отображение заставки при запуске приложения.
 class SplashFragment : Fragment() {
     // Переменная для хранения экземпляра биндинга (nullable)
     private var _binding: FragmentSplashBinding? = null

@@ -18,4 +18,3 @@
         tools:listitem="@layout/film_item" />
 
 </FrameLayout>
-

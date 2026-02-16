@@ -9,9 +9,8 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import com.example.androidappfilmproject.R
+import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
-import com.example.androidappfilmproject.domain.Film
 import com.google.android.material.snackbar.Snackbar
 
 // Создаем класс LocalDetailsFragment, который отвечает за отображение
@@ -70,6 +69,9 @@ class LocalDetailsFragment : Fragment() {
         binding.detailsFab.setOnClickListener {
             Snackbar.make(binding.root, disabledMessage, Snackbar.LENGTH_SHORT).show()
         }
+        binding.detailsFabDownloadWp.setOnClickListener {
+            Snackbar.make(binding.root, disabledMessage, Snackbar.LENGTH_SHORT).show()
+        }
 
         // Настраиваем отображение постера
         binding.detailsPoster.apply {
@@ -84,17 +86,11 @@ class LocalDetailsFragment : Fragment() {
 
             // Загружаем постер фильма из ресурсов
             Glide.with(this@LocalDetailsFragment)
-                .load(film.poster.toInt())
+                .load(film.poster?.toInt())
                 .centerCrop()
                 .into(detailsPoster)
 
             detailsDescription.text = film.description
-
-            // Устанавливаем иконку для кнопки "избранное"
-            favoriteButton.setImageResource(
-                if (film.isInFavorites) R.drawable.baseline_favorite_24
-                else R.drawable.baseline_favorite_border_24
-            )
 
             // Устанавливаем прогресс для кольцевого индикатора рейтинга
             val progress = (film.rating * 10).toInt().coerceIn(0, 100)
