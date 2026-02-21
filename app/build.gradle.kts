@@ -128,7 +128,7 @@ dependencies {
 
     //Новые библиотеки для создания анимации для модуля 33
     implementation("androidx.fragment:fragment-ktx:1.8.9")// Для viewModels() во фрагментах
-    implementation("androidx.activity:activity-ktx:1.12.3")// Для activityViewModels() в активностях (если нужно)
+    implementation("androidx.activity:activity-ktx:1.12.4")// Для activityViewModels() в активностях (если нужно)
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")// Для ViewModelScope и других KTX расширений
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")// Для LiveData KTX расширений
 
@@ -139,7 +139,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:5.3.2") //логгер
 
     implementation(libs.androidx.paging.runtime.ktx)
-    implementation("androidx.paging:paging-rxjava3:3.4.0")
+    implementation("androidx.paging:paging-rxjava3:3.4.1")
 
     //Библиотека Koin для модуля 4.1.1
     implementation("io.insert-koin:koin-android:4.1.1")
@@ -155,7 +155,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
-    //Библиотеки для модуля 44 (RxJava)
+    //Библиотеки для модулей 44 и 45 (RxJava)
     implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
     implementation("io.reactivex.rxjava3:rxjava:3.1.12")
 
