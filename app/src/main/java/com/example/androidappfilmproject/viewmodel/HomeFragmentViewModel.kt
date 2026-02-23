@@ -30,7 +30,7 @@ class HomeFragmentViewModel @Inject constructor(
 
     // Инициализируем Observable для получения списка фильмов
     val films: Observable<PagingData<Film>>
-    
+
     // Новый поток для рекомендации фильма
     val recommendation: Observable<Film>
 
@@ -49,22 +49,31 @@ class HomeFragmentViewModel @Inject constructor(
             .map { it.first() } // Берем самый популярный
             .observeOn(AndroidSchedulers.mainThread())
 
-        // Основной поток фильмов
+        // Основной поток фильмов с поддержкой поиска и пагинации
         films = Observable.combineLatest(
             categoryObservable,
-            querySubject.distinctUntilChanged()
+            querySubject
+                .distinctUntilChanged()
+                // Фильтруем: пропускаем пустую строку (для сброса) или текст от 3 символов
+                .filter { it.isEmpty() || it.length >= 3 }
+                // Задержка, чтобы не спамить запросами при вводе
+                .debounce(500, TimeUnit.MILLISECONDS)
         ) { category, query ->
             category to query
         }
-        .debounce(300, TimeUnit.MILLISECONDS)
-        .switchMap { (category, query) ->
-            if (query.isEmpty()) {
-                interactor.getPagedFilms(category)
-            } else {
-                interactor.getSearchResult(query)
+            // Метод отменяющий предыдущие подписки и
+            // отвечающий за отображение только последнего запроса
+            .switchMap { (category, query) ->
+                if (query.isEmpty()) {
+                    // Если поиск пуст — грузим фильмы по категориям из БД + Сети
+                    interactor.getPagedFilms(category)
+                } else {
+                    // Если есть запрос — грузим результаты поиска из API (с пагинацией)
+                    interactor.getSearchResult(query)
+                }
             }
-        }
-        .cachedIn(viewModelScope)
+            // Кэшируем результат в viewModelScope, чтобы не терять данные при повороте экрана
+            .cachedIn(viewModelScope)
     }
 
     // Метод для установки нового поискового запроса
@@ -88,6 +97,7 @@ class HomeFragmentViewModel @Inject constructor(
     fun toggleProgressBar(isVisible: Boolean) {
         interactor.setLoadingStatus(isVisible)
     }
+
     // Вызывается при уничтожении ViewModel
     override fun onCleared() {
         super.onCleared()
