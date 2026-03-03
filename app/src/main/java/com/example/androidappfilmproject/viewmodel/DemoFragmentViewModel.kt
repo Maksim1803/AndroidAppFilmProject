@@ -1,8 +1,8 @@
 package com.example.androidappfilmproject.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.domain.Interactor
+import com.example.database_module.entity.Film
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -19,7 +19,7 @@ class DemoFragmentViewModel @Inject constructor(
     // Инициализируем BehaviorSubject для хранения поискового запроса
     private val querySubject = BehaviorSubject.createDefault("")
 
-    // Поток отфильтрованных фильмов
+    // Поток отфильтрованных фильмов. Используем Film из database_module
     val films: Observable<List<Film>> = Observable.combineLatest(
         interactor.getAllFilmsFromDb(),
         querySubject.distinctUntilChanged().debounce(300, TimeUnit.MILLISECONDS)

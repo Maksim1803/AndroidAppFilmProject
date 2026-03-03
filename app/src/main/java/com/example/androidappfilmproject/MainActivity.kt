@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
 import com.example.androidappfilmproject.view.fragments.DemoFragment
 import com.example.androidappfilmproject.view.fragments.DetailsFragment
@@ -16,6 +15,7 @@ import com.example.androidappfilmproject.view.fragments.LocalDetailsFragment
 import com.example.androidappfilmproject.view.fragments.SelectionsFragment
 import com.example.androidappfilmproject.view.fragments.SplashFragment
 import com.example.androidappfilmproject.view.fragments.WatchLaterFragment
+import com.example.database_module.entity.Film
 
 // Класс MainActivity, который является главным в приложении.
 class MainActivity : AppCompatActivity() {

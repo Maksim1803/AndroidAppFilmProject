@@ -8,9 +8,10 @@ import androidx.paging.PagingData
 import androidx.paging.rxjava3.observable
 import com.example.androidappfilmproject.BuildConfig
 import com.example.androidappfilmproject.R
-import com.example.androidappfilmproject.data.db.AppDatabase
-import com.example.androidappfilmproject.data.entity.Film
-import com.example.androidappfilmproject.data.entity.TmdbResults
+import com.example.database_module.db.AppDatabase
+import com.example.database_module.entity.Film
+import com.example.remote_module.TmdbApi
+import com.example.remote_module.entity.TmdbResults
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
@@ -32,12 +33,12 @@ class MainRepository(
     // Обновляет текущее состояние загрузки
     fun setLoadingStatus(isLoading: Boolean) = loadingStatus.onNext(isLoading)
 
-    // Предоставляет поток состояния загрузки (скрываем Subject за интерфейсом Observable)
+    // Предоставляет поток состояния загрузки
     fun getLoadingStatus(): Observable<Boolean> = loadingStatus.hide()
 
-    // Запрашивает список фильмов напрямую из API (без сохранения в БД)
+    // Запрашивает список фильмов напрямую из API (RxJava)
     fun getFilmsFromApiRx(category: String): Observable<TmdbResults> {
-        return tmdbApi.getFilmsObservable(
+        return tmdbApi.getFilms(
             category = category,
             apiKey = BuildConfig.TMDB_API_KEY,
             language = "ru-RU",
@@ -45,7 +46,7 @@ class MainRepository(
         )
     }
 
-    // Получает поток данных PagingData, используя RemoteMediator для синхронизации БД и Сети
+    // Получает поток данных PagingData с помощью RemoteMediator
     fun getFilms(category: String): Observable<PagingData<Film>> {
         val filmRemoteMediator = FilmRemoteMediator(
             context = context,
@@ -53,7 +54,6 @@ class MainRepository(
             appDatabase = appDatabase,
             category = category
         )
-        // Возвращает поток данных PagingData с помощью Pager
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
             remoteMediator = filmRemoteMediator,
@@ -61,7 +61,7 @@ class MainRepository(
         ).observable
     }
 
-    // Поиск фильмов через API с поддержкой пагинации (без кэширования в БД)
+    // Поиск фильмов через API с поддержкой пагинации
     fun getSearchResult(query: String): Observable<PagingData<Film>> {
         return Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
@@ -69,7 +69,7 @@ class MainRepository(
         ).observable
     }
 
-    // Обновляет данные фильма в БД (например, статус "избранное")
+    // Обновляет данные фильма в БД
     fun updateFilm(film: Film): Completable = Completable.fromAction { filmDao.update(film) }
 
     // Удаляет фильм из локальной БД
@@ -86,7 +86,7 @@ class MainRepository(
     // Получает данные конкретного фильма по ID из БД
     fun getFilmById(id: Int): Observable<Film> = filmDao.getFilmById(id)
 
-    // Метод для получения всех статичных фильмов (используется в демо-режиме
+    // Метод для получения всех статичных фильмов (Демо-режим)
     fun getAllFilmsFromDb(): Observable<List<Film>> = Observable.just(filmsDataBase)
 
     // Список фильмов для Демо-режима.
@@ -197,4 +197,3 @@ class MainRepository(
         )
     )
 }
-

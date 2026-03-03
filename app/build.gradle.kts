@@ -88,6 +88,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.animation)
     implementation(libs.androidx.ui.text.android)
+    implementation(libs.filament.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -158,5 +159,9 @@ dependencies {
     //Библиотеки для модулей 44 и 45 (RxJava)
     implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
     implementation("io.reactivex.rxjava3:rxjava:3.1.12")
+
+    //Библиотеки для модуля 46(Remote module) и задания со звездочкой (Database module)
+    implementation(project(":remote_module"))
+    implementation(project(":database_module"))
 
 }

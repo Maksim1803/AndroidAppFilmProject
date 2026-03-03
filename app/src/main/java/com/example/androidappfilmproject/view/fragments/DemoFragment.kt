@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -14,11 +15,11 @@ import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.MainActivity
-import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.databinding.FragmentDemoBinding
 import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapter
 import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
 import com.example.androidappfilmproject.viewmodel.DemoFragmentViewModel
+import com.example.database_module.entity.Film
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -29,8 +30,6 @@ class DemoFragment : Fragment() {
 
     // Инициализируем ViewBinding
     private var _binding: FragmentDemoBinding? = null
-
-    // Используем backing property для получения не nullable версии binding
     private val binding get() = _binding!!
 
     // Инициализируем CompositeDisposable для управления подписками
@@ -46,15 +45,13 @@ class DemoFragment : Fragment() {
     // Ленивая инициализация адаптера
     private lateinit var filmsAdapter: FilmListRecyclerAdapter
 
-    // Вызывается при присоединении фрагмента к контексту.
+    // Метод для внедрения зависимостей через Dagger
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
-        // Выполняем Dagger-инъекцию, чтобы получить viewModelFactory
         (requireActivity().application as App).dagger.inject(this)
     }
 
-    // Метод для создания иерархии представлений, связанной с фрагментом.
+    // Метод для создания и раздувания (inflate) макета фрагмента
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -63,19 +60,16 @@ class DemoFragment : Fragment() {
         return binding.root
     }
 
-    // Метод, который вызывается сразу после того, как onCreateView() завершил свою работу.
+    // Метод для настройки компонентов экрана и подписки на данные из ViewModel
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Вызываем метод для инициализации RecyclerView
         initRecycler()
 
-        // Используем новый ID searchViewDemo с задержкой
         binding.searchViewDemo.postDelayed({
             if (_binding != null) initSearchView()
         }, 600)
 
-        // Привязываем адаптер к RecyclerView
         val disposable = viewModel.films
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { films ->
@@ -84,22 +78,24 @@ class DemoFragment : Fragment() {
         compositeDisposable.add(disposable)
     }
 
+
     // Метод для инициализации RecyclerView
     private fun initRecycler() {
         filmsAdapter =
             FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
-                // Обрабатываем клик по элементу списка.
                 override fun click(film: Film) {
                     (requireActivity() as MainActivity).launchLocalDetailsFragment(film)
                 }
 
-                // В демо-режиме эта функция не нужна.
-                override fun onFavoriteClick(film: Film) {}
+                override fun onFavoriteClick(film: Film, favoriteIcon: ImageView) {
+                    // В демо-режиме эта функция не используется
+                }
 
-                // В демо-режиме эта функция не нужна.
-                override fun longClick(film: Film) {}
+                override fun longClick(film: Film) {
+                    // В демо-режиме эта функция не используется
+                }
             })
-        // Вызываем demoRecycler для отображения списка фильмов
+
         binding.demoRecycler.apply {
             adapter = filmsAdapter
             layoutManager = LinearLayoutManager(requireContext())
@@ -107,7 +103,7 @@ class DemoFragment : Fragment() {
         }
     }
 
-    // Метод для поиска фильмов
+    // Метод для настройки поисковой строки и обработки ввода текста
     private fun initSearchView() {
         binding.searchViewDemo.setIconifiedByDefault(false)
         binding.searchViewDemo.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -119,16 +115,15 @@ class DemoFragment : Fragment() {
         })
     }
 
-    // Вызывается при временной приостановке фрагмента
+    // Метод для скрытия мягкой клавиатуры при уходе с фрагмента
     override fun onPause() {
         super.onPause()
-        // Прячем клавиатуру
-        val imm =
-            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        // Ипользуем searchViewDemo вместо searchViewHome
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.searchViewDemo.windowToken, 0)
     }
 
-    // Вызывается, когда иерархия представлений, связанная с фрагментом, удаляется.
+    // Метод для очистки подписок и зануления binding для предотвращения утечек памяти
     override fun onDestroyView() {
         super.onDestroyView()
         compositeDisposable.clear()

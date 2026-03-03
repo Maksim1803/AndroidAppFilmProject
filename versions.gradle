@@ -1,0 +1,5 @@
+ext {
+    daggerVersion = '2.59.1'
+    dagger = "com.google.dagger:dagger:${daggerVersion}".toString()
+    daggerCompiler = "com.google.dagger:dagger-compiler:${daggerVersion}".toString()
+}

@@ -7,22 +7,24 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.example.androidappfilmproject.BuildConfig
-import com.example.androidappfilmproject.data.db.AppDatabase
-import com.example.androidappfilmproject.data.entity.Film
+import com.example.database_module.db.AppDatabase
+import com.example.database_module.entity.Film
 import com.example.androidappfilmproject.data.entity.toFilm
 import com.example.androidappfilmproject.utils.NetworkChecker
+import com.example.remote_module.TmdbApi
+import kotlinx.coroutines.rx3.awaitSingle
 import java.io.IOException
 
 // Создаем класс для синхронизации данных из сети в локальную БД
 @OptIn(ExperimentalPagingApi::class)
 class FilmRemoteMediator(
-    context: Context, // Параметр используется только для инициализации networkChecker
+    private val context: Context,
     private val tmdbApi: TmdbApi,
     private val appDatabase: AppDatabase,
     private val category: String
 ) : RemoteMediator<Int, Film>() {
 
-    // Инициализируем DAO для доступа к таблице фильмов
+    // Инициализируем DAO через базу данных из database_module
     private val filmDao = appDatabase.filmDao()
 
     // Инициализируем NetworkChecker для проверки состояния сети
@@ -34,7 +36,6 @@ class FilmRemoteMediator(
         if (!networkChecker.isInternetAvailable()) {
             return MediatorResult.Error(IOException("Нет подключения к интернету"))
         }
-
         // Основной блок обработки сетевого запроса и кэширования
         return try {
             val loadKey = when (loadType) {
@@ -46,13 +47,13 @@ class FilmRemoteMediator(
                 }
             }
 
-            // Выполняем сетевой запрос к TMDB API
+            // Выполняем сетевой запрос к TMDB API через RxJava
             val response = tmdbApi.getFilms(
                 category = category,
                 apiKey = BuildConfig.TMDB_API_KEY,
                 language = "ru-RU",
                 page = loadKey
-            )
+            ).awaitSingle()
 
             // Преобразуем DTO модели из сети в Entity модели для БД и назначаем категорию
             val films = response.tmdbFilms.map {
