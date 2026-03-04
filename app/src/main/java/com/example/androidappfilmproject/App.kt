@@ -3,6 +3,7 @@ package com.example.androidappfilmproject
 import android.app.Application
 import com.example.androidappfilmproject.di.AppComponent
 import com.example.androidappfilmproject.di.DaggerAppComponent
+import com.example.remote_module.DaggerRemoteComponent
 
 // Основной класс приложения, который инициализирует Dagger.
 class App : Application() {
@@ -15,8 +16,16 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        // Создаем Dagger-компонент с помощью фабрики
-        dagger = DaggerAppComponent.factory().create(this)
+
+        // 1. Сначала создаем компонент для сетевого модуля (remote_module)
+        val remoteProvider = DaggerRemoteComponent.create()
+
+        // 2. Затем создаем основной компонент приложения, 
+        // передавая ему remoteProvider как зависимость.
+        dagger = DaggerAppComponent.builder()
+            .context(this)
+            .remoteProvider(remoteProvider)
+            .build()
     }
 
     // Companion object для доступа к экземпляру приложения.
@@ -27,7 +36,3 @@ class App : Application() {
             private set
     }
 }
-
-
-
-

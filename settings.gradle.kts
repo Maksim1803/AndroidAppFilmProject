@@ -17,9 +17,10 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
-
-    rootProject.name = "AndroidAppFilmProject" +
-            ""
-    include(":app")
 }
- 
+
+rootProject.name = "AndroidAppFilmProject"
+
+include(":app")
+include(":remote_module")
+include(":database_module")

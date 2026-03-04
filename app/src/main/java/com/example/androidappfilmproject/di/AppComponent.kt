@@ -3,42 +3,51 @@ package com.example.androidappfilmproject.di
 import android.content.Context
 import com.example.androidappfilmproject.di.modules.DatabaseModule
 import com.example.androidappfilmproject.di.modules.DomainModule
-import com.example.androidappfilmproject.di.modules.RemoteModule
 import com.example.androidappfilmproject.di.modules.ViewModelModule
 import com.example.androidappfilmproject.view.fragments.DemoFragment
 import com.example.androidappfilmproject.view.fragments.DetailsFragment
 import com.example.androidappfilmproject.view.fragments.FavoritesFragment
 import com.example.androidappfilmproject.view.fragments.HomeFragment
 import com.example.androidappfilmproject.view.fragments.SelectionsFragment
+import com.example.remote_module.RemoteProvider
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
 // Главный компонент Dagger для всего приложения.
-// Он связывает все модули и предоставляет методы для внедрения зависимостей.
+// Теперь он зависит от RemoteProvider, который живет в другом модуле.
 
 @Singleton
 @Component(
-    //Внедряем все модули, нужные для этого компонента
+    // Внедряем модули базы данных и домена.
+    // RemoteModule теперь предоставляется через зависимости компонента (dependencies).
+    dependencies = [RemoteProvider::class],
     modules = [
-        RemoteModule::class,
         DatabaseModule::class,
         DomainModule::class,
         ViewModelModule::class
     ]
 )
+
+//Интерфейс AppComponent определяющий методы для внедрения зависимостей во фрагменты.
 interface AppComponent {
     // Методы для внедрения зависимостей во фрагменты
     fun inject(homeFragment: HomeFragment)
     fun inject(selectionsFragment: SelectionsFragment)
     fun inject(demoFragment: DemoFragment)
     fun inject(detailsFragment: DetailsFragment)
-    fun inject(favoritesFragment: FavoritesFragment) // Добавляем новый метод
+    fun inject(favoritesFragment: FavoritesFragment)
 
-    // Фабрика для создания экземпляра AppComponent.
-    // Позволяет передать в граф зависимостей внешний экземпляр, в данном случае, Context.
-    @Component.Factory
-    interface Factory {
-        fun create(@BindsInstance context: Context): AppComponent
+    // Используем Builder для сборки компонента с внешними зависимостями
+    @Component.Builder
+    // Интерфейс для билдера компонента
+    interface Builder {
+        @BindsInstance
+        // Метод для установки контекста в билдер
+        fun context(context: Context): Builder
+        // Метод для установки внешнего провайдера зависимостей
+        fun remoteProvider(remoteProvider: RemoteProvider): Builder
+        // Метод для сборки компонента
+        fun build(): AppComponent
     }
 }

@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.rxjava3.cachedIn
-import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.domain.Interactor
+import com.example.database_module.entity.Film
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -28,7 +28,7 @@ class HomeFragmentViewModel @Inject constructor(
     // Инициализируем Observable для показа ProgressBar
     val showProgressBar: Observable<Boolean> = interactor.loadingStatus
 
-    // Инициализируем Observable для получения списка фильмов
+    // Инициализируем Observable для получения списка фильмов. Используем Film из database_module
     val films: Observable<PagingData<Film>>
 
     // Новый поток для рекомендации фильма
@@ -83,13 +83,25 @@ class HomeFragmentViewModel @Inject constructor(
 
     // Метод для обработки клика по иконке "избранное"
     fun onFavoriteClicked(film: Film) {
-        val disposable = interactor.toggleFavoriteStatus(film).subscribe()
+        // ИСПРАВЛЕНИЕ: Переносим работу с БД в IO поток и добавляем обработку ошибок
+        val disposable = interactor.toggleFavoriteStatus(film)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                // Успешно обновили
+            }, {
+                // Логируем ошибку, но приложение не падает
+                it.printStackTrace()
+            })
         compositeDisposable.add(disposable)
     }
 
     // Метод для удаления фильма из кэша
     fun removeFilmFromCache(film: Film) {
-        val disposable = interactor.removeFilmFromCache(film).subscribe()
+        val disposable = interactor.removeFilmFromCache(film)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({}, { it.printStackTrace() })
         compositeDisposable.add(disposable)
     }
 
