@@ -7,4 +7,6 @@ import javax.inject.Singleton
 @Component(
     modules = [RemoteModule::class]
 )
+// Интерфейс RemoteComponent определяет методы для создания
+// экземпляра RemoteComponent.
 interface RemoteComponent : RemoteProvider

@@ -147,7 +147,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:lineSpacingExtra="4dp"
-            android:textColor="@android:color/black"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="16sp"
             tools:text="@tools:sample/lorem/random" />
 

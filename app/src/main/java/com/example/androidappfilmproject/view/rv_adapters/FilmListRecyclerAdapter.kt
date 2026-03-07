@@ -13,6 +13,8 @@ import com.example.androidappfilmproject.databinding.FilmItemBinding
 import com.example.database_module.entity.Film
 import com.example.remote_module.entity.ApiConstants
 
+// Создаем класс FilmListRecyclerAdapter, который является адаптером для RecyclerView
+// работает с PagingData.
 class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
     PagingDataAdapter<Film, FilmListRecyclerAdapter.FilmViewHolder>(FilmDiffCallback()) {
 
@@ -41,9 +43,11 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
         }
     }
 
+    // ViewHolder для представления элемента списка
     class FilmViewHolder(val binding: FilmItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        
+
+        // Метод для привязки данных к элементу списка
         fun bind(film: Film) {
             binding.title.text = film.title
             binding.description.text = film.description
@@ -69,6 +73,7 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
         }
     }
 
+    // Интерфейс для обработки кликов
     interface OnItemClickListener {
         fun click(film: Film)
         // Теперь принимаем иконку
@@ -76,6 +81,7 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
         fun longClick(film: Film)
     }
 
+    // Класс для сравнения элементов списка
     class FilmDiffCallback : DiffUtil.ItemCallback<Film>() {
         override fun areItemsTheSame(oldItem: Film, newItem: Film): Boolean = oldItem.id == newItem.id
         override fun areContentsTheSame(oldItem: Film, newItem: Film): Boolean = oldItem == newItem

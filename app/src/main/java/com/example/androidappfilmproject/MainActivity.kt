@@ -1,5 +1,8 @@
 package com.example.androidappfilmproject
 
+import android.content.BroadcastReceiver
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
+import com.example.androidappfilmproject.receivers.ConnectionChecker
 import com.example.androidappfilmproject.view.fragments.DemoFragment
 import com.example.androidappfilmproject.view.fragments.DetailsFragment
 import com.example.androidappfilmproject.view.fragments.FavoritesFragment
@@ -22,6 +26,9 @@ class MainActivity : AppCompatActivity() {
 
     // Объявляем переменную для хранения экземпляра биндинга
     private lateinit var binding: ActivityMainBinding
+    
+    // Объявляем переменную для ресивера
+    private lateinit var receiver: BroadcastReceiver
 
     // Метод, вызываемый при создании активности
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +47,17 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
             insets
         }
+
+        // Инициализируем ресивер
+        receiver = ConnectionChecker()
+        // Создаем фильтр для нужных нам событий
+        val filters = IntentFilter().apply {
+            addAction(Intent.ACTION_POWER_CONNECTED)
+            addAction(Intent.ACTION_BATTERY_LOW)
+        }
+        // Регистрируем ресивер: теперь он будет слушать систему, пока MainActivity жива
+        registerReceiver(receiver, filters)
+
         // Запускаем инициализацию нижнего навигационного меню
         initNavigation()
 
@@ -133,5 +151,12 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+    }
+
+    // Метод, вызываемый при уничтожении активности
+    override fun onDestroy() {
+        super.onDestroy()
+        // Отключаем ресивер при уничтожении активности
+        unregisterReceiver(receiver)
     }
 }
