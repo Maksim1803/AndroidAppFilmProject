@@ -32,8 +32,8 @@ interface FilmDao {
     @Delete
     fun delete(film: Film)
 
-    // Метод для очистки кэша (фильмы конкретной категории)
-    @Query("DELETE FROM film_table WHERE category = :category")
+    // Метод для очистки кэша (фильмы конкретной категории), не удаляя избранное
+    @Query("DELETE FROM film_table WHERE category = :category AND isInFavorites = 0")
     fun deleteByCategory(category: String)
 
     // Метод для полной очистки таблицы с фильмами.
@@ -43,6 +43,10 @@ interface FilmDao {
     // Метод для получения всех фильмов из базы данных в виде Observable.
     @Query("SELECT * FROM film_table")
     fun getAllFilms(): Observable<List<Film>>
+
+    // Метод для получения списка ID избранных фильмов
+    @Query("SELECT id FROM film_table WHERE isInFavorites = 1")
+    fun getFavoriteIds(): List<Int>
 
     // Метод для получения всех фильмов для постраничной загрузки через Paging Library.
     @Query("SELECT * FROM film_table WHERE category = :category")

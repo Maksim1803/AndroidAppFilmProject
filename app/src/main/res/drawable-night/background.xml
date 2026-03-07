@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Темный градиент для ночного режима -->
+    <gradient
+        android:startColor="#1A0A33"
+        android:endColor="#000000"
+        android:angle="45"/>
+</shape>

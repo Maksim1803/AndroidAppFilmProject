@@ -53,6 +53,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        ndk {
+            // Нужные архитектуры для специфических устройств (эмуляторов)
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
+        }
         // Make the API key available in BuildConfig
         buildConfigField("String", "TMDB_API_KEY", "\"${localProperties.getProperty("tmdb.api_key") ?: ""}\"")
     }

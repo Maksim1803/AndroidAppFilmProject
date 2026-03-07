@@ -18,7 +18,7 @@ import java.io.IOException
 // Создаем класс для синхронизации данных из сети в локальную БД
 @OptIn(ExperimentalPagingApi::class)
 class FilmRemoteMediator(
-    private val context: Context,
+    context: Context,
     private val tmdbApi: TmdbApi,
     private val appDatabase: AppDatabase,
     private val category: String
@@ -55,23 +55,33 @@ class FilmRemoteMediator(
                 page = loadKey
             ).awaitSingle()
 
-            // Преобразуем DTO модели из сети в Entity модели для БД и назначаем категорию
-            val films = response.tmdbFilms.map {
-                it.toFilm().apply { this.category = this@FilmRemoteMediator.category }
-            }
-
             // Только если данные успешно получены, работаем с БД
             appDatabase.withTransaction {
                 if (loadType == LoadType.REFRESH) {
-                    // Очищаем только старые фильмы текущей категории
+                    // Очищаем только старые фильмы текущей категории, которые не в избранном
                     filmDao.deleteByCategory(category)
                 }
+
+                // Получаем список ID всех избранных фильмов, чтобы сохранить их статус при вставке новых данных
+                val favoriteIds = filmDao.getFavoriteIds()
+
+                // Преобразуем DTO модели из сети в Entity модели для БД и назначаем категорию
+                val films = response.tmdbFilms.map {
+                    it.toFilm().apply {
+                        this.category = this@FilmRemoteMediator.category
+                        // Если фильм уже был в избранном, сохраняем этот статус
+                        if (favoriteIds.contains(this.id)) {
+                            this.isInFavorites = true
+                        }
+                    }
+                }
+
                 // Сохраняем свежезагруженные фильмы в локальное хранилище
                 filmDao.insertAll(films)
             }
 
             // Возвращаем результат: Success, указывая, достигнут ли конец списка
-            MediatorResult.Success(endOfPaginationReached = films.isEmpty())
+            MediatorResult.Success(endOfPaginationReached = response.tmdbFilms.isEmpty())
         } catch (e: Exception) {
             // Любая ошибка (timeout, 401, и т.д.) пробрасывается в UI
             MediatorResult.Error(e)

@@ -20,6 +20,7 @@ import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapte
 import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
 import com.example.androidappfilmproject.viewmodel.DemoFragmentViewModel
 import com.example.database_module.entity.Film
+import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -88,11 +89,13 @@ class DemoFragment : Fragment() {
                 }
 
                 override fun onFavoriteClick(film: Film, favoriteIcon: ImageView) {
-                    // В демо-режиме эта функция не используется
+                    // Показываем Snackbar о недоступности функции в демо-режиме
+                    Snackbar.make(binding.root, "Функция недоступна в демо-режиме", Snackbar.LENGTH_SHORT).show()
                 }
 
                 override fun longClick(film: Film) {
-                    // В демо-режиме эта функция не используется
+                    // Показываем Snackbar о недоступности функции в демо-режиме
+                    Snackbar.make(binding.root, "Функция недоступна в демо-режиме", Snackbar.LENGTH_SHORT).show()
                 }
             })
 
