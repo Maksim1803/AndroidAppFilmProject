@@ -1,8 +1,12 @@
 package com.example.androidappfilmproject
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
 import com.example.androidappfilmproject.di.AppComponent
 import com.example.androidappfilmproject.di.DaggerAppComponent
+import com.example.androidappfilmproject.view.notifications.NotificationConstants
 import com.example.remote_module.DaggerRemoteComponent
 
 // Основной класс приложения, который инициализирует Dagger.
@@ -26,6 +30,18 @@ class App : Application() {
             .context(this)
             .remoteProvider(remoteProvider)
             .build()
+
+        // Создаем канал уведомлений
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Watch Later Channel"
+            val descriptionText = "Films Search notification channel"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val mChannel = NotificationChannel(NotificationConstants.CHANNEL_ID, name, importance)
+            mChannel.description = descriptionText
+            // Регистрируем канал в системе
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(mChannel)
+        }
     }
 
     // Companion object для доступа к экземпляру приложения.
