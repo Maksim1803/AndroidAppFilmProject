@@ -1,10 +1,14 @@
 package com.example.androidappfilmproject.view.notifications
 
+import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import androidx.annotation.RequiresPermission
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.bumptech.glide.Glide
@@ -21,6 +25,17 @@ object NotificationHelper {
 
     // Метод для создания уведомления (нотификации)
     fun createNotification(context: Context, film: Film) {
+        // Проверка разрешения на уведомления (требуется для Android 13+)
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // Если разрешения нет, мы не можем отправить уведомление.
+            // В реальном приложении здесь стоит запросить разрешение у пользователя.
+            return
+        }
+
         val mIntent = Intent(context, MainActivity::class.java).apply {
             // Кладем фильм в интент для задания со звездочкой
             putExtra("film", film)
@@ -51,6 +66,7 @@ object NotificationHelper {
             .into(object : CustomTarget<Bitmap>() {
                 override fun onLoadCleared(placeholder: Drawable?) {
                 }
+                @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                     builder.setStyle(NotificationCompat.BigPictureStyle().bigPicture(resource))
                     notificationManager.notify(film.id, builder.build())
