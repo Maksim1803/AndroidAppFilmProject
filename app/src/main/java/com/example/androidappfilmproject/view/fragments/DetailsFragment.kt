@@ -23,6 +23,7 @@ import com.bumptech.glide.Glide
 import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
+import com.example.androidappfilmproject.view.notifications.NotificationHelper
 import com.example.androidappfilmproject.viewmodel.DetailsFragmentViewModel
 import com.example.database_module.entity.Film
 import com.example.remote_module.entity.ApiConstants
@@ -51,6 +52,7 @@ class DetailsFragment : Fragment() {
         super.onAttach(context)
         (requireActivity().application as App).dagger.inject(this)
     }
+
     // Вызывается для создания иерархии представлений, связанной с фрагментом.
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,6 +61,7 @@ class DetailsFragment : Fragment() {
         _binding = FragmentDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
+
     // Вызывается сразу после того, как onCreateView() завершил свою работу.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -72,7 +75,6 @@ class DetailsFragment : Fragment() {
 
         if (filmFromArgs == null) {
             Snackbar.make(binding.root, "Ошибка: Фильм не найден", Snackbar.LENGTH_SHORT).show()
-            activity?.finish()
             return
         }
 
@@ -93,35 +95,37 @@ class DetailsFragment : Fragment() {
             })
         compositeDisposable.add(disposable)
 
-        // ЛОГИКА ИЗБРАННОГО (как в HomeFragment)
+        // ЛОГИКА ИЗБРАННОГО
         binding.favoriteButton.setOnClickListener {
             currentFilm?.let { film ->
-                // 1. Инвертируем статус
                 film.isInFavorites = !film.isInFavorites
-                
-                // 2. Обновляем UI
                 updateFavoriteIcon(film.isInFavorites)
-                
-                // 3. Показываем Snackbar
-                val message = if (film.isInFavorites) "Добавлено в избранное" else "Удалено из избранного"
+                val message =
+                    if (film.isInFavorites) "Добавлено в избранное" else "Удалено из избранного"
                 Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
-
-                // 4. Отправляем правильный объект в базу
                 viewModel.onFavoriteClicked(film)
             }
         }
 
+        // КНОПКА "ПОСМОТРЕТЬ ПОЗЖЕ" (Нотификация)
         binding.watchLaterButton.setOnClickListener {
-            Snackbar.make(binding.root, "Добавлено в список 'Посмотреть позже'", Snackbar.LENGTH_SHORT).show()
+            NotificationHelper.createNotification(requireContext(), filmFromArgs)
+            Snackbar.make(
+                binding.root,
+                "Напоминание установлено",
+                Snackbar.LENGTH_SHORT
+            ).show()
         }
 
+        // КНОПКА "ПОДЕЛИТЬСЯ"
         binding.detailsFab.setOnClickListener {
-            currentFilm?.let { film ->
-                val intent = Intent(Intent.ACTION_SEND)
-                intent.putExtra(Intent.EXTRA_TEXT, "Check out this film: ${film.title}\n\n${film.description}")
-                intent.type = "text/plain"
-                startActivity(Intent.createChooser(intent, "Share To:"))
-            }
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.putExtra(
+                Intent.EXTRA_TEXT,
+                "Check out this film: ${filmFromArgs.title}\n\n${filmFromArgs.description}"
+            )
+            intent.type = "text/plain"
+            startActivity(Intent.createChooser(intent, "Share To:"))
         }
 
         binding.detailsFabDownloadWp.setOnClickListener {
@@ -132,20 +136,23 @@ class DetailsFragment : Fragment() {
             this.scaleType = ImageView.ScaleType.CENTER_CROP
         }
     }
+
     // Метод для установки деталей фильма в UI.
     private fun setFilmsDetails(film: Film) {
         binding.apply {
             detailsToolbar.title = film.title
-            
+
             film.poster?.let { posterPath ->
                 try {
                     val resourceId = posterPath.toInt()
-                    Glide.with(this@DetailsFragment).load(resourceId).centerCrop().into(detailsPoster)
+                    Glide.with(this@DetailsFragment).load(resourceId).centerCrop()
+                        .into(detailsPoster)
                 } catch (_: NumberFormatException) {
                     val fullUrl = ApiConstants.IMAGES_URL + "w780/" + posterPath.removePrefix("/")
                     Glide.with(this@DetailsFragment).load(fullUrl).centerCrop().into(detailsPoster)
                 }
-            } ?: Glide.with(this@DetailsFragment).load(R.drawable.no_poster).centerCrop().into(detailsPoster)
+            } ?: Glide.with(this@DetailsFragment).load(R.drawable.no_poster).centerCrop()
+                .into(detailsPoster)
 
             detailsDescription.text = film.description
             updateFavoriteIcon(film.isInFavorites)
@@ -153,7 +160,8 @@ class DetailsFragment : Fragment() {
             ratingDonut.setProgress(progress)
         }
     }
-     // Метод отвечает за обновление иконки избранного в UI.
+
+    // Метод отвечает за обновление иконки избранного в UI.
     private fun updateFavoriteIcon(isInFavorites: Boolean) {
         binding.favoriteButton.setImageResource(
             if (isInFavorites) R.drawable.baseline_favorite_24
@@ -163,15 +171,23 @@ class DetailsFragment : Fragment() {
 
     // Метод для для проверки разрешений на запись во память телефона
     private fun checkPermission(): Boolean {
-        val result = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val result = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
         return result == PackageManager.PERMISSION_GRANTED
     }
+
     // Метод для запроса разрешения на запись в память телефона
     private fun requestPermission() {
         requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             performAsyncLoadOfPoster()
         }
@@ -188,7 +204,8 @@ class DetailsFragment : Fragment() {
                 put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/FilmsSearchApp")
             }
             val contentResolver = requireActivity().contentResolver
-            val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            val uri =
+                contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
             uri?.let {
                 contentResolver.openOutputStream(it)?.use { os ->
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os)

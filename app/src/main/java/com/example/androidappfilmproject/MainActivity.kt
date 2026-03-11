@@ -3,6 +3,7 @@ package com.example.androidappfilmproject
 import android.content.BroadcastReceiver
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -67,6 +68,17 @@ class MainActivity : AppCompatActivity() {
                 .beginTransaction()
                 .replace(R.id.fragment_placeholder, SplashFragment())
                 .commit()
+        }
+
+        // Обработка перехода из уведомления (задание со звездочкой)
+        intent?.let { intent ->
+            val film = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra("film", Film::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra<Film>("film")
+            }
+            film?.let { launchDetailsFragment(it) }
         }
     }
 
