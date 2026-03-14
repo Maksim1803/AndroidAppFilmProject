@@ -22,6 +22,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import javax.inject.Inject
 
+// Создаем класс WatchLaterFragment, который отвечает за отображение
+// экрана "Посмотреть позже".
 class WatchLaterFragment : Fragment() {
 
     private var _binding: FragmentWatchLaterBinding? = null
@@ -48,7 +50,7 @@ class WatchLaterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        // Запуск анимации появления
         AnimationHelper.performFragmentCircularRevealAnimation(binding.root, 3)
 
         initRecycler()
@@ -64,6 +66,7 @@ class WatchLaterFragment : Fragment() {
         compositeDisposable.add(disposable)
     }
 
+    // Метод для настройки RecyclerView и обработка кликов
     private fun initRecycler() {
         watchLaterAdapter = WatchLaterRecyclerAdapter(object : WatchLaterRecyclerAdapter.OnItemClickListener {
             override fun click(film: Film) {
@@ -80,9 +83,10 @@ class WatchLaterFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
         }
     }
-
+    // Метод для очистки ресурсов и отписки от RxJava при уничтожении View
     override fun onDestroyView() {
         super.onDestroyView()
+        // Очистка подписок во избежание утечек
         compositeDisposable.clear()
         _binding = null
     }
