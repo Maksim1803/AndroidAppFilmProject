@@ -4,11 +4,13 @@ import android.content.Context
 import com.example.androidappfilmproject.di.modules.DatabaseModule
 import com.example.androidappfilmproject.di.modules.DomainModule
 import com.example.androidappfilmproject.di.modules.ViewModelModule
+import com.example.androidappfilmproject.domain.Interactor
 import com.example.androidappfilmproject.view.fragments.DemoFragment
 import com.example.androidappfilmproject.view.fragments.DetailsFragment
 import com.example.androidappfilmproject.view.fragments.FavoritesFragment
 import com.example.androidappfilmproject.view.fragments.HomeFragment
 import com.example.androidappfilmproject.view.fragments.SelectionsFragment
+import com.example.androidappfilmproject.view.fragments.WatchLaterFragment
 import com.example.remote_module.RemoteProvider
 import dagger.BindsInstance
 import dagger.Component
@@ -37,6 +39,10 @@ interface AppComponent {
     fun inject(demoFragment: DemoFragment)
     fun inject(detailsFragment: DetailsFragment)
     fun inject(favoritesFragment: FavoritesFragment)
+    fun inject(watchLaterFragment: WatchLaterFragment)
+
+    // Добавляем метод для получения интерактора, чтобы использовать его в NotificationHelper
+    fun getInteractor(): Interactor
 
     // Используем Builder для сборки компонента с внешними зависимостями
     @Component.Builder

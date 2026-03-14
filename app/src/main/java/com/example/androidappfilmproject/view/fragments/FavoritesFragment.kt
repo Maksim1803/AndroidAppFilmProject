@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.MainActivity
@@ -85,6 +87,13 @@ class FavoritesFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             val decorator = TopSpacingItemDecoration(8)
             addItemDecoration(decorator)
+        }
+
+        // Слушатель состояний загрузки PagingData для отображения текста о пустом списке
+        filmsAdapter.addLoadStateListener { loadState ->
+            if (loadState.source.refresh is LoadState.NotLoading) {
+                binding.emptyText.isVisible = filmsAdapter.itemCount < 1
+            }
         }
 
         // Вызываем метод для получения списка избранных фильмов

@@ -9,6 +9,7 @@ import com.example.androidappfilmproject.viewmodel.FavoritesFragmentViewModel
 import com.example.androidappfilmproject.viewmodel.HomeFragmentViewModel
 import com.example.androidappfilmproject.viewmodel.SelectionsFragmentViewModel
 import com.example.androidappfilmproject.viewmodel.ViewModelFactory
+import com.example.androidappfilmproject.viewmodel.WatchLaterViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -45,4 +46,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(FavoritesFragmentViewModel::class)
     abstract fun bindFavoritesFragmentViewModel(viewModel: FavoritesFragmentViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(WatchLaterViewModel::class)
+    abstract fun bindWatchLaterViewModel(viewModel: WatchLaterViewModel): ViewModel
 }

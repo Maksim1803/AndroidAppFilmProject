@@ -86,6 +86,9 @@ class MainRepository(
     // Получает данные конкретного фильма по ID из БД
     fun getFilmById(id: Int): Observable<Film> = filmDao.getFilmById(id)
 
+    // Получает список фильмов для экрана "Посмотреть позже"
+    fun getWatchLaterFilmsFromDb(): Observable<List<Film>> = filmDao.getWatchLaterFilms()
+
     // Метод для получения всех статичных фильмов (Демо-режим)
     fun getAllFilmsFromDb(): Observable<List<Film>> = Observable.just(filmsDataBase)
 
