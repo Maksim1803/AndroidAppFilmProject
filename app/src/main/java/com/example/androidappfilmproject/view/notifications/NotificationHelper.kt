@@ -1,6 +1,7 @@
 package com.example.androidappfilmproject.view.notifications
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
@@ -131,6 +132,7 @@ object NotificationHelper {
     }
 
     // Метод для отмены уведомления
+    @SuppressLint("CheckResult")
     fun cancelNotification(context: Context, film: Film) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(film.title, null, context, ReminderBroadcast::class.java)

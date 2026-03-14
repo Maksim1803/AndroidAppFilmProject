@@ -1,5 +1,6 @@
 package com.example.androidappfilmproject.view.rv_adapters
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -36,6 +37,7 @@ class WatchLaterRecyclerAdapter(private val clickListener: OnItemClickListener) 
 
     // Класс ViewHolder для каждого элемента списка
     class ViewHolder(val binding: FilmItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        @SuppressLint("SetTextI18n")
         fun bind(film: Film) {
             binding.title.text = film.title
             

@@ -14,7 +14,9 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 
-// Класс для предоставления зависимостей ViewModel.
+// Класс для предоставления зависимостей ViewModel,
+// Все методы помечены неиспользуемыми, т.к. это является особенностью работы Dagger 2.
+// Dagger вызывает эти методы внутри сгенерированных классов (типа DaggerAppComponent).
 @Module
 abstract class ViewModelModule {
 
