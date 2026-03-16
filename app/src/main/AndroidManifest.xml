@@ -37,6 +37,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Регистрируем обращение к ресиверу (модуль 49, нотификации) -->
+        <receiver android:name=".receivers.ReminderBroadcast"/>
     </application>
 
 </manifest>

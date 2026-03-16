@@ -109,12 +109,15 @@ class DetailsFragment : Fragment() {
 
         // КНОПКА "ПОСМОТРЕТЬ ПОЗЖЕ" (Нотификация)
         binding.watchLaterButton.setOnClickListener {
-            NotificationHelper.createNotification(requireContext(), filmFromArgs)
-            Snackbar.make(
-                binding.root,
-                "Напоминание установлено",
-                Snackbar.LENGTH_SHORT
-            ).show()
+            currentFilm?.let { film ->
+                NotificationHelper.notificationSet(requireContext(), film) {
+                    Snackbar.make(
+                        binding.root,
+                        "Напоминание установлено",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
 
         // КНОПКА "ПОДЕЛИТЬСЯ"

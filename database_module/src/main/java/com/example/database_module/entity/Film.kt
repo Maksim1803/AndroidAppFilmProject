@@ -23,6 +23,10 @@ data class Film(
     var isInFavorites: Boolean = false,
     // Добавляем поле категории, чтобы различать фильмы в БД
     var category: String = "popular",
+    // Поле для "Посмотреть позже"
+    var isInWatchLater: Boolean = false,
+    // Время напоминания
+    var watchLaterTime: Long = 0L,
     // Уникальный идентификатор фильма, является первичным ключом в базе данных.
     @PrimaryKey
     val id: Int

@@ -50,12 +50,16 @@ class Interactor(
     // Метод для получения детальной информации о конкретном фильме по его ID
     fun getFilmById(id: Int): Observable<Film> = repo.getFilmById(id)
 
-    // МЕТОД ОБНОВЛЕНИЯ: Теперь он просто сохраняет объект в базу.
-    // Вся логика инверсии статуса должна быть на уровне UI (фрагмента).
     // Метод для обновления данных фильма (включая статус "избранное") в репозитории
     fun toggleFavoriteStatus(film: Film): Completable {
         return repo.updateFilm(film)
     }
+
+    // Метод для получения списка фильмов "Посмотреть позже"
+    fun getWatchLaterFilms(): Observable<List<Film>> = repo.getWatchLaterFilmsFromDb()
+
+    // Метод для обновления фильма в БД
+    fun updateFilmInDb(film: Film): Completable = repo.updateFilm(film)
 
     // Метод для удаления конкретного фильма из локального кэша (базы данных)
     fun removeFilmFromCache(film: Film): Completable = repo.deleteFilm(film)
