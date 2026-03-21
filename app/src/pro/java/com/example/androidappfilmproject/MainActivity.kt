@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     // Объявляем переменную для хранения экземпляра биндинга
     private lateinit var binding: ActivityMainBinding
-    
+
     // Объявляем переменную для ресивера
     private lateinit var receiver: BroadcastReceiver
 
@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         // Устанавливаем макет для активности
         setContentView(binding.root)
-        
+
         // Настраиваем отступы
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

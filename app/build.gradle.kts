@@ -34,7 +34,8 @@ android {
             keyAlias = keystoreProperties["keyAlias"] as String
             keyPassword = keystoreProperties["keyPassword"] as String
             // Проверка на null для предотвращения ошибок сборки, если файл отсутствует
-            storeFile = if (keystoreProperties.containsKey("storeFile")) file(keystoreProperties["storeFile"] as String) else null
+            storeFile =
+                if (keystoreProperties.containsKey("storeFile")) file(keystoreProperties["storeFile"] as String) else null
             storePassword = keystoreProperties["storePassword"] as String
         }
     }
@@ -58,7 +59,11 @@ android {
             abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
         }
         // Make the API key available in BuildConfig
-        buildConfigField("String", "TMDB_API_KEY", "\"${localProperties.getProperty("tmdb.api_key") ?: ""}\"")
+        buildConfigField(
+            "String",
+            "TMDB_API_KEY",
+            "\"${localProperties.getProperty("tmdb.api_key") ?: ""}\""
+        )
     }
 
     buildTypes {
@@ -81,7 +86,34 @@ android {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
+    // Создание платной и бесплатной версий для задания модуля 52
+    flavorDimensions += "version"
+    productFlavors {
+        create("basic") {
+            dimension = "version"
+            applicationIdSuffix = ".basic"
+            versionNameSuffix = "-basic"
+        }
+        create("pro") {
+            dimension = "version"
+            applicationIdSuffix = ".pro"
+            versionNameSuffix = "-pro"
+        }
+    }
+    sourceSets {
+        getByName("basic") {
+            java {
+                srcDirs("src\\basic\\java", "src\\basic\\java")
+            }
+        }
+        getByName("pro") {
+            java {
+                srcDirs("src\\pro\\java", "src\\pro\\java")
+            }
+        }
+    }
 }
+
 
 dependencies {
 
