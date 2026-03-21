@@ -6,9 +6,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
@@ -24,7 +27,9 @@ import com.example.androidappfilmproject.view.fragments.SplashFragment
 import com.example.androidappfilmproject.view.fragments.WatchLaterFragment
 import com.example.database_module.entity.Film
 
-// Класс MainActivity, который является главным в приложении для basic флавора.
+
+// * Класс MainActivity, который является главным в приложении для basic флавора.
+
 class MainActivity : AppCompatActivity() {
 
     // Объявляем переменную для хранения экземпляра биндинга
@@ -33,11 +38,35 @@ class MainActivity : AppCompatActivity() {
     // Объявляем переменную для ресивера
     private lateinit var receiver: BroadcastReceiver
 
+    // Добавляем Handler для фоновой проверки времени (используем android.os.Handler)
+    private val trialHandler = Handler(Looper.getMainLooper())
+
+    // Объект-задача, который будет проверять триал каждую секунду
+    private val trialCheckerRunnable = object : Runnable {
+        override fun run() {
+            if (!isFeatureAvailable()) {
+                // Если время вышло — принудительно выкидываем на главную
+                handleTrialExpiration()
+            } else {
+                // Если еще есть время, планируем следующую проверку через 1 сек
+                trialHandler.postDelayed(this, 1000)
+            }
+        }
+    }
+
     // Метод, вызываемый при создании активности
     override fun onCreate(savedInstanceState: Bundle?) {
         // Включаем поддержку современного режима отрисовки
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        // === ЛАЙФХАК ДЛЯ ТЕСТОВ ===
+        // Сбрасываем триал при каждом запуске, чтобы можно было потестить 20 секунд
+        getSharedPreferences("trial_prefs", Context.MODE_PRIVATE).edit().clear().apply()
+
+        // Записываем время запуска
+        val prefs = getSharedPreferences("trial_prefs", Context.MODE_PRIVATE)
+        prefs.edit { putLong("first_launch_time", System.currentTimeMillis()) }
 
         // Инициализируем биндинг
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -82,6 +111,9 @@ class MainActivity : AppCompatActivity() {
             }
             film?.let { launchDetailsFragment(it) }
         }
+
+        // Запускаем фоновую проверку времени
+        trialHandler.post(trialCheckerRunnable)
     }
 
     // Метод для запуска фрагмента с деталями фильма
@@ -126,6 +158,39 @@ class MainActivity : AppCompatActivity() {
             .beginTransaction()
             .replace(R.id.fragment_placeholder, fragment, tag)
             .commit()
+    }
+
+    // Логика проверки пробного периода
+    private fun isFeatureAvailable(): Boolean {
+        val prefs = getSharedPreferences("trial_prefs", Context.MODE_PRIVATE)
+        val firstLaunchTime = prefs.getLong("first_launch_time", 0L)
+        
+        // Если времени нет — считаем, что доступ есть (первые миллисекунды запуска)
+        if (firstLaunchTime == 0L) return true
+        
+        val currentTime = System.currentTimeMillis()
+        val trialTimeInMillis = 20 * 1000L // 20 секунд
+
+        return (currentTime - firstLaunchTime) < trialTimeInMillis
+    }
+
+    // Метод для автоматического возврата на главную
+    private fun handleTrialExpiration() {
+        val currentId = binding.bottomNavigation.selectedItemId
+        // Проверяем, находится ли пользователь сейчас на "платной" вкладке
+        if (currentId == R.id.favorites || currentId == R.id.selections) {
+            Toast.makeText(this, "Пробный период истек!", Toast.LENGTH_SHORT).show()
+
+            // Программно переключаем BottomNavigation на Home
+            binding.bottomNavigation.selectedItemId = R.id.home
+
+            // Меняем фрагмент
+            val tag = "home"
+            val fragment = checkFragmentExistence(tag) ?: HomeFragment()
+            changeFragment(fragment, tag)
+        }
+        // Останавливаем таймер, так как выкидывать больше некого
+        trialHandler.removeCallbacks(trialCheckerRunnable)
     }
 
     // Метод для инициализации нижнего навигационного меню
@@ -175,30 +240,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Логика проверки пробного периода
-    private fun isFeatureAvailable(): Boolean {
-        val prefs = getSharedPreferences("trial_prefs", Context.MODE_PRIVATE)
-        val firstLaunchTime = prefs.getLong("first_launch_time", 0L)
-
-        if (firstLaunchTime == 0L) {
-            // Первый запуск: сохраняем текущее время
-            val currentTime = System.currentTimeMillis()
-            prefs.edit().putLong("first_launch_time", currentTime).apply()
-            return true
-        }
-
-        val currentTime = System.currentTimeMillis()
-       // val threeDaysInMillis = 3 * 24 * 60 * 60 * 1000L // 90 дней в миллисекундах
-        val trialDaysInMillis = 10 * 1000L // 10 секунд в миллисекундах
-
-        return (currentTime - firstLaunchTime) < trialDaysInMillis
-    }
-
-
     // Метод, вызываемый при уничтожении активности
     override fun onDestroy() {
         super.onDestroy()
         // Отключаем ресивер при уничтожении активности
         unregisterReceiver(receiver)
+        // Останавливаем таймер
+        trialHandler.removeCallbacks(trialCheckerRunnable)
     }
 }
