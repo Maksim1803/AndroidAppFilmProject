@@ -81,6 +81,10 @@ class HomeFragment : Fragment() {
             }
         compositeDisposable.add(progressDisposable)
 
+        // Закоментим пока рекомендацию фильма к просмотру
+        // (задание со звездочкой из предыдущих модулей), чтобы
+        // не конфликтовала с промо-экраном модуля 53.
+        /*
         val recommendationDisposable = viewModel.recommendation
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { film ->
@@ -91,6 +95,7 @@ class HomeFragment : Fragment() {
                     .show()
             }
         compositeDisposable.add(recommendationDisposable)
+        */
 
         val loadStateDisposable = filmsAdapter.loadStateFlow
             .asObservable()

@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-parcelize")
     id("kotlin-kapt")
+    alias(libs.plugins.google.gms.google.services)
 }
 
 // Load properties from local.properties
@@ -125,6 +126,7 @@ dependencies {
     implementation(libs.androidx.core.animation)
     implementation(libs.androidx.ui.text.android)
     implementation(libs.filament.android)
+    implementation(libs.firebase.config)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

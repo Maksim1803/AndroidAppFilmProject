@@ -46,7 +46,6 @@ class DetailsFragment : Fragment() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private val viewModel: DetailsFragmentViewModel by viewModels { viewModelFactory }
 
-
     // Вызывается при присоединении фрагмента к контексту.
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -100,8 +99,7 @@ class DetailsFragment : Fragment() {
             currentFilm?.let { film ->
                 film.isInFavorites = !film.isInFavorites
                 updateFavoriteIcon(film.isInFavorites)
-                val message =
-                    if (film.isInFavorites) "Добавлено в избранное" else "Удалено из избранного"
+                val message = if (film.isInFavorites) "Добавлено в избранное" else "Удалено из избранного"
                 Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
                 viewModel.onFavoriteClicked(film)
             }
@@ -111,11 +109,7 @@ class DetailsFragment : Fragment() {
         binding.watchLaterButton.setOnClickListener {
             currentFilm?.let { film ->
                 NotificationHelper.notificationSet(requireContext(), film) {
-                    Snackbar.make(
-                        binding.root,
-                        "Напоминание установлено",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    Snackbar.make(binding.root, "Напоминание установлено", Snackbar.LENGTH_SHORT).show()
                 }
             }
         }
@@ -123,10 +117,7 @@ class DetailsFragment : Fragment() {
         // КНОПКА "ПОДЕЛИТЬСЯ"
         binding.detailsFab.setOnClickListener {
             val intent = Intent(Intent.ACTION_SEND)
-            intent.putExtra(
-                Intent.EXTRA_TEXT,
-                "Check out this film: ${filmFromArgs.title}\n\n${filmFromArgs.description}"
-            )
+            intent.putExtra(Intent.EXTRA_TEXT, "Check out this film: ${filmFromArgs.title}\n\n${filmFromArgs.description}")
             intent.type = "text/plain"
             startActivity(Intent.createChooser(intent, "Share To:"))
         }
@@ -146,16 +137,17 @@ class DetailsFragment : Fragment() {
             detailsToolbar.title = film.title
 
             film.poster?.let { posterPath ->
-                try {
-                    val resourceId = posterPath.toInt()
-                    Glide.with(this@DetailsFragment).load(resourceId).centerCrop()
-                        .into(detailsPoster)
-                } catch (_: NumberFormatException) {
-                    val fullUrl = ApiConstants.IMAGES_URL + "w780/" + posterPath.removePrefix("/")
+                // Если это число (ресурс), грузим как ресурс
+                val resourceId = posterPath.toIntOrNull()
+                if (resourceId != null) {
+                    Glide.with(this@DetailsFragment).load(resourceId).centerCrop().into(detailsPoster)
+                } else {
+                    // Иначе грузим как URL, убирая лишние слэши
+                    val cleanPath = posterPath.removePrefix("/")
+                    val fullUrl = ApiConstants.IMAGES_URL + "w780/" + cleanPath
                     Glide.with(this@DetailsFragment).load(fullUrl).centerCrop().into(detailsPoster)
                 }
-            } ?: Glide.with(this@DetailsFragment).load(R.drawable.no_poster).centerCrop()
-                .into(detailsPoster)
+            } ?: Glide.with(this@DetailsFragment).load(R.drawable.no_poster).centerCrop().into(detailsPoster)
 
             detailsDescription.text = film.description
             updateFavoriteIcon(film.isInFavorites)
@@ -174,23 +166,16 @@ class DetailsFragment : Fragment() {
 
     // Метод для для проверки разрешений на запись во память телефона
     private fun checkPermission(): Boolean {
-        val result = ContextCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
+        val result = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
         return result == PackageManager.PERMISSION_GRANTED
     }
 
-    // Метод для запроса разрешения на запись в память телефона
+    // Метод для запрса разрешения на запись в память телефона
     private fun requestPermission() {
         requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             performAsyncLoadOfPoster()
         }
@@ -207,8 +192,7 @@ class DetailsFragment : Fragment() {
                 put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/FilmsSearchApp")
             }
             val contentResolver = requireActivity().contentResolver
-            val uri =
-                contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
             uri?.let {
                 contentResolver.openOutputStream(it)?.use { os ->
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os)
@@ -226,8 +210,8 @@ class DetailsFragment : Fragment() {
         }
 
         binding.progressBar.isVisible = true
-        val posterPath = film.poster?.removePrefix("/")
-        val fullUrl = ApiConstants.IMAGES_URL + "w185/" + posterPath
+        val cleanPath = film.poster?.removePrefix("/") ?: ""
+        val fullUrl = ApiConstants.IMAGES_URL + "w500/" + cleanPath
 
         val disposable = viewModel.loadWallpaper(fullUrl)
             .subscribe({ bitmap ->

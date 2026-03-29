@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     android:background="@drawable/background">
 
+    <com.example.androidappfilmproject.view.customviews.PromoView
+        android:id="@+id/promo_view_group"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:alpha="0"
+        android:translationZ="10dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <FrameLayout
         android:id="@+id/fragment_placeholder"
         android:layout_width="0dp"
