@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -26,6 +27,10 @@ import com.example.androidappfilmproject.view.fragments.SelectionsFragment
 import com.example.androidappfilmproject.view.fragments.SplashFragment
 import com.example.androidappfilmproject.view.fragments.WatchLaterFragment
 import com.example.database_module.entity.Film
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 
 // * Класс MainActivity, который является главным в приложении для basic флавора.
@@ -64,9 +69,11 @@ class MainActivity : AppCompatActivity() {
         // Сбрасываем триал при каждом запуске, чтобы можно было потестить 20 секунд
         getSharedPreferences("trial_prefs", Context.MODE_PRIVATE).edit().clear().apply()
 
-        // Записываем время запуска
+        // Записываем время ПЕРВОГО запуска (если его еще нет)
         val prefs = getSharedPreferences("trial_prefs", Context.MODE_PRIVATE)
-        prefs.edit { putLong("first_launch_time", System.currentTimeMillis()) }
+        if (prefs.getLong("first_launch_time", 0L) == 0L) {
+            prefs.edit { putLong("first_launch_time", System.currentTimeMillis()) }
+        }
 
         // Инициализируем биндинг
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -101,7 +108,14 @@ class MainActivity : AppCompatActivity() {
                 .commit()
         }
 
-        // Обработка перехода из уведомления (задание со звездочкой)
+        // Реализация показа кастомной композиции view при запуске для модуля 53
+        // Добавляем задержку, экран приветствия успел закрыться и не перебивал навигацию
+        Handler(Looper.getMainLooper()).postDelayed({
+            showPromoIfNeeded()
+        }, 3000)
+
+
+        // Обработка перехода из уведомления (задание со звездочкой модуля 53)
         intent?.let { intent ->
             val film = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 intent.getParcelableExtra("film", Film::class.java)
@@ -114,6 +128,66 @@ class MainActivity : AppCompatActivity() {
 
         // Запускаем фоновую проверку времени
         trialHandler.post(trialCheckerRunnable)
+    }
+
+    // Метод для показа кастомной композиции view при запуске
+    private fun showPromoIfNeeded() {
+        if (!App.instance.isPromoShown) {
+            val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+            
+            val configSettings = FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(0)
+                .build()
+            firebaseRemoteConfig.setConfigSettingsAsync(configSettings)
+
+            firebaseRemoteConfig.fetch()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        firebaseRemoteConfig.activate()
+                    }
+                    
+                    val filmLink = firebaseRemoteConfig.getString("film_link")
+                    val filmId = firebaseRemoteConfig.getLong("film_id").toInt()
+                    
+                    if (filmLink.isNotBlank()) {
+                        App.instance.isPromoShown = true
+                        binding.promoViewGroup.apply {
+                            visibility = View.VISIBLE
+                            animate().setDuration(1000).alpha(1f).start()
+                            setLinkForPoster(filmLink)
+                            
+                            closeButton.setOnClickListener {
+                                visibility = View.GONE
+                            }
+
+                            // Обработка клика: ищем фильм в БД по ID
+                            val action = {
+                                if (filmId != 0) {
+                                    (application as App).dagger.getInteractor().getFilmById(filmId)
+                                        .firstElement()
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe({ film ->
+                                            launchDetailsFragment(film)
+                                            visibility = View.GONE
+                                        }, {
+                                            visibility = View.GONE
+                                        }, {
+                                            // Если фильма нет в БД, выводим подсказку
+                                            Toast.makeText(this@MainActivity, "Фильм еще не загружен в список", Toast.LENGTH_SHORT).show()
+                                            visibility = View.GONE
+                                        })
+                                } else {
+                                    visibility = View.GONE
+                                }
+                            }
+
+                            watchButton.setOnClickListener { action() }
+                            poster.setOnClickListener { action() }
+                        }
+                    }
+                }
+        }
     }
 
     // Метод для запуска фрагмента с деталями фильма
@@ -152,7 +226,7 @@ class MainActivity : AppCompatActivity() {
     private fun checkFragmentExistence(tag: String): Fragment? =
         supportFragmentManager.findFragmentByTag(tag)
 
-    // Метод для изменения текущего фрагмента и добавления его в backstack
+    // Метод для изменения текущий фрагмента и добавления его в backstack
     private fun changeFragment(fragment: Fragment, tag: String) {
         supportFragmentManager
             .beginTransaction()
@@ -165,7 +239,6 @@ class MainActivity : AppCompatActivity() {
         val prefs = getSharedPreferences("trial_prefs", Context.MODE_PRIVATE)
         val firstLaunchTime = prefs.getLong("first_launch_time", 0L)
         
-        // Если времени нет — считаем, что доступ есть (первые миллисекунды запуска)
         if (firstLaunchTime == 0L) return true
         
         val currentTime = System.currentTimeMillis()
@@ -177,19 +250,13 @@ class MainActivity : AppCompatActivity() {
     // Метод для автоматического возврата на главную
     private fun handleTrialExpiration() {
         val currentId = binding.bottomNavigation.selectedItemId
-        // Проверяем, находится ли пользователь сейчас на "платной" вкладке
         if (currentId == R.id.favorites || currentId == R.id.selections) {
             Toast.makeText(this, "Пробный период истек!", Toast.LENGTH_SHORT).show()
-
-            // Программно переключаем BottomNavigation на Home
             binding.bottomNavigation.selectedItemId = R.id.home
-
-            // Меняем фрагмент
             val tag = "home"
             val fragment = checkFragmentExistence(tag) ?: HomeFragment()
             changeFragment(fragment, tag)
         }
-        // Останавливаем таймер, так как выкидывать больше некого
         trialHandler.removeCallbacks(trialCheckerRunnable)
     }
 
@@ -243,9 +310,7 @@ class MainActivity : AppCompatActivity() {
     // Метод, вызываемый при уничтожении активности
     override fun onDestroy() {
         super.onDestroy()
-        // Отключаем ресивер при уничтожении активности
         unregisterReceiver(receiver)
-        // Останавливаем таймер
         trialHandler.removeCallbacks(trialCheckerRunnable)
     }
 }

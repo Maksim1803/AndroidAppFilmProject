@@ -34,6 +34,8 @@
     <!-- Добавлены строки для модуля 49 -->
     <string name="Spisok_pust">Список напоминаний пуст</string>
     <string name="Spisok_pust_2">Список избранного пуст</string>
+    <string name="Posmotrite_film">Посмотрите фильм:</string>
+    <string name="Smotret">Смотреть</string>
 
 
 </resources>

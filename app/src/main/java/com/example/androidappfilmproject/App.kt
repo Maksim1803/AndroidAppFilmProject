@@ -16,6 +16,9 @@ class App : Application() {
     // является главным компонентом Dagger.
     lateinit var dagger: AppComponent
 
+    //Добавим флаг для проверки показа кастомной композиции view только в начале
+    var isPromoShown = false
+
     // Метод, который вызывается при создании приложения.
     override fun onCreate() {
         super.onCreate()

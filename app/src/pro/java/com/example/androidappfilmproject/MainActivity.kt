@@ -5,6 +5,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -21,6 +24,10 @@ import com.example.androidappfilmproject.view.fragments.SelectionsFragment
 import com.example.androidappfilmproject.view.fragments.SplashFragment
 import com.example.androidappfilmproject.view.fragments.WatchLaterFragment
 import com.example.database_module.entity.Film
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 // Класс MainActivity, который является главным в приложении.
 class MainActivity : AppCompatActivity() {
@@ -70,6 +77,12 @@ class MainActivity : AppCompatActivity() {
                 .commit()
         }
 
+        // Реализация показа кастомной композиции view при запуске
+        // Добавляем задержку, чтобы Splash успел закрыться и не перебивал навигацию
+        Handler(Looper.getMainLooper()).postDelayed({
+            showPromoIfNeeded()
+        }, 3000)
+
         // Обработка перехода из уведомления (задание со звездочкой)
         intent?.let { intent ->
             val film = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -79,6 +92,63 @@ class MainActivity : AppCompatActivity() {
                 intent.getParcelableExtra<Film>("film")
             }
             film?.let { launchDetailsFragment(it) }
+        }
+    }
+
+    private fun showPromoIfNeeded() {
+        if (!App.instance.isPromoShown) {
+            val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+            
+            val configSettings = FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(0)
+                .build()
+            firebaseRemoteConfig.setConfigSettingsAsync(configSettings)
+
+            firebaseRemoteConfig.fetch()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        firebaseRemoteConfig.activate()
+                    }
+                    
+                    val filmLink = firebaseRemoteConfig.getString("film_link")
+                    val filmId = firebaseRemoteConfig.getLong("film_id").toInt()
+                    
+                    if (filmLink.isNotBlank()) {
+                        App.instance.isPromoShown = true
+                        binding.promoViewGroup.apply {
+                            visibility = View.VISIBLE
+                            animate().setDuration(1000).alpha(1f).start()
+                            setLinkForPoster(filmLink)
+                            
+                            closeButton.setOnClickListener {
+                                visibility = View.GONE
+                            }
+
+                            // Обработка клика: ищем фильм в БД по ID
+                            val action = {
+                                if (filmId != 0) {
+                                    (application as App).dagger.getInteractor().getFilmById(filmId)
+                                        .firstElement()
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe({ film ->
+                                            launchDetailsFragment(film)
+                                            visibility = View.GONE
+                                        }, {
+                                            visibility = View.GONE
+                                        }, {
+                                            visibility = View.GONE
+                                        })
+                                } else {
+                                    visibility = View.GONE
+                                }
+                            }
+
+                            watchButton.setOnClickListener { action() }
+                            poster.setOnClickListener { action() }
+                        }
+                    }
+                }
         }
     }
 
