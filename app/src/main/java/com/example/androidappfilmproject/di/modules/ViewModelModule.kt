@@ -9,11 +9,14 @@ import com.example.androidappfilmproject.viewmodel.FavoritesFragmentViewModel
 import com.example.androidappfilmproject.viewmodel.HomeFragmentViewModel
 import com.example.androidappfilmproject.viewmodel.SelectionsFragmentViewModel
 import com.example.androidappfilmproject.viewmodel.ViewModelFactory
+import com.example.androidappfilmproject.viewmodel.WatchLaterViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 
-// Класс для предоставления зависимостей ViewModel.
+// Класс для предоставления зависимостей ViewModel,
+// Все методы помечены неиспользуемыми, т.к. это является особенностью работы Dagger 2.
+// Dagger вызывает эти методы внутри сгенерированных классов (типа DaggerAppComponent).
 @Module
 abstract class ViewModelModule {
 
@@ -45,4 +48,9 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(FavoritesFragmentViewModel::class)
     abstract fun bindFavoritesFragmentViewModel(viewModel: FavoritesFragmentViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(WatchLaterViewModel::class)
+    abstract fun bindWatchLaterViewModel(viewModel: WatchLaterViewModel): ViewModel
 }

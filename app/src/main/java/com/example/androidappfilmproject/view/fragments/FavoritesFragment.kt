@@ -5,18 +5,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.MainActivity
-import com.example.androidappfilmproject.data.entity.Film
+import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.databinding.FragmentFavoritesBinding
 import com.example.androidappfilmproject.utils.AnimationHelper
 import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapter
 import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
 import com.example.androidappfilmproject.viewmodel.FavoritesFragmentViewModel
+import com.example.database_module.entity.Film
+import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -70,8 +75,18 @@ class FavoritesFragment : Fragment() {
             override fun click(film: Film) {
                 (requireActivity() as MainActivity).launchDetailsFragment(film)
             }
-            // Обрабатываем клик по кнопке "Избранное"
-            override fun onFavoriteClick(film: Film) {
+            // Добавлен второй параметр favoriteIcon для соответствия интерфейсу
+            override fun onFavoriteClick(film: Film, favoriteIcon: ImageView) {
+                film.isInFavorites = !film.isInFavorites
+
+                if (film.isInFavorites) {
+                    favoriteIcon.setImageResource(R.drawable.baseline_favorite_24)
+                    Snackbar.make(binding.root, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
+                } else {
+                    favoriteIcon.setImageResource(R.drawable.baseline_favorite_border_24)
+                    Snackbar.make(binding.root, "Удалено из избранного", Snackbar.LENGTH_SHORT).show()
+                }
+
                 viewModel.onFavoriteClicked(film)
             }
             // В этом фрагменте не используется
@@ -84,6 +99,13 @@ class FavoritesFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             val decorator = TopSpacingItemDecoration(8)
             addItemDecoration(decorator)
+        }
+
+        // Слушатель состояний загрузки PagingData для отображения текста о пустом списке
+        filmsAdapter.addLoadStateListener { loadState ->
+            if (loadState.source.refresh is LoadState.NotLoading) {
+                binding.emptyText.isVisible = filmsAdapter.itemCount < 1
+            }
         }
 
         // Вызываем метод для получения списка избранных фильмов

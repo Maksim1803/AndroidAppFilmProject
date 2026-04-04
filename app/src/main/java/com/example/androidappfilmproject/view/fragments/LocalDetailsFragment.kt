@@ -9,9 +9,9 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import com.example.androidappfilmproject.data.entity.Film
 import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
 import com.google.android.material.snackbar.Snackbar
+import com.example.database_module.entity.Film
 
 // Создаем класс LocalDetailsFragment, который отвечает за отображение
 // подробной информации о фильме из локальной базы данных (демо-режим).

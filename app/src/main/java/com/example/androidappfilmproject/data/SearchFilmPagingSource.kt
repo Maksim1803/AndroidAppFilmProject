@@ -3,19 +3,20 @@ package com.example.androidappfilmproject.data
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.androidappfilmproject.BuildConfig
-import com.example.androidappfilmproject.data.entity.Film
+import com.example.database_module.entity.Film
 import com.example.androidappfilmproject.data.entity.toFilm
+import com.example.remote_module.TmdbApi
+import kotlinx.coroutines.rx3.awaitSingle
 import retrofit2.HttpException
 import java.io.IOException
 
-// Создаем класс SearchFilmPagingSource, который является источником данных для Paging 3
-// для поиска фильмов.
+// Класс - источник данных для поиска. Теперь использует Film из database_module
 class SearchFilmPagingSource(
-    private val tmdbApi: TmdbApi, // API для работы с сетью
-    private val query: String // Поисковый запрос
+    private val tmdbApi: TmdbApi,
+    private val query: String
 ) : PagingSource<Int, Film>() {
 
-    // Метод для загрузки данных
+    // Метод для загрузки порции данных (страницы) по поисковому запросу
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Film> {
         val page = params.key ?: 1
 
@@ -25,21 +26,17 @@ class SearchFilmPagingSource(
                 language = "ru-RU",
                 query = query,
                 page = page
-            )
+            ).awaitSingle()
 
-            // Преобразуем DTO модели из сети в Entity модели для БД
+            // Мапим результаты в нашу сущность Film
             val films = results.tmdbFilms.map { it.toFilm() }
 
-            // Возвращаем страницу с данными
+            // Метод для формирования успешного результата с ключами соседних страниц
             LoadResult.Page(
                 data = films,
-                // Ключ для предыдущей страницы
                 prevKey = if (page == 1) null else page - 1,
-                // Ключ для следующей страницы
                 nextKey = if (films.isEmpty() || page >= results.totalPages) null else page + 1
             )
-
-            // Обрабатываем ошибки
         } catch (e: IOException) {
             LoadResult.Error(e)
         } catch (e: HttpException) {
@@ -49,7 +46,7 @@ class SearchFilmPagingSource(
         }
     }
 
-    // Метод для определения ключа обновления
+    // Метод для определения ключа (номера страницы) при обновлении данных (инвалидации)
     override fun getRefreshKey(state: PagingState<Int, Film>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)

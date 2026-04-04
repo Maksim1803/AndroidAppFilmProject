@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-parcelize")
     id("kotlin-kapt")
+    alias(libs.plugins.google.gms.google.services)
 }
 
 // Load properties from local.properties
@@ -34,7 +35,8 @@ android {
             keyAlias = keystoreProperties["keyAlias"] as String
             keyPassword = keystoreProperties["keyPassword"] as String
             // Проверка на null для предотвращения ошибок сборки, если файл отсутствует
-            storeFile = if (keystoreProperties.containsKey("storeFile")) file(keystoreProperties["storeFile"] as String) else null
+            storeFile =
+                if (keystoreProperties.containsKey("storeFile")) file(keystoreProperties["storeFile"] as String) else null
             storePassword = keystoreProperties["storePassword"] as String
         }
     }
@@ -53,8 +55,16 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        ndk {
+            // Нужные архитектуры для специфических устройств (эмуляторов)
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
+        }
         // Make the API key available in BuildConfig
-        buildConfigField("String", "TMDB_API_KEY", "\"${localProperties.getProperty("tmdb.api_key") ?: ""}\"")
+        buildConfigField(
+            "String",
+            "TMDB_API_KEY",
+            "\"${localProperties.getProperty("tmdb.api_key") ?: ""}\""
+        )
     }
 
     buildTypes {
@@ -77,7 +87,34 @@ android {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
+    // Создание платной и бесплатной версий для задания модуля 52
+    flavorDimensions += "version"
+    productFlavors {
+        create("basic") {
+            dimension = "version"
+            applicationIdSuffix = ".basic"
+            versionNameSuffix = "-basic"
+        }
+        create("pro") {
+            dimension = "version"
+            applicationIdSuffix = ".pro"
+            versionNameSuffix = "-pro"
+        }
+    }
+    sourceSets {
+        getByName("basic") {
+            java {
+                srcDirs("src\\basic\\java", "src\\basic\\java")
+            }
+        }
+        getByName("pro") {
+            java {
+                srcDirs("src\\pro\\java", "src\\pro\\java")
+            }
+        }
+    }
 }
+
 
 dependencies {
 
@@ -88,6 +125,8 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.animation)
     implementation(libs.androidx.ui.text.android)
+    implementation(libs.filament.android)
+    implementation(libs.firebase.config)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -128,7 +167,7 @@ dependencies {
 
     //Новые библиотеки для создания анимации для модуля 33
     implementation("androidx.fragment:fragment-ktx:1.8.9")// Для viewModels() во фрагментах
-    implementation("androidx.activity:activity-ktx:1.12.3")// Для activityViewModels() в активностях (если нужно)
+    implementation("androidx.activity:activity-ktx:1.12.4")// Для activityViewModels() в активностях (если нужно)
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")// Для ViewModelScope и других KTX расширений
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")// Для LiveData KTX расширений
 
@@ -139,7 +178,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:5.3.2") //логгер
 
     implementation(libs.androidx.paging.runtime.ktx)
-    implementation("androidx.paging:paging-rxjava3:3.4.0")
+    implementation("androidx.paging:paging-rxjava3:3.4.1")
 
     //Библиотека Koin для модуля 4.1.1
     implementation("io.insert-koin:koin-android:4.1.1")
@@ -155,8 +194,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
-    //Библиотеки для модуля 44 (RxJava)
+    //Библиотеки для модулей 44 и 45 (RxJava)
     implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
     implementation("io.reactivex.rxjava3:rxjava:3.1.12")
+
+    //Библиотеки для модуля 46(Remote module) и задания со звездочкой (Database module)
+    implementation(project(":remote_module"))
+    implementation(project(":database_module"))
 
 }

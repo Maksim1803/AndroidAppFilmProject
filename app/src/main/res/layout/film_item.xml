@@ -68,7 +68,8 @@
             android:contentDescription="@string/favorite_icon_content_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_favorite_border" />
+            app:srcCompat="@drawable/ic_favorite_border"
+            app:tint="@color/colorPrimaryDark" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

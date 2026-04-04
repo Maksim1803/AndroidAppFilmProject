@@ -3,7 +3,7 @@ package com.example.androidappfilmproject.viewmodel
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.lifecycle.ViewModel
-import com.example.androidappfilmproject.data.entity.Film
+import com.example.database_module.entity.Film
 import com.example.androidappfilmproject.domain.Interactor
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -29,16 +29,20 @@ class DetailsFragmentViewModel @Inject constructor(
 
     // Метод для обработки клика по иконке "избранное".
     fun onFavoriteClicked(film: Film) {
+        // Переносим в фоновый поток и добавляем обработку ошибок
         val disposable = interactor.toggleFavoriteStatus(film)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe()
+            .subscribe({
+                // Успешно обновили в БД
+            }, {
+                // Предотвращаем вылет при ошибке
+                it.printStackTrace()
+            })
         compositeDisposable.add(disposable)
     }
 
     // Метод для загрузки картинки (постера) по URL с использованием Single.
-    // RxJava 3 не допускает null, поэтому возвращаем Single<Bitmap> и кидаем ошибку,
-    // если загрузка не удалась.
     fun loadWallpaper(url: String): Single<Bitmap> {
         return Single.fromCallable {
             val urlObj = URL(url)
@@ -50,6 +54,7 @@ class DetailsFragmentViewModel @Inject constructor(
         }.subscribeOn(Schedulers.io())
          .observeOn(AndroidSchedulers.mainThread())
     }
+
     // Метод для очистки ресурсов при уничтожении ViewModel.
     override fun onCleared() {
         super.onCleared()

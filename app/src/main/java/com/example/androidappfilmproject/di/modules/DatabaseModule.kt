@@ -2,10 +2,10 @@ package com.example.androidappfilmproject.di.modules
 
 import android.content.Context
 import androidx.room.Room
-import com.example.androidappfilmproject.data.db.AppDatabase
-import com.example.androidappfilmproject.data.dao.FilmDao
 import com.example.androidappfilmproject.data.MainRepository
-import com.example.androidappfilmproject.data.TmdbApi
+import com.example.database_module.dao.FilmDao
+import com.example.database_module.db.AppDatabase
+import com.example.remote_module.TmdbApi
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
