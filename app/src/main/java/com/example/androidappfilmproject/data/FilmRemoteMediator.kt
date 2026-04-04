@@ -57,21 +57,35 @@ class FilmRemoteMediator(
 
             // Только если данные успешно получены, работаем с БД
             appDatabase.withTransaction {
+                // Получаем текущие фильмы из БД, которые помечены как "Посмотреть позже" или "Избранное"
+                // Это нужно, чтобы при обновлении списка (REFRESH) не затереть их статус.
+                
+                // В данном случае мы просто будем проверять ID при вставке.
+                // Но проблема в том, что deleteByCategory удаляет записи.
+                
                 if (loadType == LoadType.REFRESH) {
-                    // Очищаем только старые фильмы текущей категории, которые не в избранном
-                    filmDao.deleteByCategory(category)
+                    // Очищаем только те фильмы, которые НЕ в избранном И НЕ в списке "Посмотреть позже"
+                    filmDao.deleteUnusedByCategory(category)
                 }
 
-                // Получаем список ID всех избранных фильмов, чтобы сохранить их статус при вставке новых данных
+                // Получаем списки ID для сохранения статусов
                 val favoriteIds = filmDao.getFavoriteIds()
+                val watchLaterFilms = filmDao.getWatchLaterFilmsSync()
 
                 // Преобразуем DTO модели из сети в Entity модели для БД и назначаем категорию
-                val films = response.tmdbFilms.map {
-                    it.toFilm().apply {
+                val films = response.tmdbFilms.map { tmdbFilm ->
+                    tmdbFilm.toFilm().apply {
                         this.category = this@FilmRemoteMediator.category
-                        // Если фильм уже был в избранном, сохраняем этот статус
+                        
+                        // Сохраняем статус "Избранное"
                         if (favoriteIds.contains(this.id)) {
                             this.isInFavorites = true
+                        }
+                        
+                        // Сохраняем статус "Посмотреть позже" и время
+                        watchLaterFilms.find { it.id == this.id }?.let { savedFilm ->
+                            this.isInWatchLater = true
+                            this.watchLaterTime = savedFilm.watchLaterTime
                         }
                     }
                 }

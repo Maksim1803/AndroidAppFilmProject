@@ -69,8 +69,8 @@ class MainRepository(
         ).observable
     }
 
-    // Обновляет данные фильма в БД
-    fun updateFilm(film: Film): Completable = Completable.fromAction { filmDao.update(film) }
+    // Обновляет данные фильма в БД (или вставляет, если фильма еще нет)
+    fun updateFilm(film: Film): Completable = Completable.fromAction { filmDao.insert(film) }
 
     // Удаляет фильм из локальной БД
     fun deleteFilm(film: Film): Completable = Completable.fromAction { filmDao.delete(film) }

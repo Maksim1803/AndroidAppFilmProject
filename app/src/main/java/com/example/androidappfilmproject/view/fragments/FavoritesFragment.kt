@@ -14,12 +14,14 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.MainActivity
+import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.databinding.FragmentFavoritesBinding
 import com.example.androidappfilmproject.utils.AnimationHelper
 import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapter
 import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
 import com.example.androidappfilmproject.viewmodel.FavoritesFragmentViewModel
 import com.example.database_module.entity.Film
+import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -75,6 +77,16 @@ class FavoritesFragment : Fragment() {
             }
             // Добавлен второй параметр favoriteIcon для соответствия интерфейсу
             override fun onFavoriteClick(film: Film, favoriteIcon: ImageView) {
+                film.isInFavorites = !film.isInFavorites
+
+                if (film.isInFavorites) {
+                    favoriteIcon.setImageResource(R.drawable.baseline_favorite_24)
+                    Snackbar.make(binding.root, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
+                } else {
+                    favoriteIcon.setImageResource(R.drawable.baseline_favorite_border_24)
+                    Snackbar.make(binding.root, "Удалено из избранного", Snackbar.LENGTH_SHORT).show()
+                }
+
                 viewModel.onFavoriteClicked(film)
             }
             // В этом фрагменте не используется

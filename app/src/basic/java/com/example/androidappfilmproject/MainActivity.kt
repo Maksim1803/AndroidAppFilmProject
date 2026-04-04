@@ -242,7 +242,7 @@ class MainActivity : AppCompatActivity() {
         if (firstLaunchTime == 0L) return true
         
         val currentTime = System.currentTimeMillis()
-        val trialTimeInMillis = 20 * 1000L // 20 секунд
+        val trialTimeInMillis = 30 * 1000L // 20 секунд
 
         return (currentTime - firstLaunchTime) < trialTimeInMillis
     }
