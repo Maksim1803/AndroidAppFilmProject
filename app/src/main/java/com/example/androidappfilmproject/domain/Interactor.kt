@@ -71,7 +71,4 @@ class Interactor(
     fun saveLanguage(language: String) {
         preferences.saveLanguage(language)
     }
-
-    // Метод для получения текущего языка
-    fun getLanguage(): String = preferences.getLanguage()
 }

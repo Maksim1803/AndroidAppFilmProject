@@ -75,7 +75,7 @@
     <string name="demo_film_9_title">Interstellar</string>
     <string name="demo_film_10_title">Predator</string>
     <string name="demo_film_11_title">Top Gun</string>
-    <string name="demo_film_13_title">Indiana Jones</string>
+    <string name="demo_film_12_title">Indiana Jones</string>
 
     <!-- Demo films descriptions -->
     <string name="demo_film_1_desc">A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O., but his tragic past may doom the project and his team to disaster.</string>
@@ -89,5 +89,5 @@
     <string name="demo_film_9_desc">When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot, Joseph Cooper, is tasked to pilot a spacecraft, along with a team of researchers, to find a new planet for humans.</string>
     <string name="demo_film_10_desc">A team of commandos on a mission in a Central American jungle find themselves hunted by an extraterrestrial warrior.</string>
     <string name="demo_film_11_desc">After thirty years, Maverick is still pushing the envelope as a top naval aviator, but must confront ghosts of his past when he leads TOP GUN\'s elite graduates on a mission that demands the ultimate sacrifice from those chosen to fly it.</string>
-    <string name="demo_film_13_desc">Archaeologist and adventurer Indiana Jones is hired by the U.S. government to find the Ark of the Covenant before the Nazis can obtain its awesome powers.</string>
+    <string name="demo_film_12_desc">Archaeologist and adventurer Indiana Jones is hired by the U.S. government to find the Ark of the Covenant before the Nazis can obtain its awesome powers.</string>
 </resources>
