@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -20,6 +21,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
@@ -73,7 +78,7 @@ class DetailsFragment : Fragment() {
         }
 
         if (filmFromArgs == null) {
-            Snackbar.make(binding.root, "Ошибка: Фильм не найден", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, R.string.error_film_not_found, Snackbar.LENGTH_SHORT).show()
             return
         }
 
@@ -99,8 +104,8 @@ class DetailsFragment : Fragment() {
             currentFilm?.let { film ->
                 film.isInFavorites = !film.isInFavorites
                 updateFavoriteIcon(film.isInFavorites)
-                val message = if (film.isInFavorites) "Добавлено в избранное" else "Удалено из избранного"
-                Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+                val messageResId = if (film.isInFavorites) R.string.added_to_favorites else R.string.removed_from_favorites
+                Snackbar.make(binding.root, messageResId, Snackbar.LENGTH_SHORT).show()
                 viewModel.onFavoriteClicked(film)
             }
         }
@@ -109,7 +114,7 @@ class DetailsFragment : Fragment() {
         binding.watchLaterButton.setOnClickListener {
             currentFilm?.let { film ->
                 NotificationHelper.notificationSet(requireContext(), film) {
-                    Snackbar.make(binding.root, "Напоминание установлено", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, R.string.reminder_set, Snackbar.LENGTH_SHORT).show()
                 }
             }
         }
@@ -145,7 +150,36 @@ class DetailsFragment : Fragment() {
                     // Иначе грузим как URL, убирая лишние слэши
                     val cleanPath = posterPath.removePrefix("/")
                     val fullUrl = ApiConstants.IMAGES_URL + "w780/" + cleanPath
-                    Glide.with(this@DetailsFragment).load(fullUrl).centerCrop().into(detailsPoster)
+                    
+                    Glide.with(this@DetailsFragment)
+                        .load(fullUrl)
+                        .timeout(30000) // Таймаут 30 секунд
+                        .listener(object : RequestListener<Drawable> {
+                            override fun onLoadFailed(
+                                e: GlideException?,
+                                model: Any?,
+                                target: Target<Drawable>,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                // Если загрузка основного постера сорвалась
+                                binding.progressBar.isVisible = false
+                                Snackbar.make(binding.root, R.string.error_loading_check_internet, Snackbar.LENGTH_LONG).show()
+                                return false
+                            }
+
+                            override fun onResourceReady(
+                                resource: Drawable,
+                                model: Any,
+                                target: Target<Drawable>?,
+                                dataSource: DataSource,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                binding.progressBar.isVisible = false
+                                return false
+                            }
+                        })
+                        .centerCrop()
+                        .into(detailsPoster)
                 }
             } ?: Glide.with(this@DetailsFragment).load(R.drawable.no_poster).centerCrop().into(detailsPoster)
 
@@ -214,13 +248,26 @@ class DetailsFragment : Fragment() {
         val fullUrl = ApiConstants.IMAGES_URL + "w500/" + cleanPath
 
         val disposable = viewModel.loadWallpaper(fullUrl)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doFinally { 
+                // Этот блок сработает ВСЕГДА: и при успехе, и при ошибке
+                binding.progressBar.isVisible = false 
+            }
             .subscribe({ bitmap ->
-                binding.progressBar.isVisible = false
                 saveToGallery(bitmap)
-                Snackbar.make(binding.root, "Сохранено в Галерею", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, R.string.downloaded_to_gallery, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.open) {
+                        val intent = Intent().apply {
+                            action = Intent.ACTION_VIEW
+                            type = "image/*"
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                        startActivity(intent)
+                    }
+                    .show()
             }, {
-                binding.progressBar.isVisible = false
-                Snackbar.make(binding.root, "Ошибка при загрузке", Snackbar.LENGTH_SHORT).show()
+                // Всплывающее сообщение об ошибке
+                Snackbar.make(binding.root, R.string.error_loading_check_internet, Snackbar.LENGTH_SHORT).show()
             })
         compositeDisposable.add(disposable)
     }

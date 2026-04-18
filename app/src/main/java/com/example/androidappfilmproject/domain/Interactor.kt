@@ -63,4 +63,15 @@ class Interactor(
 
     // Метод для удаления конкретного фильма из локального кэша (базы данных)
     fun removeFilmFromCache(film: Film): Completable = repo.deleteFilm(film)
+
+    // Метод для очистки кэша
+    fun clearCache(): Completable = repo.clearCache()
+
+    // Метод для сохранения языка
+    fun saveLanguage(language: String) {
+        preferences.saveLanguage(language)
+    }
+
+    // Метод для получения текущего языка
+    fun getLanguage(): String = preferences.getLanguage()
 }

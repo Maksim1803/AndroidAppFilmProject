@@ -9,6 +9,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
 import com.google.android.material.snackbar.Snackbar
 import com.example.database_module.entity.Film
@@ -46,7 +47,7 @@ class LocalDetailsFragment : Fragment() {
 
         // Если фильм не найден, показываем сообщение и закрываем активность
         if (filmFromArgs == null) {
-            Snackbar.make(binding.root, "Ошибка: Фильм не найден", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, R.string.error_film_not_found, Snackbar.LENGTH_SHORT).show()
             activity?.finish()
             return
         }
@@ -58,19 +59,18 @@ class LocalDetailsFragment : Fragment() {
         // Устанавливаем детали фильма
         setFilmsDetails(filmFromArgs)
 
-        // Отключаем кнопки, так как это демо-режим
-        val disabledMessage = "Функция недоступна в демо-режиме"
+        // Отключаем кнопки, так как это демо-режим. Используем ресурс для перевода.
         binding.watchLaterButton.setOnClickListener {
-            Snackbar.make(binding.root, disabledMessage, Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, R.string.not_available_in_demo, Snackbar.LENGTH_SHORT).show()
         }
         binding.favoriteButton.setOnClickListener {
-            Snackbar.make(binding.root, disabledMessage, Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, R.string.not_available_in_demo, Snackbar.LENGTH_SHORT).show()
         }
         binding.detailsFab.setOnClickListener {
-            Snackbar.make(binding.root, disabledMessage, Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, R.string.not_available_in_demo, Snackbar.LENGTH_SHORT).show()
         }
         binding.detailsFabDownloadWp.setOnClickListener {
-            Snackbar.make(binding.root, disabledMessage, Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, R.string.not_available_in_demo, Snackbar.LENGTH_SHORT).show()
         }
 
         // Настраиваем отображение постера

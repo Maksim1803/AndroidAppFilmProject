@@ -8,6 +8,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.databinding.FilmItemBinding
 import com.example.database_module.entity.Film
@@ -58,15 +59,29 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
                 else R.drawable.baseline_favorite_border_24
             )
 
+            // Сбрасываем изображение перед загрузкой нового
+            Glide.with(itemView.context).clear(binding.poster)
+
             film.poster?.let { posterPath ->
                 try {
                     val resourceId = posterPath.toInt()
-                    Glide.with(itemView).load(resourceId).centerCrop().into(binding.poster)
+                    // Для ресурсов отключаем кэш и ставим таймаут (хотя для ресурсов он не нужен, но для единообразия)
+                    Glide.with(itemView.context)
+                        .load(resourceId)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true)
+                        .timeout(30000)
+                        .centerCrop()
+                        .into(binding.poster)
                 } catch (_: NumberFormatException) {
                     val fullUrl = ApiConstants.IMAGES_URL + "w342" + posterPath
-                    Glide.with(itemView).load(fullUrl).centerCrop().into(binding.poster)
+                    Glide.with(itemView.context)
+                        .load(fullUrl)
+                        .timeout(30000) // Жесткий таймаут 30 секунд
+                        .centerCrop()
+                        .into(binding.poster)
                 }
-            } ?: Glide.with(itemView).load(R.drawable.no_poster).centerCrop().into(binding.poster)
+            } ?: Glide.with(itemView.context).load(R.drawable.no_poster).centerCrop().into(binding.poster)
 
             val progress = (film.rating * 10).toInt().coerceIn(0, 100)
             binding.ratingDonut.setProgress(progress)
@@ -76,7 +91,6 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) :
     // Интерфейс для обработки кликов
     interface OnItemClickListener {
         fun click(film: Film)
-        // Теперь принимаем иконку
         fun onFavoriteClick(film: Film, favoriteIcon: ImageView)
         fun longClick(film: Film)
     }

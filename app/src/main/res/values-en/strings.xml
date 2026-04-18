@@ -1,0 +1,93 @@
+<resources>
+    <string name="app_name">FindAFilm</string>
+    <string name="text_on_topMenu">Film Search</string>
+    <string name="disclaimer">Images taken from https://www.movieposters.com/</string>
+    <string name="btn_menu_1">Menu</string>
+    <string name="btn_menu_2">Favorites</string>
+    <string name="btn_menu_3">Watch Later</string>
+    <string name="btn_menu_4">Selections</string>
+    <string name="btn_menu_5">Settings</string>
+    <string name="menu_home_title_text">Home</string>
+    <string name="menu_settings_title">Settings</string>
+    <string name="menu_favorites_title">Favorites</string>
+    <string name="menu_watch_later_title">Watch Later</string>
+    <string name="menu_selections_title">Selections</string>
+    <string name="page_title">Find it!</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search">Search</string>
+    <string name="film_poster_content_description">Film poster</string>
+    <string name="favorite_icon_content_description">Favorite icon</string>
+    <string name="demo">Demo</string>
+    <string name="share">Share</string>
+    <string name="add_to_favorites">Add to favorites</string>
+    <string name="add_to_watch_later">Add to "Watch Later"</string>
+    <string name="radio_button_popular">Popular</string>
+    <string name="radio_button_top_rated">Top Rated</string>
+    <string name="radio_button_upcoming">Upcoming</string>
+    <string name="radio_button_playing">Now Playing</string>
+    <string name="radio_group_header">Main screen selection:</string>
+    <!-- Added strings for module 42 -->
+    <string name="permission_storage">No permission. Please provide permission</string>
+    <string name="downloaded_to_gallery">"Saved to gallery"</string>
+    <string name="open">To gallery</string>
+    <!-- Added strings for module 49 -->
+    <string name="Spisok_pust">Reminder list is empty</string>
+    <string name="Spisok_pust_2">Favorites list is empty</string>
+    <string name="Posmotrite_film">Watch the film:</string>
+    <string name="Smotret">Watch</string>
+
+    <string name="menu_settings">Settings</string>
+    <string name="menu_theme">Theme</string>
+    <string name="menu_language">Language</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="lang_ru">Russian</string>
+    <string name="lang_en">English</string>
+
+    <string name="added_to_favorites">Added to favorites</string>
+    <string name="removed_from_favorites">Removed from favorites</string>
+    <string name="error_film_not_found">Error: Film not found</string>
+    <string name="reminder_set">Reminder set</string>
+    <string name="trial_expired">Trial period expired!</string>
+    <string name="available_in_pro">Available in Pro version</string>
+    <string name="not_available_in_demo">Feature not available in demo mode</string>
+    <string name="error_no_internet">No internet connection</string>
+    <string name="error_loading">Loading error</string>
+    <string name="error_loading_check_internet">Loading error, please check your internet connection</string>
+    <string name="film_removed_from_cache">Film \"%1$s\" removed from cache</string>
+
+    <string name="search_hint_demo">Search in demo...</string>
+    <string name="notification_title">Don\'t forget to watch!</string>
+    <string name="promo_film_not_found">Film not loaded yet</string>
+    <string name="notification_channel_name">Film Reminders</string>
+    <string name="notification_channel_desc">Channel for "Watch Later" reminders</string>
+
+    <!-- Demo films titles -->
+    <string name="demo_film_1_title">Inception</string>
+    <string name="demo_film_2_title">Sinners</string>
+    <string name="demo_film_3_title">Home Alone</string>
+    <string name="demo_film_4_title">Under Fire</string>
+    <string name="demo_film_5_title">The Substance</string>
+    <string name="demo_film_6_title">Locked</string>
+    <string name="demo_film_7_title">Companion</string>
+    <string name="demo_film_8_title">The Gorge</string>
+    <string name="demo_film_9_title">Interstellar</string>
+    <string name="demo_film_10_title">Predator</string>
+    <string name="demo_film_11_title">Top Gun</string>
+    <string name="demo_film_13_title">Indiana Jones</string>
+
+    <!-- Demo films descriptions -->
+    <string name="demo_film_1_desc">A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O., but his tragic past may doom the project and his team to disaster.</string>
+    <string name="demo_film_2_desc">Trying to leave their troubled lives behind, twin brothers return to their hometown to discover that an even greater evil is waiting to welcome them back.</string>
+    <string name="demo_film_3_desc">An eight-year-old troublemaker must protect his house from a pair of burglars when he is accidentally left home alone by his family during Christmas vacation.</string>
+    <string name="demo_film_4_desc">A squad of Navy SEALs on a covert mission in Iraq recount the chaos and brotherhood of war as they look back on the event.</string>
+    <string name="demo_film_5_desc">A fading celebrity takes a black-market drug: a cell-replicating substance that temporarily creates a younger, better version of herself.</string>
+    <string name="demo_film_6_desc">A thief who breaks into a high-tech SUV finds himself trapped inside, caught in a sophisticated psychological game of cat and mouse.</string>
+    <string name="demo_film_7_desc">A weekend getaway with friends turns into chaos when it is discovered that one of the guests is not who they claim to be.</string>
+    <string name="demo_film_8_desc">When an ancient evil emerges, they must work together to survive and confront what lies within.</string>
+    <string name="demo_film_9_desc">When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot, Joseph Cooper, is tasked to pilot a spacecraft, along with a team of researchers, to find a new planet for humans.</string>
+    <string name="demo_film_10_desc">A team of commandos on a mission in a Central American jungle find themselves hunted by an extraterrestrial warrior.</string>
+    <string name="demo_film_11_desc">After thirty years, Maverick is still pushing the envelope as a top naval aviator, but must confront ghosts of his past when he leads TOP GUN\'s elite graduates on a mission that demands the ultimate sacrifice from those chosen to fly it.</string>
+    <string name="demo_film_13_desc">Archaeologist and adventurer Indiana Jones is hired by the U.S. government to find the Ark of the Covenant before the Nazis can obtain its awesome powers.</string>
+</resources>
