@@ -28,10 +28,10 @@ class RemoteModule {
     @Singleton
     // Метод предоставляет экземпляр HTTP-клиента OkHttpClient.
     fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
-        // Увеличиваем таймауты для стабильности при слабом соединении
-        .callTimeout(60, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
-        .connectTimeout(60, TimeUnit.SECONDS)
+        // Ограничиваем таймауты до 30 секунд по просьбе пользователя
+        .callTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .connectTimeout(30, TimeUnit.SECONDS)
         .addInterceptor(HttpLoggingInterceptor().apply {
             // Используем уровень BODY для детальной отладки сетевых запросов
             level = HttpLoggingInterceptor.Level.BODY

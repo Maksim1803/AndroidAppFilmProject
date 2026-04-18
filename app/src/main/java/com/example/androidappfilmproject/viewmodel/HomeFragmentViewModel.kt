@@ -110,6 +110,15 @@ class HomeFragmentViewModel @Inject constructor(
         interactor.setLoadingStatus(isVisible)
     }
 
+    // Метод для очистки кэша при смене языка
+    fun clearCache() {
+        val disposable = interactor.clearCache()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe()
+        compositeDisposable.add(disposable)
+    }
+
     // Вызывается при уничтожении ViewModel
     override fun onCleared() {
         super.onCleared()

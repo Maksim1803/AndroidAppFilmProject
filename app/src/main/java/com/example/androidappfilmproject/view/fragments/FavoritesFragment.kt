@@ -79,13 +79,14 @@ class FavoritesFragment : Fragment() {
             override fun onFavoriteClick(film: Film, favoriteIcon: ImageView) {
                 film.isInFavorites = !film.isInFavorites
 
-                if (film.isInFavorites) {
+                val messageResId = if (film.isInFavorites) {
                     favoriteIcon.setImageResource(R.drawable.baseline_favorite_24)
-                    Snackbar.make(binding.root, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
+                    R.string.added_to_favorites
                 } else {
                     favoriteIcon.setImageResource(R.drawable.baseline_favorite_border_24)
-                    Snackbar.make(binding.root, "Удалено из избранного", Snackbar.LENGTH_SHORT).show()
+                    R.string.removed_from_favorites
                 }
+                Snackbar.make(binding.root, messageResId, Snackbar.LENGTH_SHORT).show()
 
                 viewModel.onFavoriteClicked(film)
             }

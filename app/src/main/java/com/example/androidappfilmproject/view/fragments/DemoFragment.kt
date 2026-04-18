@@ -15,6 +15,7 @@ import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidappfilmproject.App
 import com.example.androidappfilmproject.MainActivity
+import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.databinding.FragmentDemoBinding
 import com.example.androidappfilmproject.view.rv_adapters.FilmListRecyclerAdapter
 import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
@@ -66,9 +67,14 @@ class DemoFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initRecycler()
+        initPopupMenu()
 
         binding.searchViewDemo.postDelayed({
-            if (_binding != null) initSearchView()
+            if (_binding != null) {
+                initSearchView()
+                // Принудительно устанавливаем подсказку из ресурсов
+                binding.searchViewDemo.queryHint = getString(R.string.search_hint_demo)
+            }
         }, 600)
 
         val disposable = viewModel.films
@@ -77,6 +83,12 @@ class DemoFragment : Fragment() {
                 filmsAdapter.submitData(lifecycle, PagingData.from(films))
             }
         compositeDisposable.add(disposable)
+    }
+
+    private fun initPopupMenu() {
+        binding.buttonMenuDemo.setOnClickListener {
+            Snackbar.make(binding.root, R.string.not_available_in_demo, Snackbar.LENGTH_SHORT).show()
+        }
     }
 
 
@@ -90,12 +102,12 @@ class DemoFragment : Fragment() {
 
                 override fun onFavoriteClick(film: Film, favoriteIcon: ImageView) {
                     // Показываем Snackbar о недоступности функции в демо-режиме
-                    Snackbar.make(binding.root, "Функция недоступна в демо-режиме", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, R.string.not_available_in_demo, Snackbar.LENGTH_SHORT).show()
                 }
 
                 override fun longClick(film: Film) {
                     // Показываем Snackbar о недоступности функции в демо-режиме
-                    Snackbar.make(binding.root, "Функция недоступна в демо-режиме", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(binding.root, R.string.not_available_in_demo, Snackbar.LENGTH_SHORT).show()
                 }
             })
 

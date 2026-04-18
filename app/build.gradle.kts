@@ -47,7 +47,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.androidappfilmproject"
+        // applicationId удален отсюда, чтобы не путаться. Полные ID прописаны во flavors ниже.
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -92,12 +92,12 @@ android {
     productFlavors {
         create("basic") {
             dimension = "version"
-            applicationIdSuffix = ".basic"
+            applicationId = "com.Maksim1803.findafilm.basic"
             versionNameSuffix = "-basic"
         }
         create("pro") {
             dimension = "version"
-            applicationIdSuffix = ".pro"
+            applicationId = "com.Maksim1803.findafilm.pro"
             versionNameSuffix = "-pro"
         }
     }
@@ -164,6 +164,7 @@ dependencies {
     //Glide
     implementation("com.github.bumptech.glide:glide:5.0.5")
     kapt("com.github.bumptech.glide:compiler:5.0.5")
+    implementation("com.github.bumptech.glide:okhttp3-integration:5.0.5") // Интеграция с OkHttp для таймаутов
 
     //Новые библиотеки для создания анимации для модуля 33
     implementation("androidx.fragment:fragment-ktx:1.8.9")// Для viewModels() во фрагментах

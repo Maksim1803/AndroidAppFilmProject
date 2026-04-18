@@ -14,6 +14,8 @@ class PreferenceProvider(context: Context) {
         private const val KEY_FIRST_LAUNCH = "first_launch"
         private const val KEY_DEFAULT_CATEGORY = "default_category"
         private const val DEFAULT_CATEGORY = "popular"
+        private const val KEY_LANGUAGE = "app_language"
+        private const val DEFAULT_LANGUAGE = "en-US"
     }
 
     // Инициализируем SharedPreferences сразу
@@ -41,6 +43,7 @@ class PreferenceProvider(context: Context) {
         if (preference.getBoolean(KEY_FIRST_LAUNCH, true)) {
             preference.edit {
                 putString(KEY_DEFAULT_CATEGORY, DEFAULT_CATEGORY)
+                putString(KEY_LANGUAGE, DEFAULT_LANGUAGE)
                 putBoolean(KEY_FIRST_LAUNCH, false)
             }
         }
@@ -55,5 +58,15 @@ class PreferenceProvider(context: Context) {
     fun saveDefaultCategory(category: String) {
         preference.edit { putString(KEY_DEFAULT_CATEGORY, category) }
         categorySubject.onNext(category)
+    }
+
+    // Метод для получения текущего языка
+    fun getLanguage(): String {
+        return preference.getString(KEY_LANGUAGE, DEFAULT_LANGUAGE) ?: DEFAULT_LANGUAGE
+    }
+
+    // Метод для сохранения языка
+    fun saveLanguage(language: String) {
+        preference.edit { putString(KEY_LANGUAGE, language) }
     }
 }

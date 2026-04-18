@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_theme"
+        android:title="@string/menu_theme">
+        <menu>
+            <item
+                android:id="@+id/theme_light"
+                android:title="@string/theme_light" />
+            <item
+                android:id="@+id/theme_dark"
+                android:title="@string/theme_dark" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menu_language"
+        android:title="@string/menu_language">
+        <menu>
+            <item
+                android:id="@+id/lang_ru"
+                android:title="@string/lang_ru" />
+            <item
+                android:id="@+id/lang_en"
+                android:title="@string/lang_en" />
+        </menu>
+    </item>
+</menu>
