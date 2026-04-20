@@ -1,5 +1,6 @@
 package com.example.androidappfilmproject
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Intent
 import android.content.IntentFilter
@@ -80,6 +81,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun showPromoIfNeeded() {
         if (!App.instance.isPromoShown) {
             val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
@@ -93,37 +95,54 @@ class MainActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         firebaseRemoteConfig.activate()
                     }
-                    val filmLink = firebaseRemoteConfig.getString("film_link")
-                    val filmId = firebaseRemoteConfig.getLong("film_id").toInt()
-                    
-                    if (filmLink.isNotBlank()) {
-                        App.instance.isPromoShown = true
-                        binding.promoViewGroup.apply {
-                            visibility = View.VISIBLE
-                            animate().setDuration(1000).alpha(1f).start()
-                            setLinkForPoster(filmLink)
-                            closeButton.setOnClickListener { visibility = View.GONE }
 
-                            val action = {
-                                if (filmId != 0) {
-                                    (application as App).dagger.getInteractor().getFilmById(filmId)
-                                        .firstElement()
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe({ film ->
-                                            launchDetailsFragment(film)
-                                            visibility = View.GONE
-                                        }, { visibility = View.GONE }, {
-                                            Toast.makeText(this@MainActivity, R.string.promo_film_not_found, Toast.LENGTH_SHORT).show()
-                                            visibility = View.GONE
-                                        })
-                                } else { visibility = View.GONE }
-                            }
-                            watchButton.setOnClickListener { action() }
-                            poster.setOnClickListener { action() }
-                        }
+                    // Теперь из Remote Config берем только разрешение на показ
+                    val isPromoEnabled = firebaseRemoteConfig.getBoolean("show_promo")
+
+                    if (isPromoEnabled) {
+                        // Если показ разрешен, идем в TMDB за свежими трендами
+                        val interactor = (application as App).dagger.getInteractor()
+
+                        interactor.getRecommendation("popular")
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({ films ->
+                                if (films.isNotEmpty()) {
+                                    // Выбираем фильм на основе дня года, чтобы он менялся раз в сутки
+                                    val dayOfYear = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_YEAR)
+                                    val index = dayOfYear % films.size
+                                    val selectedFilm = films[index]
+
+                                    displayPromo(selectedFilm)
+                                }
+                            }, {
+                                // Ошибка загрузки из API (например, нет сети)
+                            })
                     }
                 }
+        }
+    }
+
+    private fun displayPromo(film: Film) {
+        App.instance.isPromoShown = true
+        binding.promoViewGroup.apply {
+            visibility = View.VISIBLE
+            animate().setDuration(1000).alpha(1f).start()
+
+            // Устанавливаем постер
+            setLinkForPoster(film.poster ?: "")
+
+            closeButton.setOnClickListener {
+                visibility = View.GONE
+            }
+
+            val action = {
+                launchDetailsFragment(film)
+                visibility = View.GONE
+            }
+
+            watchButton.setOnClickListener { action() }
+            poster.setOnClickListener { action() }
         }
     }
 
