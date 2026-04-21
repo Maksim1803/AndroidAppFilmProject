@@ -59,7 +59,7 @@
     <string name="film_removed_from_cache">Film \"%1$s\" removed from cache</string>
     <string name="watch_later_remind">Remind: %1$s</string>
 
-    <string name="search_hint_demo">Search in demo...</string>
+    <string name="search_hint_demo">Search in demo…</string>
     <string name="notification_title">Don\'t forget to watch!</string>
     <string name="promo_film_not_found">Film not loaded yet</string>
     <string name="notification_channel_name">Film Reminders</string>
