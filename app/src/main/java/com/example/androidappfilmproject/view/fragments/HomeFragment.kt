@@ -94,7 +94,7 @@ class HomeFragment : Fragment() {
                 if (loadState.refresh is LoadState.Error) {
                     val error = (loadState.refresh as LoadState.Error).error
                     val message = if (error is IOException) {
-                        getString(R.string.error_no_internet)
+                        getString(R.string.error_connection_vpn)
                     } else {
                         getString(R.string.error_loading)
                     }

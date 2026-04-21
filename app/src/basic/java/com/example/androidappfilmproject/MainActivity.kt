@@ -140,6 +140,7 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }, {
                                 // Ошибка загрузки из API (например, нет сети)
+                                Snackbar.make(binding.root, R.string.error_connection_vpn, Snackbar.LENGTH_LONG).show()
                             })
                     }
                 }
@@ -177,6 +178,7 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null).commit()
     }
 
+    @Suppress("unused")
     fun launchLocalDetailsFragment(film: Film) {
         val bundle = Bundle().apply { putParcelable("film", film) }
         val fragment = LocalDetailsFragment().apply { arguments = bundle }

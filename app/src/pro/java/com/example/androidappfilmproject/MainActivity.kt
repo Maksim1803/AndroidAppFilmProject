@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import com.google.android.material.snackbar.Snackbar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -118,6 +119,7 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }, {
                                 // Ошибка загрузки из API (например, нет сети)
+                                Snackbar.make(binding.root, R.string.error_connection_vpn, Snackbar.LENGTH_LONG).show()
                             })
                     }
                 }

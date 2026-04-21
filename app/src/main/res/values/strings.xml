@@ -55,6 +55,7 @@
     <string name="error_no_internet">Нет подключения к интернету</string>
     <string name="error_loading">Ошибка загрузки</string>
     <string name="error_loading_check_internet">Ошибка загрузки, проверьте интернет соединение</string>
+    <string name="error_connection_vpn">Ошибка подключения. Проверьте настройки сети или попробуйте использовать другое соединение (VPN).</string>
     <string name="film_removed_from_cache">Фильм \"%1$s\" удален из кэша</string>
     <string name="watch_later_remind">Напомнить: %1$s</string>
 

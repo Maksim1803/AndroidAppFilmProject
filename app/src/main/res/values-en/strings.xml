@@ -55,6 +55,7 @@
     <string name="error_no_internet">No internet connection</string>
     <string name="error_loading">Loading error</string>
     <string name="error_loading_check_internet">Loading error, please check your internet connection</string>
+    <string name="error_connection_vpn">Connection error. Check your network settings or try using another connection (VPN).</string>
     <string name="film_removed_from_cache">Film \"%1$s\" removed from cache</string>
     <string name="watch_later_remind">Remind: %1$s</string>
 
