@@ -56,6 +56,7 @@
     <string name="error_loading">Ошибка загрузки</string>
     <string name="error_loading_check_internet">Ошибка загрузки, проверьте интернет соединение</string>
     <string name="film_removed_from_cache">Фильм \"%1$s\" удален из кэша</string>
+    <string name="watch_later_remind">Напомнить: %1$s</string>
 
     <string name="search_hint_demo">Поиск в демо...</string>
     <string name="notification_title">Не забудьте посмотреть!</string>

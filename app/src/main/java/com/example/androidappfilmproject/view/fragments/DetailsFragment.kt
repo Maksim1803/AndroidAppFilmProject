@@ -7,8 +7,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.media.MediaScannerConnection
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
@@ -35,6 +37,8 @@ import com.example.remote_module.entity.ApiConstants
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
 
 // Создаем класс DetailsFragment, который отвечает за отображение подробной информации о фильме.
@@ -232,6 +236,18 @@ class DetailsFragment : Fragment() {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os)
                 }
             }
+        } else {
+            // ЛОГИКА ДЛЯ API 28 И НИЖЕ
+            val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "FilmsSearchApp")
+            if (!directory.exists()) directory.mkdirs()
+
+            val file = File(directory, "${film.title}.jpg")
+            FileOutputStream(file).use { os ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os)
+            }
+
+            // Оповещаем систему о новом файле
+            MediaScannerConnection.scanFile(requireContext(), arrayOf(file.toString()), null, null)
         }
     }
 

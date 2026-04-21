@@ -43,7 +43,8 @@ class WatchLaterRecyclerAdapter(private val clickListener: OnItemClickListener) 
             
             val date = Date(film.watchLaterTime)
             val format = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
-            binding.description.text = "Напомнить: ${format.format(date)}"
+            val context = binding.root.context
+            binding.description.text = context.getString(R.string.watch_later_remind, format.format(date))
 
             // Используем иконку "Избранное", так как delete нет в проекте, 
             // либо можно использовать baseline_watch_later_24 для индикации отмены

@@ -56,6 +56,7 @@
     <string name="error_loading">Loading error</string>
     <string name="error_loading_check_internet">Loading error, please check your internet connection</string>
     <string name="film_removed_from_cache">Film \"%1$s\" removed from cache</string>
+    <string name="watch_later_remind">Remind: %1$s</string>
 
     <string name="search_hint_demo">Search in demo...</string>
     <string name="notification_title">Don\'t forget to watch!</string>
