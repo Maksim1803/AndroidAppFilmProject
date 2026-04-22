@@ -1,6 +1,7 @@
 package com.example.androidappfilmproject.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.example.androidappfilmproject.data.preferences.PreferenceProvider
 import com.example.androidappfilmproject.domain.Interactor
 import com.example.database_module.entity.Film
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -13,14 +14,17 @@ import javax.inject.Inject
 
 // Создаем класс DemoFragmentViewModel, который является ViewModel для DemoFragment.
 class DemoFragmentViewModel @Inject constructor(
-    interactor: Interactor
+    private val interactor: Interactor
 ) : ViewModel() {
 
     // Инициализируем BehaviorSubject для хранения поискового запроса
     private val querySubject = BehaviorSubject.createDefault("")
 
-    // Поток отфильтрованных фильмов. Используем Film из database_module
+    // Поток отфильтрованных фильмов. Используем Film из database_module.
+    // Теперь мы также слушаем изменения языка через интеррактор.
     val films: Observable<List<Film>> = Observable.combineLatest(
+        // Каждую секунду проверяем язык (упрощенно) или реагируем на запрос. 
+        // Но лучше всего — заставить getAllFilmsFromDb возвращать актуальное.
         interactor.getAllFilmsFromDb(),
         querySubject.distinctUntilChanged().debounce(300, TimeUnit.MILLISECONDS)
     ) { allFilms, query ->

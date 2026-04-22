@@ -3,6 +3,7 @@ package com.example.androidappfilmproject.data
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.androidappfilmproject.BuildConfig
+import com.example.androidappfilmproject.data.preferences.PreferenceProvider
 import com.example.database_module.entity.Film
 import com.example.androidappfilmproject.data.entity.toFilm
 import com.example.remote_module.TmdbApi
@@ -13,7 +14,8 @@ import java.io.IOException
 // Класс - источник данных для поиска. Теперь использует Film из database_module
 class SearchFilmPagingSource(
     private val tmdbApi: TmdbApi,
-    private val query: String
+    private val query: String,
+    private val preferences: PreferenceProvider
 ) : PagingSource<Int, Film>() {
 
     // Метод для загрузки порции данных (страницы) по поисковому запросу
@@ -23,7 +25,7 @@ class SearchFilmPagingSource(
         return try {
             val results = tmdbApi.searchFilms(
                 apiKey = BuildConfig.TMDB_API_KEY,
-                language = "ru-RU",
+                language = preferences.getLanguage(),
                 query = query,
                 page = page
             ).awaitSingle()

@@ -57,11 +57,13 @@ object NotificationHelper {
 
         val builder = NotificationCompat.Builder(context, NotificationConstants.CHANNEL_ID).apply {
             setSmallIcon(R.drawable.baseline_watch_later_24)
-            setContentTitle("Не забудьте посмотреть!")
+            setContentTitle(context.getString(R.string.notification_title))
             setContentText(film.title)
-            priority = NotificationCompat.PRIORITY_DEFAULT
+            priority = NotificationCompat.PRIORITY_HIGH
             setContentIntent(pendingIntent)
             setAutoCancel(true)
+            setOnlyAlertOnce(true) // Чтобы не было звука при обновлении картинкой
+            setDefaults(NotificationCompat.DEFAULT_ALL)
         }
 
         val notificationManager = NotificationManagerCompat.from(context)
@@ -77,8 +79,6 @@ object NotificationHelper {
                     notificationManager.notify(film.id, builder.build())
                 }
             })
-        
-        notificationManager.notify(film.id, builder.build())
     }
 
     // Метод, который будет вызывать DatePickerDialog и TimePickerDialog:

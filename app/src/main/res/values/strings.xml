@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AndroidAppFilmProject</string>
+    <string name="app_name">FindAFilm</string>
     <string name="text_on_topMenu">Поиск фильмов</string>
     <string name="disclaimer">Картинки взяты с https://www.movieposters.com/</string>
     <string name="btn_menu_1">Меню</string>
@@ -37,5 +37,59 @@
     <string name="Posmotrite_film">Посмотрите фильм:</string>
     <string name="Smotret">Смотреть</string>
 
+    <string name="menu_settings">Настройки</string>
+    <string name="menu_theme">Тема</string>
+    <string name="menu_language">Язык</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Темная</string>
+    <string name="lang_ru">Русский</string>
+    <string name="lang_en">English</string>
 
+    <string name="added_to_favorites">Добавлено в избранное</string>
+    <string name="removed_from_favorites">Удалено из избранного</string>
+    <string name="error_film_not_found">Ошибка: Фильм не найден</string>
+    <string name="reminder_set">Напоминание установлено</string>
+    <string name="trial_expired">Пробный период истек!</string>
+    <string name="available_in_pro">Доступно в Pro версии</string>
+    <string name="not_available_in_demo">Функция недоступна в демо-режиме</string>
+    <string name="error_no_internet">Нет подключения к интернету</string>
+    <string name="error_loading">Ошибка загрузки</string>
+    <string name="error_loading_check_internet">Ошибка загрузки, проверьте интернет соединение</string>
+    <string name="error_connection_vpn">Ошибка подключения. Проверьте настройки сети или попробуйте использовать другое соединение (VPN).</string>
+    <string name="film_removed_from_cache">Фильм \"%1$s\" удален из кэша</string>
+    <string name="watch_later_remind">Напомнить: %1$s</string>
+
+    <string name="search_hint_demo">Поиск в демо…</string>
+    <string name="notification_title">Не забудьте посмотреть!</string>
+    <string name="promo_film_not_found">Фильм еще не загружен в список</string>
+    <string name="notification_channel_name">Напоминания о фильмах</string>
+    <string name="notification_channel_desc">Канал для напоминаний "Посмотреть позже"</string>
+
+    <!-- Демо фильмы названия -->
+    <string name="demo_film_1_title">Начало</string>
+    <string name="demo_film_2_title">Грешники</string>
+    <string name="demo_film_3_title">Один дома</string>
+    <string name="demo_film_4_title">Под огнем</string>
+    <string name="demo_film_5_title">Субстанция</string>
+    <string name="demo_film_6_title">Запертый</string>
+    <string name="demo_film_7_title">Компаньон</string>
+    <string name="demo_film_8_title">Ущелье</string>
+    <string name="demo_film_9_title">Интерстеллар</string>
+    <string name="demo_film_10_title">Хищник</string>
+    <string name="demo_film_11_title">Топган</string>
+    <string name="demo_film_12_title">Индиана Джонс</string>
+
+    <!-- Демо фильмы описания -->
+    <string name="demo_film_1_desc">Вору, который крадёт секреты с помощью технологии обмена снами, поручают задачу: внедрить идею в сознание гендиректора, но его трагическое прошлое может привести всё к катастрофе.</string>
+    <string name="demo_film_2_desc">Пытаясь оставить позади свою неспокойную жизнь, братья-близнецы возвращаются в родной город, и убеждаются, что здесь их ждёт ещё большее зло.</string>
+    <string name="demo_film_3_desc">Американское семейство отправляется из Чикаго в Европу, но в спешке сборов бестолковые родители забывают дома одного из своих детей. Юное создание, однако, не теряется и демонстрирует чудеса изобретательности…</string>
+    <string name="demo_film_4_desc">Взвод «морских котиков» отправляется на опасную миссию в Ирак, и рассказывает о хаосе и братстве на войне, вспоминая об этом событии.</string>
+    <string name="demo_film_5_desc">Увядающая знаменитость принимает препарат с чёрного рынка, который воспроизводит клетки и создаёт более молодую и привлекательную версию самой себя.</string>
+    <string name="demo_film_6_desc">Вор, забравшийся в роскошный внедорожник, понимает, что попал в изощрённую игру в психологический хоррор.</string>
+    <string name="demo_film_7_desc">Отдых на выходных с друзьями превращается в хаос после того, как выясняется, что один из гостей не тот, за кого себя выдает.</string>
+    <string name="demo_film_8_desc">Когда появляется зло, они должны действовать сообща, чтобы выжить и противостоять тому, что внутри.</string>
+    <string name="demo_film_9_desc">Когда человечество своим образом жизни пришло к продовольственному кризису, коллектив учёных отправляется сквозь черную дыру (которая соединяет области пространства-времени через большое расстояние) в путешествие, чтобы найти планету с подходящими для человечества условиями жизни.</string>
+    <string name="demo_film_10_desc">Для освобождения американских граждан элитная группа спецназа направлена в джунгли. Там, видавшим многое бойцам, предстоит встретиться с невероятным ужасом.</string>
+    <string name="demo_film_11_desc">Очень крутой боевик с Томом Крузом в главной роли. </string>
+    <string name="demo_film_12_desc">Крутой, можно сказать христоматийный приключенческий боевик</string>
 </resources>

@@ -7,7 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
+import androidx.core.os.LocaleListCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -29,6 +32,7 @@ import kotlinx.coroutines.rx3.asObservable
 import java.util.Locale
 import javax.inject.Inject
 import com.example.database_module.entity.Film
+import java.io.IOException
 
 // Создаем класс HomeFragment, который отвечает за отображение главного экрана.
 class HomeFragment : Fragment() {
@@ -66,6 +70,7 @@ class HomeFragment : Fragment() {
         initRecycler()
         initPullToRefresh()
         initSearchView()
+        initPopupMenu()
 
         val filmsDisposable = viewModel.films
             .observeOn(AndroidSchedulers.mainThread())
@@ -81,22 +86,6 @@ class HomeFragment : Fragment() {
             }
         compositeDisposable.add(progressDisposable)
 
-        // Закоментим пока рекомендацию фильма к просмотру
-        // (задание со звездочкой из предыдущих модулей), чтобы
-        // не конфликтовала с промо-экраном модуля 53.
-        /*
-        val recommendationDisposable = viewModel.recommendation
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { film ->
-                Snackbar.make(binding.root, "Рекомендуем: ${film.title}", Snackbar.LENGTH_LONG)
-                    .setAction("Смотреть") {
-                        (requireActivity() as MainActivity).launchDetailsFragment(film)
-                    }
-                    .show()
-            }
-        compositeDisposable.add(recommendationDisposable)
-        */
-
         val loadStateDisposable = filmsAdapter.loadStateFlow
             .asObservable()
             .observeOn(AndroidSchedulers.mainThread())
@@ -104,10 +93,54 @@ class HomeFragment : Fragment() {
                 viewModel.toggleProgressBar(loadState.refresh is LoadState.Loading)
                 if (loadState.refresh is LoadState.Error) {
                     val error = (loadState.refresh as LoadState.Error).error
-                    Snackbar.make(binding.root, error.localizedMessage ?: "Ошибка загрузки", Snackbar.LENGTH_LONG).show()
+                    val message = if (error is IOException) {
+                        getString(R.string.error_connection_vpn)
+                    } else {
+                        getString(R.string.error_loading)
+                    }
+                    Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
                 }
             }
         compositeDisposable.add(loadStateDisposable)
+    }
+
+    private fun initPopupMenu() {
+        binding.buttonMenu.setOnClickListener { view ->
+            val popup = PopupMenu(requireContext(), view)
+            popup.menuInflater.inflate(R.menu.main_menu, popup.menu)
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.theme_light -> {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                        true
+                    }
+                    R.id.theme_dark -> {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                        true
+                    }
+                    R.id.lang_ru -> {
+                        // Сохраняем язык в настройки и чистим кэш
+                        (requireActivity().application as App).dagger.getInteractor().saveLanguage("ru-RU")
+                        viewModel.clearCache()
+                        
+                        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("ru")
+                        AppCompatDelegate.setApplicationLocales(appLocale)
+                        true
+                    }
+                    R.id.lang_en -> {
+                        // Сохраняем язык в настройки и чистим кэш
+                        (requireActivity().application as App).dagger.getInteractor().saveLanguage("en-US")
+                        viewModel.clearCache()
+
+                        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("en")
+                        AppCompatDelegate.setApplicationLocales(appLocale)
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
+        }
     }
 
     // Метод для настройки RecyclerView, адаптера и обработки кликов
@@ -120,20 +153,22 @@ class HomeFragment : Fragment() {
             override fun onFavoriteClick(film: Film, favoriteIcon: ImageView) {
                 film.isInFavorites = !film.isInFavorites
 
-                if (film.isInFavorites) {
+                val messageResId = if (film.isInFavorites) {
                     favoriteIcon.setImageResource(R.drawable.baseline_favorite_24)
-                    Snackbar.make(binding.root, "Добавлено в избранное", Snackbar.LENGTH_SHORT).show()
+                    R.string.added_to_favorites
                 } else {
                     favoriteIcon.setImageResource(R.drawable.baseline_favorite_border_24)
-                    Snackbar.make(binding.root, "Удалено из избранного", Snackbar.LENGTH_SHORT).show()
+                    R.string.removed_from_favorites
                 }
+                Snackbar.make(binding.root, messageResId, Snackbar.LENGTH_SHORT).show()
 
                 viewModel.onFavoriteClicked(film)
             }
 
             override fun longClick(film: Film) {
                 viewModel.removeFilmFromCache(film)
-                Snackbar.make(binding.root, "Фильм \"${film.title}\" удален из кэша", Snackbar.LENGTH_SHORT).show()
+                val message = getString(R.string.film_removed_from_cache, film.title)
+                Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
             }
         })
 

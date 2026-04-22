@@ -3,6 +3,7 @@ package com.example.androidappfilmproject.di.modules
 import android.content.Context
 import androidx.room.Room
 import com.example.androidappfilmproject.data.MainRepository
+import com.example.androidappfilmproject.data.preferences.PreferenceProvider
 import com.example.database_module.dao.FilmDao
 import com.example.database_module.db.AppDatabase
 import com.example.remote_module.TmdbApi
@@ -33,5 +34,10 @@ class DatabaseModule {
     // Метод предоставляет основной репозиторий приложения
     @Provides
     @Singleton
-    fun provideRepository(context: Context, appDatabase: AppDatabase, tmdbApi: TmdbApi) = MainRepository(context, appDatabase, tmdbApi)
+    fun provideRepository(
+        context: Context,
+        appDatabase: AppDatabase,
+        tmdbApi: TmdbApi,
+        preferences: PreferenceProvider
+    ) = MainRepository(context, appDatabase, tmdbApi, preferences)
 }

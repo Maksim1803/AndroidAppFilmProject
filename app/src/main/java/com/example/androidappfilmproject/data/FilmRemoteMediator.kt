@@ -7,6 +7,8 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.example.androidappfilmproject.BuildConfig
+import com.example.androidappfilmproject.R
+import com.example.androidappfilmproject.data.preferences.PreferenceProvider
 import com.example.database_module.db.AppDatabase
 import com.example.database_module.entity.Film
 import com.example.androidappfilmproject.data.entity.toFilm
@@ -18,10 +20,11 @@ import java.io.IOException
 // Создаем класс для синхронизации данных из сети в локальную БД
 @OptIn(ExperimentalPagingApi::class)
 class FilmRemoteMediator(
-    context: Context,
+    private val context: Context,
     private val tmdbApi: TmdbApi,
     private val appDatabase: AppDatabase,
-    private val category: String
+    private val category: String,
+    private val preferences: PreferenceProvider
 ) : RemoteMediator<Int, Film>() {
 
     // Инициализируем DAO через базу данных из database_module
@@ -34,7 +37,7 @@ class FilmRemoteMediator(
     override suspend fun load(loadType: LoadType, state: PagingState<Int, Film>): MediatorResult {
         // Проверка интернета
         if (!networkChecker.isInternetAvailable()) {
-            return MediatorResult.Error(IOException("Нет подключения к интернету"))
+            return MediatorResult.Error(IOException(context.getString(R.string.error_no_internet)))
         }
         // Основной блок обработки сетевого запроса и кэширования
         return try {
@@ -51,17 +54,12 @@ class FilmRemoteMediator(
             val response = tmdbApi.getFilms(
                 category = category,
                 apiKey = BuildConfig.TMDB_API_KEY,
-                language = "ru-RU",
+                language = preferences.getLanguage(),
                 page = loadKey
             ).awaitSingle()
 
             // Только если данные успешно получены, работаем с БД
             appDatabase.withTransaction {
-                // Получаем текущие фильмы из БД, которые помечены как "Посмотреть позже" или "Избранное"
-                // Это нужно, чтобы при обновлении списка (REFRESH) не затереть их статус.
-                
-                // В данном случае мы просто будем проверять ID при вставке.
-                // Но проблема в том, что deleteByCategory удаляет записи.
                 
                 if (loadType == LoadType.REFRESH) {
                     // Очищаем только те фильмы, которые НЕ в избранном И НЕ в списке "Посмотреть позже"
