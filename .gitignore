@@ -18,3 +18,6 @@ deploymentTargetSelector.xml
 
 # Firebase configuration (модуль 53)
 **/google-services.json
+# Настройки релиза
+*.jks
+keystore.properties
