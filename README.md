@@ -5,11 +5,12 @@
 ## Скриншоты
 
 ### Промо (Play Console)
-<img src="screenshots/Find a Film.png" width="100%">
+<img src="screenshots/Find_A_Film.png" width="100%">
 
 ### Интерфейс (Темная тема)
-| Главный экран                                     | Описание фильма                           |
-|---------------------------------------------------|----------------------------------------------------------|
+
+| Главный экран | Описание фильма |
+| :---: | :---: |
 | <img src="screenshots/Dark_main.png" width="400"> | <img src="screenshots/Dark_description.png" width="400"> |
 
 ## Стек технологий
