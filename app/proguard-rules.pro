@@ -1,21 +1,57 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# --- Базовые настройки ---
+-optimizationpasses 5
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-dontpreverify
+-verbose
+-keepattributes SourceFile,LineNumberTable,Signature,InnerClasses,EnclosingMethod,*Annotation*
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# --- Настройка обфускации ---
+# Сохраняем BuildConfig, так как он используется для API ключей
+-keep class com.example.androidappfilmproject.BuildConfig { *; }
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# --- Retrofit & OkHttp ---
+-keepattributes Signature, InnerClasses, EnclosingMethod
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-dontwarn org.conscrypt.**
+-keepnames class retrofit2.** { *; }
+-keepclassmembernames interface * {
+    @retrofit2.http.* <methods>;
+}
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# --- GSON ---
+# Важно: сохраняем поля моделей, которые маппятся из JSON
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+-keep class com.google.gson.** { *; }
+
+# --- Room ---
+-keep class * extends androidx.room.RoomDatabase
+-dontwarn androidx.room.paging.**
+
+# --- RxJava ---
+-dontwarn java.lang.instrument.ClassFileTransformer
+-dontwarn sun.misc.**
+-keep class io.reactivex.rxjava3.** { *; }
+
+# --- Glide ---
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public class * extends com.bumptech.glide.module.AppGlideModule
+-keep public enum com.bumptech.glide.load.resource.bitmap.VideoDecoder$VideoMetadataRetrieverSettings { *; }
+-keepnames class com.bumptech.glide.integration.okhttp3.OkHttpGlideModule
+
+# --- Koin / Dagger ---
+-keep class io.insertkoin.** { *; }
+-keep class com.google.dagger.** { *; }
+
+# --- ТВОИ МОДЕЛИ ДАННЫХ (Самое важное!) ---
+# Сохраняем все сущности из модулей, чтобы R8 не удалил их поля
+-keep class com.example.remote_module.entity.** { *; }
+-keep class com.example.database_module.entity.** { *; }
+
+# Сохраняем Parcelable классы
+-keep class * implements android.os.Parcelable {
+    public static final android.os.Parcelable$Creator *;
+}

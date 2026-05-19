@@ -251,6 +251,7 @@ class DetailsFragment : Fragment() {
         }
     }
 
+
     // Метод отвечающий за загрузку постера в галерею
     private fun performAsyncLoadOfPoster() {
         val film = currentFilm ?: return
