@@ -5,7 +5,7 @@
 ## 📱 Скриншоты
 
 ### Промо (Play Console)
-<img src="metadata/Find_A_Film.png" width="100%">
+<img src="screenshots/Find_A_Film.png" width="100%">
 
 ### Интерфейс (Темная тема)
 
