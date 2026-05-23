@@ -24,12 +24,14 @@ class ConnectionChecker : BroadcastReceiver() {
         // Он гарантированно отобразится и переживет перезапуск Activity.
         Toast.makeText(context.applicationContext, message, Toast.LENGTH_LONG).show()
 
-        // Переключаем тему
+        // Переключаем тему и сохраняем настройку
         when (intent.action) {
             Intent.ACTION_BATTERY_LOW -> {
+                (context.applicationContext as? com.example.androidappfilmproject.App)?.dagger?.getInteractor()?.saveTheme(AppCompatDelegate.MODE_NIGHT_YES)
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             }
             Intent.ACTION_POWER_CONNECTED -> {
+                (context.applicationContext as? com.example.androidappfilmproject.App)?.dagger?.getInteractor()?.saveTheme(AppCompatDelegate.MODE_NIGHT_NO)
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
         }

@@ -111,10 +111,12 @@ class HomeFragment : Fragment() {
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.theme_light -> {
+                        (requireActivity().application as App).dagger.getInteractor().saveTheme(AppCompatDelegate.MODE_NIGHT_NO)
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                         true
                     }
                     R.id.theme_dark -> {
+                        (requireActivity().application as App).dagger.getInteractor().saveTheme(AppCompatDelegate.MODE_NIGHT_YES)
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                         true
                     }

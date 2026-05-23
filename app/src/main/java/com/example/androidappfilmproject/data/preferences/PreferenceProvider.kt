@@ -16,6 +16,8 @@ class PreferenceProvider(context: Context) {
         private const val DEFAULT_CATEGORY = "popular"
         private const val KEY_LANGUAGE = "app_language"
         private const val DEFAULT_LANGUAGE = "en-US"
+        private const val KEY_THEME = "app_theme"
+        private const val DEFAULT_THEME = 1 // AppCompatDelegate.MODE_NIGHT_NO
     }
 
     // Инициализируем SharedPreferences сразу
@@ -68,5 +70,15 @@ class PreferenceProvider(context: Context) {
     // Метод для сохранения языка
     fun saveLanguage(language: String) {
         preference.edit { putString(KEY_LANGUAGE, language) }
+    }
+
+    // Метод для получения текущей темы
+    fun getTheme(): Int {
+        return preference.getInt(KEY_THEME, DEFAULT_THEME)
+    }
+
+    // Метод для сохранения темы
+    fun saveTheme(themeMode: Int) {
+        preference.edit { putInt(KEY_THEME, themeMode) }
     }
 }

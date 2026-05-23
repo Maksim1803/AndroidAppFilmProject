@@ -12,14 +12,12 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
 }
 
-// Load properties from local.properties
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     localProperties.load(FileInputStream(localPropertiesFile))
 }
 
-// Load properties from keystore.properties
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("app/keystore.properties")
 if (keystorePropertiesFile.exists()) {
@@ -34,9 +32,7 @@ android {
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String
             keyPassword = keystoreProperties["keyPassword"] as String
-            // Проверка на null для предотвращения ошибок сборки, если файл отсутствует
-            storeFile =
-                if (keystoreProperties.containsKey("storeFile")) file(keystoreProperties["storeFile"] as String) else null
+            storeFile = if (keystoreProperties.containsKey("storeFile")) file(keystoreProperties["storeFile"] as String) else null
             storePassword = keystoreProperties["storePassword"] as String
         }
     }
@@ -47,48 +43,36 @@ android {
     }
 
     defaultConfig {
-        // applicationId удален отсюда, чтобы не путаться. Полные ID прописаны во flavors ниже.
         minSdk = 24
-        targetSdk = 36
-        versionCode = 3
+        targetSdk = 35 // Используем стабильный Android 15
+        versionCode = 6
         versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            // Нужные архитектуры для специфических устройств (эмуляторов)
             abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
         }
-        // Make the API key available in BuildConfig
-        buildConfigField(
-            "String",
-            "TMDB_API_KEY",
-            "\"${localProperties.getProperty("tmdb.api_key") ?: ""}\""
-        )
+        buildConfigField("String", "TMDB_API_KEY", "\"${localProperties.getProperty("tmdb.api_key") ?: ""}\"")
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            isMinifyEnabled = false
+            isShrinkResources = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    // Новый синтаксис для kotlin (модуль 33): Используем compilerOptions DSL
     kotlin {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
-    // Создание платной и бесплатной версий для задания модуля 52
     flavorDimensions += "version"
     productFlavors {
         create("basic") {
@@ -103,106 +87,88 @@ android {
         }
     }
     sourceSets {
-        getByName("basic") {
-            java {
-                srcDirs("src\\basic\\java", "src\\basic\\java")
-            }
+        getByName("basic") { java { srcDirs("src/basic/java") } }
+        getByName("pro") { java { srcDirs("src/pro/java") } }
+    }
+    packaging {
+        jniLibs {
+            // В AGP 9.0+ для поддержки 16 КБ страниц памяти используем 
+            // не сжатые (uncompressed) библиотеки с выравниванием (alignment).
+            useLegacyPackaging = false
         }
-        getByName("pro") {
-            java {
-                srcDirs("src\\pro\\java", "src\\pro\\java")
-            }
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
 }
 
-
 dependencies {
-
     implementation(libs.androidx.core.ktx)
-    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.core:core-splashscreen:1.2.0")
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.animation)
     implementation(libs.androidx.ui.text.android)
-    implementation(libs.filament.android)
+    // Удален filament.android так как он не используется и весит много, а также мешает поддержке 16 КБ
     implementation(libs.firebase.config)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 
-    //Новые библиотеки
     // RecyclerView
     implementation("androidx.recyclerview:recyclerview:1.4.0")
-    // AdapterDelegate
     implementation("com.hannesdorfmann:adapterdelegates4-kotlin-dsl:4.3.2")
-    //MaterialDesign
-    implementation("com.google.android.material:material:1.13.0")
-    //Coordinator layout
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
 
-    //Новые библиотеки для создания базы данных модуля 26
-    // Room components
-    implementation("androidx.room:room-runtime:2.8.4")
-    implementation("androidx.room:room-ktx:2.8.4") // Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-paging:2.8.4")
-    implementation("androidx.room:room-rxjava3:2.8.4")
-    kapt("androidx.room:room-compiler:2.8.4")
+    // Room
+    val room_version = "2.8.4"
+    implementation("androidx.room:room-runtime:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+    implementation("androidx.room:room-paging:$room_version")
+    implementation("androidx.room:room-rxjava3:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
 
-    // Lifecycle components
+    // Lifecycle
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")
     implementation("androidx.lifecycle:lifecycle-common-java8:2.10.0")
     implementation("androidx.lifecycle:lifecycle-reactivestreams-ktx:2.10.0")
+    implementation("androidx.fragment:fragment-ktx:1.8.9")
+    implementation("androidx.activity:activity-ktx:1.13.0")
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.10.2") // Для asObservable()
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.11.0")
 
-    //Новые библиотеки для создания анимации для модуля 28
-    //Glide
-    implementation("com.github.bumptech.glide:glide:5.0.5")
-    kapt("com.github.bumptech.glide:compiler:5.0.5")
-    implementation("com.github.bumptech.glide:okhttp3-integration:5.0.5") // Интеграция с OkHttp для таймаутов
+    // Glide
+    implementation("com.github.bumptech.glide:glide:5.0.7")
+    kapt("com.github.bumptech.glide:compiler:5.0.7")
+    implementation("com.github.bumptech.glide:okhttp3-integration:5.0.7")
 
-    //Новые библиотеки для создания анимации для модуля 33
-    implementation("androidx.fragment:fragment-ktx:1.8.9")// Для viewModels() во фрагментах
-    implementation("androidx.activity:activity-ktx:1.12.4")// Для activityViewModels() в активностях (если нужно)
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")// Для ViewModelScope и других KTX расширений
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")// Для LiveData KTX расширений
-
-    //Новые библиотеки для работы с БД для модуля 35
-    implementation("com.squareup.retrofit2:retrofit:3.0.0") //рертофит
-    implementation("com.squareup.retrofit2:converter-gson:3.0.0") //конвертер
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
     implementation("com.squareup.retrofit2:adapter-rxjava3:3.0.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.3.2") //логгер
+    implementation("com.squareup.okhttp3:logging-interceptor:5.3.2")
 
+    // Paging
     implementation(libs.androidx.paging.runtime.ktx)
-    implementation("androidx.paging:paging-rxjava3:3.4.1")
+    implementation("androidx.paging:paging-rxjava3:3.5.0")
 
-    //Библиотека Koin для модуля 4.1.1
-    implementation("io.insert-koin:koin-android:4.1.1")
+    // DI
+    implementation("io.insert-koin:koin-android:4.2.1")
+    implementation("com.google.dagger:dagger:2.59.2")
+    kapt("com.google.dagger:dagger-compiler:2.59.2")
 
-    //Библиотеки для модуля 37
-    implementation ("com.google.dagger:dagger:2.59.1")
-    kapt ("com.google.dagger:dagger-compiler:2.59.1")
-
-    //Библиотека для модуля 38. SwipeRefreshLayout (for fragment_home.xml)
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
-
-    //Библиотека для модуля 42 (Coroutines - корутины).
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
-
-    //Библиотеки для модулей 44 и 45 (RxJava)
+    // RxJava
     implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
     implementation("io.reactivex.rxjava3:rxjava:3.1.12")
 
-    //Библиотеки для модуля 46(Remote module) и задания со звездочкой (Database module)
     implementation(project(":remote_module"))
     implementation(project(":database_module"))
 
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
