@@ -71,4 +71,12 @@ class Interactor(
     fun saveLanguage(language: String) {
         preferences.saveLanguage(language)
     }
+
+    // Метод для получения темы
+    fun getTheme(): Int = preferences.getTheme()
+
+    // Метод для сохранения темы
+    fun saveTheme(themeMode: Int) {
+        preferences.saveTheme(themeMode)
+    }
 }

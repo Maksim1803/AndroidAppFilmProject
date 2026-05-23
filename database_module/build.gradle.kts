@@ -1,14 +1,13 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-// Подключаем файл с версиями
-apply(from = "$rootDir/versions.gradle")
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
     id("kotlin-parcelize")
 }
+
+apply(from = "$rootDir/versions.gradle")
 
 android {
     namespace = "com.example.database_module"
@@ -23,21 +22,22 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlin {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
+}
+
+kapt {
+    correctErrorTypes = true
 }
 
 dependencies {
@@ -53,19 +53,15 @@ dependencies {
     implementation("androidx.room:room-rxjava3:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
 
-    // Dagger
     implementation(project.extra["dagger"] as String)
     kapt(project.extra["daggerCompiler"] as String)
 
-    // Paging (нужен для PagingSource в DAO)
-    implementation("androidx.paging:paging-runtime-ktx:3.4.1")
-    implementation("androidx.paging:paging-rxjava3:3.4.1")
+    implementation(libs.androidx.paging.runtime.ktx)
+    implementation("androidx.paging:paging-rxjava3:3.5.0")
 
-    // RxJava
     implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
     implementation("io.reactivex.rxjava3:rxjava:3.1.12")
 
-    // ЗАВИСИМОСТИ ДЛЯ ТЕСТОВ (Оживляем ExampleUnitTest)
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")

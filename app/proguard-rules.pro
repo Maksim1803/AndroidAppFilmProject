@@ -15,17 +15,26 @@
 -dontwarn okio.**
 -dontwarn javax.annotation.**
 -dontwarn org.conscrypt.**
--keepnames class retrofit2.** { *; }
+-keep class retrofit2.** { *; }
+-keep class okhttp3.** { *; }
+-keep interface retrofit2.** { *; }
 -keepclassmembernames interface * {
     @retrofit2.http.* <methods>;
 }
 
 # --- GSON ---
-# Важно: сохраняем поля моделей, которые маппятся из JSON
 -keepclassmembers class * {
     @com.google.gson.annotations.SerializedName <fields>;
 }
 -keep class com.google.gson.** { *; }
+
+# --- Kotlin Coroutines ---
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepclassmembernames class kotlinx.coroutines.android.HandlerContext {
+    private final android.os.Handler handler;
+}
+-dontwarn kotlinx.coroutines.**
 
 # --- Room ---
 -keep class * extends androidx.room.RoomDatabase
@@ -50,6 +59,18 @@
 # Сохраняем все сущности из модулей, чтобы R8 не удалил их поля
 -keep class com.example.remote_module.entity.** { *; }
 -keep class com.example.database_module.entity.** { *; }
+
+# Сохраняем интерфейс API
+-keep interface com.example.remote_module.TmdbApi { *; }
+
+# Сохраняем сгенерированные классы Dagger
+-keep class **.Dagger* { *; }
+-keep class *__Factory { *; }
+-keep class *__MemberInjector { *; }
+
+# Сохраняем Paging Source
+-keep class androidx.paging.PagingSource { *; }
+-keep class * extends androidx.paging.PagingSource { *; }
 
 # Сохраняем Parcelable классы
 -keep class * implements android.os.Parcelable {

@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import androidx.appcompat.app.AppCompatDelegate
 import com.example.androidappfilmproject.di.AppComponent
 import com.example.androidappfilmproject.di.DaggerAppComponent
 import com.example.androidappfilmproject.view.notifications.NotificationConstants
@@ -33,6 +34,10 @@ class App : Application() {
             .context(this)
             .remoteProvider(remoteProvider)
             .build()
+
+        // Устанавливаем сохраненную тему
+        val savedTheme = dagger.getInteractor().getTheme()
+        AppCompatDelegate.setDefaultNightMode(savedTheme)
 
         // Создаем канал уведомлений
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
