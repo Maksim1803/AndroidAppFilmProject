@@ -15,6 +15,7 @@ import com.example.androidappfilmproject.databinding.FragmentWatchLaterBinding
 import com.example.androidappfilmproject.MainActivity
 import com.example.androidappfilmproject.utils.AnimationHelper
 import com.example.androidappfilmproject.view.notifications.NotificationHelper
+import com.example.androidappfilmproject.view.rv_adapters.TopSpacingItemDecoration
 import com.example.androidappfilmproject.view.rv_adapters.WatchLaterRecyclerAdapter
 import com.example.androidappfilmproject.viewmodel.WatchLaterViewModel
 import com.example.database_module.entity.Film
@@ -81,6 +82,9 @@ class WatchLaterFragment : Fragment() {
         binding.watchLaterRecycler.apply {
             adapter = watchLaterAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            //Добавляем отступы между элементами списка
+            val decorator = TopSpacingItemDecoration(8)
+            addItemDecoration(decorator)
         }
     }
     // Метод для очистки ресурсов и отписки от RxJava при уничтожении View

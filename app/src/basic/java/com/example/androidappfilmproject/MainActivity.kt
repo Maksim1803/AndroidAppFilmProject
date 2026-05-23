@@ -2,7 +2,6 @@ package com.example.androidappfilmproject
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
@@ -10,11 +9,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
@@ -40,28 +37,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var receiver: BroadcastReceiver
-    private val trialHandler = Handler(Looper.getMainLooper())
-
-    private val trialCheckerRunnable = object : Runnable {
-        override fun run() {
-            if (!isFeatureAvailable()) {
-                handleTrialExpiration()
-            } else {
-                trialHandler.postDelayed(this, 1000)
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-
-        // Записываем время ПЕРВОГО запуска (если его еще нет)
-        val prefs = getSharedPreferences("trial_prefs", Context.MODE_PRIVATE)
-        if (prefs.getLong("first_launch_time", 0L) == 0L) {
-            prefs.edit { putLong("first_launch_time", System.currentTimeMillis()) }
-        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -101,8 +81,6 @@ class MainActivity : AppCompatActivity() {
             }
             film?.let { launchDetailsFragment(it) }
         }
-
-        trialHandler.post(trialCheckerRunnable)
     }
 
     @SuppressLint("CheckResult")
@@ -195,27 +173,6 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.fragment_placeholder, fragment, tag).commit()
     }
 
-    private fun isFeatureAvailable(): Boolean {
-        val prefs = getSharedPreferences("trial_prefs", Context.MODE_PRIVATE)
-        val firstLaunchTime = prefs.getLong("first_launch_time", 0L)
-        if (firstLaunchTime == 0L) return true
-        val currentTime = System.currentTimeMillis()
-        val trialTimeInMillis = 30 * 24 * 60 * 60 * 1000L // 30 дней
-        return (currentTime - firstLaunchTime) < trialTimeInMillis
-    }
-
-    private fun handleTrialExpiration() {
-        val currentId = binding.bottomNavigation.selectedItemId
-        if (currentId == R.id.selections) {
-            Toast.makeText(this, R.string.trial_expired, Toast.LENGTH_SHORT).show()
-            binding.bottomNavigation.selectedItemId = R.id.home
-            val tag = "home"
-            val fragment = checkFragmentExistence(tag) ?: HomeFragment()
-            changeFragment(fragment, tag)
-        }
-        trialHandler.removeCallbacks(trialCheckerRunnable)
-    }
-
     private fun initNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -238,13 +195,9 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.selections -> {
-                    if (isFeatureAvailable()) {
-                        val tag = "selections"
-                        val fragment = checkFragmentExistence(tag) ?: SelectionsFragment()
-                        changeFragment(fragment, tag)
-                    } else {
-                        Toast.makeText(this, R.string.available_in_pro, Toast.LENGTH_SHORT).show()
-                    }
+                    val tag = "selections"
+                    val fragment = checkFragmentExistence(tag) ?: SelectionsFragment()
+                    changeFragment(fragment, tag)
                     true
                 }
                 R.id.demo -> {
@@ -261,6 +214,5 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
-        trialHandler.removeCallbacks(trialCheckerRunnable)
     }
 }

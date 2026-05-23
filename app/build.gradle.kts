@@ -50,8 +50,8 @@ android {
         // applicationId удален отсюда, чтобы не путаться. Полные ID прописаны во flavors ниже.
         minSdk = 24
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
