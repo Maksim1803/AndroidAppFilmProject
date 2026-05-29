@@ -53,16 +53,21 @@ class SelectionsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Запускаем анимацию кругового появления (позиция 5 в нижнем меню)
-        AnimationHelper.performFragmentCircularRevealAnimation(binding.root,  5)
+        // Запускаем анимацию кругового появления (позиция 4 в нижнем меню - Selections)
+        AnimationHelper.performFragmentCircularRevealAnimation(binding.root,  4)
 
         // Наблюдаем за изменением выбранной категории в LiveData для обновления состояния кнопок
         viewModel.categoryPropertyLifeData.observe(viewLifecycleOwner, Observer<String> { cat ->
-            when (cat) {
-                POPULAR_CATEGORY -> binding.radioGroup.check(R.id.radio_popular)
-                TOP_RATED_CATEGORY -> binding.radioGroup.check(R.id.radio_top_rated)
-                UPCOMING_CATEGORY -> binding.radioGroup.check(R.id.radio_upcoming)
-                NOW_PLAYING_CATEGORY -> binding.radioGroup.check(R.id.radio_now_playing)
+            val checkedId = when (cat) {
+                POPULAR_CATEGORY -> R.id.radio_popular
+                TOP_RATED_CATEGORY -> R.id.radio_top_rated
+                UPCOMING_CATEGORY -> R.id.radio_upcoming
+                NOW_PLAYING_CATEGORY -> R.id.radio_now_playing
+                else -> -1
+            }
+            // Устанавливаем выбор только если он отличается от текущего, чтобы избежать бесконечного цикла обновлений
+            if (checkedId != -1 && binding.radioGroup.checkedRadioButtonId != checkedId) {
+                binding.radioGroup.check(checkedId)
             }
         })
 
