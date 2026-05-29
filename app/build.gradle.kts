@@ -45,8 +45,8 @@ android {
     defaultConfig {
         minSdk = 24
         targetSdk = 35 // Используем стабильный Android 15
-        versionCode = 6
-        versionName = "1.2"
+        versionCode = 7
+        versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -147,10 +147,10 @@ dependencies {
     implementation("com.github.bumptech.glide:okhttp3-integration:5.0.7")
 
     // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:3.0.0")
-    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
-    implementation("com.squareup.retrofit2:adapter-rxjava3:3.0.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.3.2")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.retrofit2:adapter-rxjava3:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Paging
     implementation(libs.androidx.paging.runtime.ktx)

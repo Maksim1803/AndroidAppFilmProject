@@ -19,6 +19,7 @@ class SelectionsFragmentViewModel @Inject constructor(
     // LiveData, которая содержит текущую выбранную категорию фильмов.
     // Используем Observable напрямую из интерактора и преобразуем в LiveData.
     val categoryPropertyLifeData: LiveData<String> = interactor.getCategoryPreferenceObservable()
+        .distinctUntilChanged()
         .toFlowable(BackpressureStrategy.LATEST)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())

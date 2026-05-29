@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -60,6 +61,17 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(receiver, filters)
 
         initNavigation()
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.promoViewGroup.visibility == View.VISIBLE) {
+                    binding.promoViewGroup.visibility = View.GONE
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        })
 
         if (savedInstanceState == null) {
             supportFragmentManager
