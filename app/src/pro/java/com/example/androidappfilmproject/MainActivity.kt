@@ -226,4 +226,41 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         unregisterReceiver(receiver)
     }
+
+    private var isTrailerPlaying = false
+
+    fun toggleSystemUI(show: Boolean) {
+        isTrailerPlaying = !show
+        if (show) {
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+            if (resources.configuration.orientation != android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
+                binding.bottomNavigation.visibility = View.VISIBLE
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+            binding.bottomNavigation.visibility = View.GONE
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        if (isTrailerPlaying) {
+            toggleSystemUI(false)
+            return
+        }
+
+        // Скрываем нижнюю навигацию в альбомном режиме для удобства просмотра
+        if (newConfig.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
+            binding.bottomNavigation.visibility = View.GONE
+        } else {
+            binding.bottomNavigation.visibility = View.VISIBLE
+        }
+    }
 }

@@ -44,6 +44,8 @@
     <string name="theme_dark">Темная</string>
     <string name="lang_ru">Русский</string>
     <string name="lang_en">English</string>
+    <string name="lang_zh">Китайский</string>
+    <string name="lang_hi">Индийский</string>
 
     <string name="added_to_favorites">Добавлено в избранное</string>
     <string name="removed_from_favorites">Удалено из избранного</string>
@@ -55,6 +57,9 @@
     <string name="error_no_internet">Нет подключения к интернету</string>
     <string name="error_loading">Ошибка загрузки</string>
     <string name="error_loading_check_internet">Ошибка загрузки, проверьте интернет соединение</string>
+    <string name="no_more_films">Фильмов в данной категории больше нет</string>
+    <string name="trailer">Трейлер</string>
+    <string name="trailer_not_found">Трейлер не найден</string>
     <string name="error_connection_vpn">Ошибка подключения. Проверьте настройки сети или попробуйте использовать другое соединение (VPN).</string>
     <string name="film_removed_from_cache">Фильм \"%1$s\" удален из кэша</string>
     <string name="watch_later_remind">Напомнить: %1$s</string>

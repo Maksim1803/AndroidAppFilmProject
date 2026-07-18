@@ -44,6 +44,8 @@
     <string name="theme_dark">Dark</string>
     <string name="lang_ru">Russian</string>
     <string name="lang_en">English</string>
+    <string name="lang_zh">Chinese</string>
+    <string name="lang_hi">Hindi</string>
 
     <string name="added_to_favorites">Added to favorites</string>
     <string name="removed_from_favorites">Removed from favorites</string>
@@ -55,6 +57,9 @@
     <string name="error_no_internet">No internet connection</string>
     <string name="error_loading">Loading error</string>
     <string name="error_loading_check_internet">Loading error, please check your internet connection</string>
+    <string name="no_more_films">No more films in this category</string>
+    <string name="trailer">Trailer</string>
+    <string name="trailer_not_found">Trailer not found</string>
     <string name="error_connection_vpn">Connection error. Check your network settings or try using another connection (VPN).</string>
     <string name="film_removed_from_cache">Film \"%1$s\" removed from cache</string>
     <string name="watch_later_remind">Remind: %1$s</string>

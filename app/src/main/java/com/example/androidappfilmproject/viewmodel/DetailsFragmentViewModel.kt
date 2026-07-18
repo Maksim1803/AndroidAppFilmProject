@@ -27,6 +27,13 @@ class DetailsFragmentViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
     }
 
+    // Метод для получения ключа трейлера фильма
+    fun getTrailerKey(id: Int): Observable<String> {
+        return interactor.getTrailerKey(id)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+    }
+
     // Метод для обработки клика по иконке "избранное".
     fun onFavoriteClicked(film: Film) {
         // Переносим в фоновый поток и добавляем обработку ошибок

@@ -39,7 +39,8 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.AndroidAppFilmProject">
+            android:theme="@style/Theme.AndroidAppFilmProject"
+            android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">FindAFilm</string>
+    <string name="lang_ru">俄语</string>
+    <string name="lang_en">英语</string>
+    <string name="lang_zh">中文</string>
+    <string name="lang_hi">印地语</string>
+    <string name="no_more_films">该类别中没有更多电影了</string>
+    <string name="trailer">预告片</string>
+    <string name="trailer_not_found">未找到预告片</string>
+</resources>

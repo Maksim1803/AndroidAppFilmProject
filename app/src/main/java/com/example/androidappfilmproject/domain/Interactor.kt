@@ -50,6 +50,9 @@ class Interactor(
     // Метод для получения детальной информации о конкретном фильме по его ID
     fun getFilmById(id: Int): Observable<Film> = repo.getFilmById(id)
 
+    // Метод для получения ключа трейлера
+    fun getTrailerKey(movieId: Int): Observable<String> = repo.getTrailerKey(movieId)
+
     // Метод для обновления данных фильма (включая статус "избранное") в репозитории
     fun toggleFavoriteStatus(film: Film): Completable {
         return repo.updateFilm(film)

@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">FindAFilm</string>
+    <string name="lang_ru">रूसी</string>
+    <string name="lang_en">अंग्रेज़ी</string>
+    <string name="lang_zh">चीनी</string>
+    <string name="lang_hi">हिंदी</string>
+    <string name="no_more_films">इस श्रेणी में और कोई फ़िल्म नहीं है</string>
+    <string name="trailer">ट्रेलर</string>
+    <string name="trailer_not_found">ट्रेलर नहीं मिला</string>
+</resources>

@@ -27,4 +27,13 @@ interface TmdbApi {
         @Query("query") query: String,
         @Query("page") page: Int
     ): Observable<TmdbResults>
+
+    // Метод для получения видео (трейлеров) фильма
+    @GET("3/movie/{movie_id}/videos")
+    fun getTrailers(
+        @Path("movie_id") movieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String? = null,
+        @Query("include_video_language") includeVideoLanguage: String? = null
+    ): Observable<com.example.remote_module.entity.TmdbVideoResults>
 }
