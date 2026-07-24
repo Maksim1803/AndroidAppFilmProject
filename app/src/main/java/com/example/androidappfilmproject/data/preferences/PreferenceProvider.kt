@@ -67,6 +67,12 @@ class PreferenceProvider(context: Context) {
         return preference.getString(KEY_LANGUAGE, DEFAULT_LANGUAGE) ?: DEFAULT_LANGUAGE
     }
 
+    // Метод для получения региона (на основе языка)
+    fun getRegion(): String {
+        val lang = getLanguage()
+        return if (lang.contains("-")) lang.split("-")[1] else ""
+    }
+
     // Метод для сохранения языка
     fun saveLanguage(language: String) {
         preference.edit { putString(KEY_LANGUAGE, language) }

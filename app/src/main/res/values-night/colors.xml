@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Backgrounds Dark -->
+    <color name="bg_start">#523000</color>
+    <color name="bg_end">#1A093D</color>
+
+    <!-- Избранное: Сделал чуть светлее для темной темы -->
+    <color name="fav_bg_start">#2E4500</color>
+    <color name="fav_bg_end">#1A1A1A</color>
+
+    <!-- Посмотреть позже: Сделал чуть светлее для темной темы -->
+    <color name="watch_bg_start">#660000</color>
+    <color name="watch_bg_end">#7A4000</color>
+
+    <color name="select_bg_start">#003649</color>
+    <color name="select_bg_end">#441212</color>
+
+    <color name="empty_text_color">@android:color/white</color>
+</resources>

@@ -123,7 +123,8 @@ class MainActivity : AppCompatActivity() {
                             .subscribe({ films ->
                                 if (films.isNotEmpty()) {
                                     // Выбираем фильм на основе дня года, чтобы он менялся раз в сутки
-                                    val dayOfYear = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_YEAR)
+                                    val dayOfYear = java.util.Calendar.getInstance()
+                                        .get(java.util.Calendar.DAY_OF_YEAR)
                                     val index = dayOfYear % films.size
                                     val selectedFilm = films[index]
 
@@ -131,7 +132,11 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }, {
                                 // Ошибка загрузки из API (например, нет сети)
-                                Snackbar.make(binding.root, R.string.error_connection_vpn, Snackbar.LENGTH_LONG).show()
+                                Snackbar.make(
+                                    binding.root,
+                                    R.string.error_connection_vpn,
+                                    Snackbar.LENGTH_LONG
+                                ).show()
                             })
                     }
                 }
@@ -178,7 +183,8 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null).commit()
     }
 
-    private fun checkFragmentExistence(tag: String): Fragment? = supportFragmentManager.findFragmentByTag(tag)
+    private fun checkFragmentExistence(tag: String): Fragment? =
+        supportFragmentManager.findFragmentByTag(tag)
 
     private fun changeFragment(fragment: Fragment, tag: String) {
         supportFragmentManager.beginTransaction()
@@ -194,30 +200,35 @@ class MainActivity : AppCompatActivity() {
                     changeFragment(fragment, tag)
                     true
                 }
+
                 R.id.favorites -> {
                     val tag = "favorites"
                     val fragment = checkFragmentExistence(tag) ?: FavoritesFragment()
                     changeFragment(fragment, tag)
                     true
                 }
+
                 R.id.watch_later -> {
                     val tag = "watch_later"
                     val fragment = checkFragmentExistence(tag) ?: WatchLaterFragment()
                     changeFragment(fragment, tag)
                     true
                 }
+
                 R.id.selections -> {
                     val tag = "selections"
                     val fragment = checkFragmentExistence(tag) ?: SelectionsFragment()
                     changeFragment(fragment, tag)
                     true
                 }
+
                 R.id.demo -> {
                     val tag = "demo"
                     val fragment = checkFragmentExistence(tag) ?: DemoFragment()
                     changeFragment(fragment, tag)
                     true
                 }
+
                 else -> false
             }
         }
@@ -226,5 +237,42 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
+    }
+
+    private var isTrailerPlaying = false
+
+    fun toggleSystemUI(show: Boolean) {
+        isTrailerPlaying = !show
+        if (show) {
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+            if (resources.configuration.orientation != android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
+                binding.bottomNavigation.visibility = View.VISIBLE
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+            binding.bottomNavigation.visibility = View.GONE
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        if (isTrailerPlaying) {
+            toggleSystemUI(false)
+            return
+        }
+
+        // Скрываем нижнюю навигацию в альбомном режиме для удобства просмотра
+        if (newConfig.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
+            binding.bottomNavigation.visibility = View.GONE
+        } else {
+            binding.bottomNavigation.visibility = View.VISIBLE
+        }
     }
 }

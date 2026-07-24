@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
@@ -91,6 +92,12 @@ class HomeFragment : Fragment() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { loadState ->
                 viewModel.toggleProgressBar(loadState.refresh is LoadState.Loading)
+
+                // Показываем уведомление, когда дошли до самого конца
+                if (loadState.append is LoadState.NotLoading && loadState.append.endOfPaginationReached) {
+                    Toast.makeText(requireContext(), R.string.no_more_films, Toast.LENGTH_SHORT).show()
+                }
+
                 if (loadState.refresh is LoadState.Error) {
                     val error = (loadState.refresh as LoadState.Error).error
                     val message = if (error is IOException) {
@@ -135,6 +142,27 @@ class HomeFragment : Fragment() {
                         viewModel.clearCache()
 
                         val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("en")
+                        AppCompatDelegate.setApplicationLocales(appLocale)
+                        true
+                    }
+                    R.id.lang_es -> {
+                        (requireActivity().application as App).dagger.getInteractor().saveLanguage("es-ES")
+                        viewModel.clearCache()
+                        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("es")
+                        AppCompatDelegate.setApplicationLocales(appLocale)
+                        true
+                    }
+                    R.id.lang_zh -> {
+                        (requireActivity().application as App).dagger.getInteractor().saveLanguage("zh-CN")
+                        viewModel.clearCache()
+                        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("zh")
+                        AppCompatDelegate.setApplicationLocales(appLocale)
+                        true
+                    }
+                    R.id.lang_hi -> {
+                        (requireActivity().application as App).dagger.getInteractor().saveLanguage("hi-IN")
+                        viewModel.clearCache()
+                        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("hi")
                         AppCompatDelegate.setApplicationLocales(appLocale)
                         true
                     }

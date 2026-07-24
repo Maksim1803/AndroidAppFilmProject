@@ -1,156 +1,219 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/background"
-    android:fitsSystemWindows="true"
-    tools:context=".view.fragments.DetailsFragment">
+    android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:fitsSystemWindows="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="false"
-            android:minHeight="60dp"
-            app:contentScrim="@color/colorSky"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:toolbarId="@+id/toolbar">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/details_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/details_poster"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:adjustViewBounds="true"
-                android:background="@color/colorBlue"
-                android:contentDescription="@string/film_poster_content_description"
-                android:fitsSystemWindows="true"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_launcher_foreground"
-                app:layout_collapseMode="parallax"
-                app:layout_constraintTop_toBottomOf="@+id/details_toolbar" />
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <!-- Правая группа кнопок (посмотреть позже, избранное, поделиться) -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:translationY="-10dp"
-        app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|end">
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/watchLaterButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:contentDescription="@string/add_to_watch_later"
-            android:src="@drawable/baseline_watch_later_24"
-            app:backgroundTint="@android:color/holo_orange_dark"
-            app:fabSize="mini"
-            app:tint="@color/colorPrimaryDark" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/favoriteButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:contentDescription="@string/add_to_favorites"
-            android:src="@drawable/baseline_favorite_border_24"
-            app:backgroundTint="@android:color/holo_orange_dark"
-            app:fabSize="mini"
-            app:tint="@color/colorPrimaryDark" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/details_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/share"
-            app:backgroundTint="@android:color/holo_orange_dark"
-            app:srcCompat="@drawable/ic_baseline_share_24"
-            app:tint="@color/colorPrimaryDark" />
-    </LinearLayout>
-
-    <!--Левая группа кнопок (рейтинг и загрузка постера в галерею)-->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:translationY="-10dp"
-        app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|start">
-
-        <com.example.androidappfilmproject.view.customviews.RatingDonutView
-            android:id="@+id/ratingDonut"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            app:animateOnLoad="false"
-            app:animationDuration="2000"
-            app:stroke="5dp" />
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp">
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/details_fab_download_wp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorOrange"
-                android:contentDescription="@string/downloaded_to_gallery"
-                app:borderWidth="0dp"
-                app:srcCompat="@drawable/ic_baseline_cloud_download_24"
-                app:tint="@color/colorPrimaryDark" />
-
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:translationZ="10dp"
-                android:visibility="invisible" />
-        </FrameLayout>
-    </LinearLayout>
-
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/nestedScrollView"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:background="@drawable/background"
+        android:fitsSystemWindows="true"
+        tools:context=".view.fragments.DetailsFragment">
 
-        <TextView
-            android:id="@+id/details_description"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:fitsSystemWindows="true"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/toolbar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="false"
+                android:minHeight="60dp"
+                app:contentScrim="@color/colorSky"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:toolbarId="@+id/toolbar">
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/details_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_collapseMode="pin"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/details_poster"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:background="@color/colorBlue"
+                    android:contentDescription="@string/film_poster_content_description"
+                    android:fitsSystemWindows="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_launcher_foreground"
+                    app:layout_collapseMode="parallax"
+                    app:layout_constraintTop_toBottomOf="@+id/details_toolbar" />
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <!-- Правая группа кнопок -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:translationY="-10dp"
+            app:layout_anchor="@id/app_bar"
+            app:layout_anchorGravity="bottom|end">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/watchLaterButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:contentDescription="@string/add_to_watch_later"
+                android:src="@drawable/baseline_watch_later_24"
+                app:backgroundTint="@android:color/holo_orange_dark"
+                app:fabSize="mini"
+                app:tint="@color/colorPrimaryDark" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/favoriteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:contentDescription="@string/add_to_favorites"
+                android:src="@drawable/baseline_favorite_border_24"
+                app:backgroundTint="@android:color/holo_orange_dark"
+                app:fabSize="mini"
+                app:tint="@color/colorPrimaryDark" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/details_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/share"
+                app:backgroundTint="@android:color/holo_orange_dark"
+                app:srcCompat="@drawable/ic_baseline_share_24"
+                app:tint="@color/colorPrimaryDark" />
+        </LinearLayout>
+
+        <!-- Левая группа кнопок -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:translationY="-10dp"
+            app:layout_anchor="@id/app_bar"
+            app:layout_anchorGravity="bottom|start">
+
+            <com.example.androidappfilmproject.view.customviews.RatingDonutView
+                android:id="@+id/ratingDonut"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:animateOnLoad="false"
+                app:animationDuration="2000"
+                app:stroke="5dp" />
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp">
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/details_fab_download_wp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/colorOrange"
+                    android:contentDescription="@string/downloaded_to_gallery"
+                    app:borderWidth="0dp"
+                    app:srcCompat="@drawable/ic_baseline_cloud_download_24"
+                    app:tint="@color/colorPrimaryDark" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:translationZ="10dp"
+                    android:visibility="invisible" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <TextView
+                android:id="@+id/details_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:lineSpacingExtra="4dp"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="16sp"
+                tools:text="@tools:sample/lorem/random" />
+
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Кнопка трейлера -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_play_trailer"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/bg_play_button"
+            android:padding="0dp"
+            app:backgroundTint="@null"
+            app:icon="@drawable/ic_baseline_play_arrow_24"
+            app:iconTint="@color/colorPrimaryDark"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="36dp"
+            android:insetBottom="0dp"
+            android:insetLeft="0dp"
+            android:insetRight="0dp"
+            android:insetTop="0dp"
+            app:elevation="8dp"/>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <!-- Контейнер для трейлера перенесен в корень FrameLayout -->
+    <FrameLayout
+        android:id="@+id/trailer_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
+
+        <WebView
+            android:id="@+id/trailer_webview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+
+        <!-- Контейнер для настоящего полноэкранного View от YouTube -->
+        <FrameLayout
+            android:id="@+id/full_screen_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/black"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_close_trailer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
             android:layout_margin="16dp"
-            android:lineSpacingExtra="4dp"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textSize="16sp"
-            tools:text="@tools:sample/lorem/random" />
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:tint="@android:color/white"
+            tools:ignore="UseAppTint" />
+    </FrameLayout>
 
-    </androidx.core.widget.NestedScrollView>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</FrameLayout>

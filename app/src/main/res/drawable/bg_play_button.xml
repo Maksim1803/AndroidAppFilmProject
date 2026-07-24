@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Оранжевый фон -->
+    <solid android:color="@android:color/holo_orange_dark" />
+    <!-- Темная окантовка 3dp -->
+    <stroke
+        android:width="3dp"
+        android:color="@color/colorPrimaryDark" />
+    <!-- Скругление углов -->
+    <corners android:radius="12dp" />
+</shape>

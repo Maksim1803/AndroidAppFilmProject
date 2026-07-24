@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -15,6 +16,7 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebChromeClient
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -28,6 +30,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.androidappfilmproject.App
+import com.example.androidappfilmproject.MainActivity
 import com.example.androidappfilmproject.R
 import com.example.androidappfilmproject.databinding.FragmentDetailsBinding
 import com.example.androidappfilmproject.view.notifications.NotificationHelper
@@ -92,6 +95,15 @@ class DetailsFragment : Fragment() {
         currentFilm = filmFromArgs
         setFilmsDetails(filmFromArgs)
 
+        // Проверяем наличие трейлера и скрываем кнопку, если его нет
+        viewModel.getTrailerKey(filmFromArgs.id)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ key ->
+                binding.btnPlayTrailer.isVisible = key.isNotEmpty()
+            }, {
+                binding.btnPlayTrailer.isVisible = false
+            }).also { compositeDisposable.add(it) }
+
         // Подписка на обновления из базы
         val disposable = viewModel.getFilmById(filmFromArgs.id)
             .observeOn(AndroidSchedulers.mainThread())
@@ -137,6 +149,79 @@ class DetailsFragment : Fragment() {
 
         binding.detailsPoster.apply {
             this.scaleType = ImageView.ScaleType.CENTER_CROP
+        }
+
+        // Логика трейлера
+        binding.btnPlayTrailer.setOnClickListener {
+            val film = currentFilm ?: return@setOnClickListener
+
+            viewModel.getTrailerKey(film.id)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ key ->
+                    if (key.isNotEmpty()) {
+                        val lang = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            resources.configuration.locales[0].language
+                        } else {
+                            @Suppress("DEPRECATION")
+                            resources.configuration.locale.language
+                        }
+                        val youtubeUrl = "https://www.youtube.com/embed/$key?autoplay=1&hl=$lang"
+                        binding.trailerContainer.visibility = View.VISIBLE
+                        (activity as? MainActivity)?.toggleSystemUI(false)
+                        binding.trailerWebview.apply {
+                            settings.javaScriptEnabled = true
+                            settings.domStorageEnabled = true
+                            settings.mediaPlaybackRequiresUserGesture = false
+                            settings.loadWithOverviewMode = true
+                            settings.useWideViewPort = true
+                            settings.userAgentString = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+                            
+                            webChromeClient = object : WebChromeClient() {
+                                private var customView: View? = null
+
+                                override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
+                                    if (customView != null) {
+                                        onHideCustomView()
+                                        return
+                                    }
+                                    customView = view
+                                    binding.fullScreenContainer.addView(customView)
+                                    binding.fullScreenContainer.visibility = View.VISIBLE
+                                    binding.trailerWebview.visibility = View.GONE
+                                    activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                                }
+
+                                override fun onHideCustomView() {
+                                    binding.fullScreenContainer.visibility = View.GONE
+                                    binding.fullScreenContainer.removeView(customView)
+                                    customView = null
+                                    binding.trailerWebview.visibility = View.VISIBLE
+                                    activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                                }
+                            }
+                            
+                            val extraHeaders = mutableMapOf<String, String>()
+                            extraHeaders["Referer"] = "https://www.themoviedb.org"
+                            loadUrl(youtubeUrl, extraHeaders)
+                        }
+                        // Меням иконку на Стоп
+                        binding.btnPlayTrailer.setIconResource(R.drawable.ic_baseline_stop_24)
+                    } else {
+                        Snackbar.make(binding.root, R.string.trailer_not_found, Snackbar.LENGTH_SHORT).show()
+                    }
+                }, {
+                    it.printStackTrace()
+                }).also { compositeDisposable.add(it) }
+        }
+
+        binding.btnCloseTrailer.setOnClickListener {
+            binding.trailerContainer.visibility = View.GONE
+            (activity as? MainActivity)?.toggleSystemUI(true)
+            // Возвращаем ориентацию при закрытии
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            binding.trailerWebview.loadUrl("about:blank")
+            // Меняем иконку обратно на Плей
+            binding.btnPlayTrailer.setIconResource(R.drawable.ic_baseline_play_arrow_24)
         }
     }
 
@@ -292,6 +377,7 @@ class DetailsFragment : Fragment() {
     // Метод вызывается, когда иерархия представлений, связанная с фрагментом, удаляется
     override fun onDestroyView() {
         super.onDestroyView()
+        binding.trailerWebview.loadUrl("about:blank")
         compositeDisposable.clear()
         _binding = null
     }

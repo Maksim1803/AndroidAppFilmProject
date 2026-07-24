@@ -27,6 +27,8 @@ data class Film(
     var isInWatchLater: Boolean = false,
     // Время напоминания
     var watchLaterTime: Long = 0L,
+    // Поле для сохранения порядка при пагинации
+    var position: Int = 0,
     // Уникальный идентификатор фильма, является первичным ключом в базе данных.
     @PrimaryKey
     val id: Int
