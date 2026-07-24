@@ -55,7 +55,8 @@ class FilmRemoteMediator(
                 category = category,
                 apiKey = BuildConfig.TMDB_API_KEY,
                 language = preferences.getLanguage(),
-                page = loadKey
+                page = loadKey,
+                region = preferences.getRegion()
             ).awaitSingle()
 
             // Только если данные успешно получены, работаем с БД
@@ -71,9 +72,11 @@ class FilmRemoteMediator(
                 val watchLaterFilms = filmDao.getWatchLaterFilmsSync()
 
                 // Преобразуем DTO модели из сети в Entity модели для БД и назначаем категорию
-                val films = response.tmdbFilms.map { tmdbFilm ->
+                val films = response.tmdbFilms.mapIndexed { index, tmdbFilm ->
                     tmdbFilm.toFilm().apply {
                         this.category = this@FilmRemoteMediator.category
+                        // Вычисляем позицию для стабильной сортировки
+                        this.position = (loadKey - 1) * state.config.pageSize + index
                         
                         // Сохраняем статус "Избранное"
                         if (favoriteIds.contains(this.id)) {

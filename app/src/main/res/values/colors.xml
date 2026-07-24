@@ -10,4 +10,19 @@
     <color name="colorRed">#F44336</color>
     <color name="colorOrange">#FF9900</color>
     <color name="colorAccent">#00BCD4</color>
+
+    <!-- Backgrounds Light -->
+    <color name="bg_start">#FFBB33</color>
+    <color name="bg_end">#2F1066</color>
+
+    <color name="fav_bg_start">#669900</color>
+    <color name="fav_bg_end">#121212</color>
+
+    <color name="watch_bg_start">#CC0000</color>
+    <color name="watch_bg_end">#FF8800</color>
+
+    <color name="select_bg_start">#0099CC</color>
+    <color name="select_bg_end">#FF4444</color>
+
+    <color name="empty_text_color">@color/colorPrimaryDark</color>
 </resources>

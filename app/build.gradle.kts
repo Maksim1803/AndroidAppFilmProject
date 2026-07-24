@@ -26,7 +26,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.example.androidappfilmproject"
-    compileSdk = 36
+    compileSdk = 37
 
     signingConfigs {
         create("release") {
@@ -44,9 +44,9 @@ android {
 
     defaultConfig {
         minSdk = 24
-        targetSdk = 35 // Используем стабильный Android 15
-        versionCode = 7
-        versionName = "1.3"
+        targetSdk = 37
+        versionCode = 8
+        versionName = "1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

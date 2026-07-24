@@ -9,6 +9,7 @@ import androidx.paging.PagingData
 import androidx.paging.rxjava3.observable
 import com.example.androidappfilmproject.BuildConfig
 import com.example.androidappfilmproject.R
+import com.example.androidappfilmproject.data.entity.toFilm
 import com.example.androidappfilmproject.data.preferences.PreferenceProvider
 import com.example.database_module.db.AppDatabase
 import com.example.database_module.entity.Film
@@ -46,7 +47,8 @@ class MainRepository(
             category = category,
             apiKey = BuildConfig.TMDB_API_KEY,
             language = preferences.getLanguage(),
-            page = 1
+            page = 1,
+            region = preferences.getRegion()
         )
     }
 
@@ -99,6 +101,12 @@ class MainRepository(
 
     // Получает данные конкретного фильма по ID из БД
     fun getFilmById(id: Int): Observable<Film> = filmDao.getFilmById(id)
+
+    // Получает свежие данные о фильме из API
+    fun getFilmDetailsFromApi(id: Int, lang: String): Observable<Film> {
+        return tmdbApi.getMovieDetails(id, BuildConfig.TMDB_API_KEY, lang)
+            .map { tmdbFilm -> tmdbFilm.toFilm() }
+    }
 
     // Получает ключ трейлера из API
     fun getTrailerKey(movieId: Int): Observable<String> {

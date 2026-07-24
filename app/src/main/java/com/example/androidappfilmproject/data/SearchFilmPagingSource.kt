@@ -27,7 +27,8 @@ class SearchFilmPagingSource(
                 apiKey = BuildConfig.TMDB_API_KEY,
                 language = preferences.getLanguage(),
                 query = query,
-                page = page
+                page = page,
+                region = preferences.getRegion()
             ).awaitSingle()
 
             // Мапим результаты в нашу сущность Film

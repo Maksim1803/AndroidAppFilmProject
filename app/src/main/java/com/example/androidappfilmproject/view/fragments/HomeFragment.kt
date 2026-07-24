@@ -93,7 +93,7 @@ class HomeFragment : Fragment() {
             .subscribe { loadState ->
                 viewModel.toggleProgressBar(loadState.refresh is LoadState.Loading)
 
-                // Показываем уведомление, когда дошли до конца списка
+                // Показываем уведомление, когда дошли до самого конца
                 if (loadState.append is LoadState.NotLoading && loadState.append.endOfPaginationReached) {
                     Toast.makeText(requireContext(), R.string.no_more_films, Toast.LENGTH_SHORT).show()
                 }
@@ -142,6 +142,13 @@ class HomeFragment : Fragment() {
                         viewModel.clearCache()
 
                         val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("en")
+                        AppCompatDelegate.setApplicationLocales(appLocale)
+                        true
+                    }
+                    R.id.lang_es -> {
+                        (requireActivity().application as App).dagger.getInteractor().saveLanguage("es-ES")
+                        viewModel.clearCache()
+                        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("es")
                         AppCompatDelegate.setApplicationLocales(appLocale)
                         true
                     }

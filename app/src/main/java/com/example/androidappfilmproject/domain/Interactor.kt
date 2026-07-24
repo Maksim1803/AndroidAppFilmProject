@@ -50,6 +50,19 @@ class Interactor(
     // Метод для получения детальной информации о конкретном фильме по его ID
     fun getFilmById(id: Int): Observable<Film> = repo.getFilmById(id)
 
+    // Метод для получения данных из API с поддержкой английского как запасного варианта
+    fun getFilmDetailsWithFallback(id: Int): Observable<Film> {
+        val lang = preferences.getLanguage()
+        return repo.getFilmDetailsFromApi(id, lang)
+            .flatMap { film ->
+                if (film.description.isEmpty() && lang != "en-US") {
+                    repo.getFilmDetailsFromApi(id, "en-US")
+                } else {
+                    Observable.just(film)
+                }
+            }
+    }
+
     // Метод для получения ключа трейлера
     fun getTrailerKey(movieId: Int): Observable<String> = repo.getTrailerKey(movieId)
 

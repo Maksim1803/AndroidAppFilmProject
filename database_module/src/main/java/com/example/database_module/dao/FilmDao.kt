@@ -51,7 +51,7 @@ interface FilmDao {
     fun getFavoriteIds(): List<Int>
 
     // Метод для получения источника данных пагинации по категории
-    @Query("SELECT * FROM film_table WHERE category = :category")
+    @Query("SELECT * FROM film_table WHERE category = :category ORDER BY position ASC")
     fun getFilmsPagingSource(category: String): PagingSource<Int, Film>
 
     // Метод для получения фильма по его ID

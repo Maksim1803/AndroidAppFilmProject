@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.media.MediaScannerConnection
@@ -17,6 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -175,7 +177,30 @@ class DetailsFragment : Fragment() {
                             settings.loadWithOverviewMode = true
                             settings.useWideViewPort = true
                             settings.userAgentString = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
-                            webChromeClient = WebChromeClient()
+                            
+                            webChromeClient = object : WebChromeClient() {
+                                private var customView: View? = null
+
+                                override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
+                                    if (customView != null) {
+                                        onHideCustomView()
+                                        return
+                                    }
+                                    customView = view
+                                    binding.fullScreenContainer.addView(customView)
+                                    binding.fullScreenContainer.visibility = View.VISIBLE
+                                    binding.trailerWebview.visibility = View.GONE
+                                    activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                                }
+
+                                override fun onHideCustomView() {
+                                    binding.fullScreenContainer.visibility = View.GONE
+                                    binding.fullScreenContainer.removeView(customView)
+                                    customView = null
+                                    binding.trailerWebview.visibility = View.VISIBLE
+                                    activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                                }
+                            }
                             
                             val extraHeaders = mutableMapOf<String, String>()
                             extraHeaders["Referer"] = "https://www.themoviedb.org"
@@ -194,6 +219,8 @@ class DetailsFragment : Fragment() {
         binding.btnCloseTrailer.setOnClickListener {
             binding.trailerContainer.visibility = View.GONE
             (activity as? MainActivity)?.toggleSystemUI(true)
+            // Возвращаем ориентацию при закрытии
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             binding.trailerWebview.loadUrl("about:blank")
             // Меняем иконку обратно на Плей
             binding.btnPlayTrailer.setIconResource(R.drawable.ic_baseline_play_arrow_24)

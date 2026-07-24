@@ -196,6 +196,14 @@
             android:layout_height="match_parent"
             android:layout_gravity="center" />
 
+        <!-- Контейнер для настоящего полноэкранного View от YouTube -->
+        <FrameLayout
+            android:id="@+id/full_screen_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/black"
+            android:visibility="gone" />
+
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/btn_close_trailer"
             android:layout_width="wrap_content"

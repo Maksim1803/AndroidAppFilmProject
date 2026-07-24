@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <gradient android:startColor="@android:color/holo_red_dark"
-        android:endColor="@android:color/holo_orange_dark"
+    <gradient android:startColor="@color/watch_bg_start"
+        android:endColor="@color/watch_bg_end"
         android:angle="45"/>
 </shape>

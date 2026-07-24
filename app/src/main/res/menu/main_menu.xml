@@ -23,6 +23,9 @@
                 android:id="@+id/lang_en"
                 android:title="@string/lang_en" />
             <item
+                android:id="@+id/lang_es"
+                android:title="@string/lang_es" />
+            <item
                 android:id="@+id/lang_zh"
                 android:title="@string/lang_zh" />
             <item
