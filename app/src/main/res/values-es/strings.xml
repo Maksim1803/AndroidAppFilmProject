@@ -59,6 +59,11 @@
     <string name="no_more_films">No hay más películas en esta categoría</string>
     <string name="trailer">Tráiler</string>
     <string name="trailer_not_found">Tráiler no encontrado</string>
+    <string name="watch_free">Ver gratis</string>
+    <string name="search_error_title">Película no encontrada</string>
+    <string name="search_error_message">Película no encontrada, ¿continuar buscando por título en el navegador?</string>
+    <string name="continue_text">Continuar</string>
+    <string name="cancel_text">Cancelar</string>
     <string name="error_connection_vpn">Error de conexión. Compruebe la configuración de su red o intente usar otra conexión (VPN).</string>
     <string name="film_removed_from_cache">Película \"%1$s\" eliminada del caché</string>
     <string name="watch_later_remind">Recordar: %1$s</string>

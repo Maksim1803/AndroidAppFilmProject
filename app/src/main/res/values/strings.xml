@@ -62,6 +62,11 @@
     <string name="no_more_films">Фильмов в данной категории больше нет</string>
     <string name="trailer">Трейлер</string>
     <string name="trailer_not_found">Трейлер не найден</string>
+    <string name="watch_free">Смотреть бесплатно</string>
+    <string name="search_error_title">Фильм не найден</string>
+    <string name="search_error_message">Фильм не найден, продолжить поиск фильма по названию в браузере?</string>
+    <string name="continue_text">Продолжить</string>
+    <string name="cancel_text">Отмена</string>
     <string name="error_connection_vpn">Ошибка подключения. Проверьте настройки сети или попробуйте использовать другое соединение (VPN).</string>
     <string name="film_removed_from_cache">Фильм \"%1$s\" удален из кэша</string>
     <string name="watch_later_remind">Напомнить: %1$s</string>

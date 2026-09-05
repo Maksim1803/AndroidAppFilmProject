@@ -59,6 +59,11 @@
     <string name="no_more_films">इस श्रेणी में और कोई फ़िल्म नहीं है</string>
     <string name="trailer">ट्रेलर</string>
     <string name="trailer_not_found">ट्रेलर नहीं मिला</string>
+    <string name="watch_free">मुफ्त में देखें</string>
+    <string name="search_error_title">फ़िल्म नहीं मिली</string>
+    <string name="search_error_message">फ़िल्म नहीं मिली, क्या ब्राउज़र में शीर्षक द्वारा खोजना जारी रखें?</string>
+    <string name="continue_text">जारी रखें</string>
+    <string name="cancel_text">रद्द करें</string>
     <string name="error_connection_vpn">कनेक्शन त्रुटि। अपनी नेटवर्क सेटिंग्स की जांच करें या किसी अन्य कनेक्शन (VPN) का उपयोग करने का प्रयास करें।</string>
     <string name="film_removed_from_cache">फ़िल्म \"%1$s\" कैश से हटा दी गई है</string>
     <string name="watch_later_remind">याद दिलाएं: %1$s</string>

@@ -62,6 +62,11 @@
     <string name="no_more_films">No more films in this category</string>
     <string name="trailer">Trailer</string>
     <string name="trailer_not_found">Trailer not found</string>
+    <string name="watch_free">Watch for free</string>
+    <string name="search_error_title">Film not found</string>
+    <string name="search_error_message">Film not found, continue searching by title in the browser?</string>
+    <string name="continue_text">Continue</string>
+    <string name="cancel_text">Cancel</string>
     <string name="error_connection_vpn">Connection error. Check your network settings or try using another connection (VPN).</string>
     <string name="film_removed_from_cache">Film \"%1$s\" removed from cache</string>
     <string name="watch_later_remind">Remind: %1$s</string>

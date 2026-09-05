@@ -75,6 +75,9 @@ class LocalDetailsFragment : Fragment() {
         binding.btnPlayTrailer.setOnClickListener {
             Snackbar.make(binding.root, R.string.not_available_in_demo, Snackbar.LENGTH_SHORT).show()
         }
+        binding.btnWatchFree.setOnClickListener {
+            Snackbar.make(binding.root, R.string.not_available_in_demo, Snackbar.LENGTH_SHORT).show()
+        }
 
         // Настраиваем отображение постера
         binding.detailsPoster.apply {
