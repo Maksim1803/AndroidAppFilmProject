@@ -157,27 +157,50 @@
 
         </androidx.core.widget.NestedScrollView>
 
-        <!-- Кнопка трейлера -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_play_trailer"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+        <!-- Группа кнопок внизу -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginBottom="24dp"
-            android:background="@drawable/bg_play_button"
-            android:padding="0dp"
-            app:backgroundTint="@null"
-            app:icon="@drawable/ic_baseline_play_arrow_24"
-            app:iconTint="@color/colorPrimaryDark"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:iconSize="36dp"
-            android:insetBottom="0dp"
-            android:insetLeft="0dp"
-            android:insetRight="0dp"
-            android:insetTop="0dp"
-            app:elevation="8dp"/>
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_play_trailer"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_play_button"
+                android:padding="0dp"
+                app:backgroundTint="@null"
+                app:icon="@drawable/ic_baseline_play_arrow_24"
+                app:iconTint="@color/colorPrimaryDark"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="36dp"
+                android:insetBottom="0dp"
+                android:insetLeft="0dp"
+                android:insetRight="0dp"
+                android:insetTop="0dp"
+                app:elevation="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_watch_free"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/watch_free"
+                android:textColor="@color/colorPrimaryDark"
+                android:textAllCaps="false"
+                app:backgroundTint="@android:color/holo_orange_dark"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/baseline_video_library_24"
+                app:iconTint="@color/colorPrimaryDark"
+                app:strokeColor="@color/colorPrimaryDark"
+                app:strokeWidth="2dp"
+                app:elevation="8dp" />
+
+        </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <!-- Контейнер для трейлера перенесен в корень FrameLayout -->

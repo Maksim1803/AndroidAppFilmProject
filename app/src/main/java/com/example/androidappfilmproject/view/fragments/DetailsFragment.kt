@@ -159,51 +159,18 @@ class DetailsFragment : Fragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ key ->
                     if (key.isNotEmpty()) {
-                        val lang = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            resources.configuration.locales[0].language
-                        } else {
-                            @Suppress("DEPRECATION")
-                            resources.configuration.locale.language
-                        }
+                        val lang = resources.configuration.locales[0].language
                         val youtubeUrl = "https://www.youtube.com/embed/$key?autoplay=1&hl=$lang"
+                        
                         binding.trailerContainer.visibility = View.VISIBLE
                         (activity as? MainActivity)?.toggleSystemUI(false)
-                        binding.trailerWebview.apply {
-                            settings.javaScriptEnabled = true
-                            settings.domStorageEnabled = true
-                            settings.mediaPlaybackRequiresUserGesture = false
-                            settings.loadWithOverviewMode = true
-                            settings.useWideViewPort = true
-                            settings.userAgentString = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
-                            
-                            webChromeClient = object : WebChromeClient() {
-                                private var customView: View? = null
-
-                                override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
-                                    if (customView != null) {
-                                        onHideCustomView()
-                                        return
-                                    }
-                                    customView = view
-                                    binding.fullScreenContainer.addView(customView)
-                                    binding.fullScreenContainer.visibility = View.VISIBLE
-                                    binding.trailerWebview.visibility = View.GONE
-                                    activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                                }
-
-                                override fun onHideCustomView() {
-                                    binding.fullScreenContainer.visibility = View.GONE
-                                    binding.fullScreenContainer.removeView(customView)
-                                    customView = null
-                                    binding.trailerWebview.visibility = View.VISIBLE
-                                    activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                                }
-                            }
-                            
-                            val extraHeaders = mutableMapOf<String, String>()
-                            extraHeaders["Referer"] = "https://www.themoviedb.org"
-                            loadUrl(youtubeUrl, extraHeaders)
-                        }
+                        
+                        setupWebView()
+                        
+                        val extraHeaders = mutableMapOf<String, String>()
+                        extraHeaders["Referer"] = "https://www.themoviedb.org"
+                        binding.trailerWebview.loadUrl(youtubeUrl, extraHeaders)
+                        
                         // Меням иконку на Стоп
                         binding.btnPlayTrailer.setIconResource(R.drawable.ic_baseline_stop_24)
                     } else {
@@ -223,6 +190,110 @@ class DetailsFragment : Fragment() {
             // Меняем иконку обратно на Плей
             binding.btnPlayTrailer.setIconResource(R.drawable.ic_baseline_play_arrow_24)
         }
+
+        binding.btnWatchFree.setOnClickListener {
+            val film = currentFilm ?: return@setOnClickListener
+            val lang = resources.configuration.locales[0].language
+
+            val query = when (lang) {
+                "ru" -> "kinogo.ec ${film.title} смотреть онлайн бесплатно"
+                "es" -> "cuevana3.ch ${film.title} ver online gratis"
+                "hi" -> "${film.title} मुफ्त में ऑनलाइन देखें"
+                "zh" -> "${film.title} 在线免费观看"
+                else -> "${film.title} watch online free"
+            }
+
+            val searchUrl = "https://www.google.com/search?q=${java.net.URLEncoder.encode(query, "UTF-8")}"
+            
+            binding.trailerContainer.visibility = View.VISIBLE
+            (activity as? MainActivity)?.toggleSystemUI(false)
+            
+            setupWebView()
+            
+            binding.trailerWebview.apply {
+                webViewClient = object : android.webkit.WebViewClient() {
+                    override fun shouldOverrideUrlLoading(view: android.webkit.WebView?, request: android.webkit.WebResourceRequest?): Boolean {
+                        return false // Открывать все ссылки внутри WebView
+                    }
+
+                    override fun onPageFinished(view: android.webkit.WebView?, url: String?) {
+                        super.onPageFinished(view, url)
+                        // Проверяем наличие текста "ничего не найдено" в Google выдаче
+                        if (url?.contains("google.com/search") == true) {
+                            view?.evaluateJavascript(
+                                "(function() { " +
+                                        "var text = document.body.innerText; " +
+                                        "return text.includes('ничего не найдено') || " +
+                                        "text.includes('did not match any documents') || " +
+                                        "text.includes('По вашему запросу ничего не найдено'); " +
+                                        "})();"
+                            ) { result ->
+                                if (result == "true") {
+                                    showSearchErrorDialog(film.title)
+                                }
+                            }
+                        }
+                    }
+                }
+                loadUrl(searchUrl)
+            }
+            // Меняем иконку трейлера на Стоп, так как плеер открыт
+            binding.btnPlayTrailer.setIconResource(R.drawable.ic_baseline_stop_24)
+        }
+    }
+
+    @android.annotation.SuppressLint("SetJavaScriptEnabled")
+    private fun setupWebView() {
+        binding.trailerWebview.apply {
+            settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
+            settings.mediaPlaybackRequiresUserGesture = false
+            settings.loadWithOverviewMode = true
+            settings.useWideViewPort = true
+            settings.javaScriptCanOpenWindowsAutomatically = true
+            settings.allowFileAccess = true
+            settings.userAgentString = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+            
+            webChromeClient = object : WebChromeClient() {
+                private var customView: View? = null
+
+                override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
+                    if (customView != null) {
+                        onHideCustomView()
+                        return
+                    }
+                    customView = view
+                    binding.fullScreenContainer.addView(customView)
+                    binding.fullScreenContainer.visibility = View.VISIBLE
+                    binding.trailerWebview.visibility = View.GONE
+                    activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    (activity as? MainActivity)?.toggleSystemUI(false)
+                }
+
+                override fun onHideCustomView() {
+                    binding.fullScreenContainer.visibility = View.GONE
+                    binding.fullScreenContainer.removeView(customView)
+                    customView = null
+                    binding.trailerWebview.visibility = View.VISIBLE
+                    activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                }
+            }
+        }
+    }
+
+    private fun showSearchErrorDialog(filmTitle: String) {
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle(R.string.search_error_title)
+            .setMessage(R.string.search_error_message)
+            .setPositiveButton(R.string.continue_text) { _, _ ->
+                val query = "$filmTitle смотреть онлайн бесплатно"
+                val searchUrl = "https://www.google.com/search?q=${java.net.URLEncoder.encode(query, "UTF-8")}"
+                binding.trailerWebview.loadUrl(searchUrl)
+            }
+            .setNegativeButton(R.string.cancel_text) { _, _ ->
+                binding.btnCloseTrailer.performClick()
+            }
+            .show()
     }
 
     // Метод для установки деталей фильма в UI.

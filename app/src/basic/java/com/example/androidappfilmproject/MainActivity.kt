@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -248,6 +249,16 @@ class MainActivity : AppCompatActivity() {
             if (resources.configuration.orientation != android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
                 binding.bottomNavigation.visibility = View.VISIBLE
             }
+            // Восстанавливаем отступы
+            ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+                insets
+            }
+            // Возвращаем стандартный режим выреза
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+            }
         } else {
             @Suppress("DEPRECATION")
             window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -257,7 +268,17 @@ class MainActivity : AppCompatActivity() {
                     or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
             binding.bottomNavigation.visibility = View.GONE
+            // Убираем отступы, чтобы контент был на весь экран
+            binding.main.setPadding(0, 0, 0, 0)
+            ViewCompat.setOnApplyWindowInsetsListener(binding.main, null)
+            
+            // Разрешаем контенту заходить в область выреза (челки)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
         }
+        // Заставляем систему пересчитать инсеты
+        ViewCompat.requestApplyInsets(binding.main)
     }
 
     override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
