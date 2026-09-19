@@ -43,11 +43,13 @@ class SplashFragment : Fragment() {
 
         // Используем Handler для задержки перехода на главный экран
         Handler(Looper.getMainLooper()).postDelayed({
-            (requireActivity() as? MainActivity)?.let {
-                // Заменяем SplashFragment на HomeFragment
-                it.supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_placeholder, HomeFragment())
-                    .commit()
+            if (isAdded) {
+                (activity as? MainActivity)?.let {
+                    // Заменяем SplashFragment на HomeFragment
+                    it.supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_placeholder, HomeFragment())
+                        .commit()
+                }
             }
         }, 2000) // Задержка в 2 секунды
     }
