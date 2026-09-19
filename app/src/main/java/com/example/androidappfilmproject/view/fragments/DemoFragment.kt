@@ -70,7 +70,7 @@ class DemoFragment : Fragment() {
         initPopupMenu()
 
         binding.searchViewDemo.postDelayed({
-            if (_binding != null) {
+            if (_binding != null && isAdded) {
                 initSearchView()
                 // Принудительно устанавливаем подсказку из ресурсов
                 binding.searchViewDemo.queryHint = getString(R.string.search_hint_demo)

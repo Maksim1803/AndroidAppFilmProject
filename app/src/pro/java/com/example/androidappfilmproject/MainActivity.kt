@@ -9,13 +9,16 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.view.WindowManager
 import com.google.android.material.snackbar.Snackbar
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import com.example.androidappfilmproject.databinding.ActivityMainBinding
 import com.example.androidappfilmproject.receivers.ConnectionChecker
@@ -42,6 +45,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         enableEdgeToEdge()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -231,21 +237,39 @@ class MainActivity : AppCompatActivity() {
 
     fun toggleSystemUI(show: Boolean) {
         isTrailerPlaying = !show
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+
         if (show) {
-            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+            windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
             if (resources.configuration.orientation != android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
                 binding.bottomNavigation.visibility = View.VISIBLE
             }
+            // Восстанавливаем отступы
+            ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+                insets
+            }
+            // Возвращаем стандартный режим выреза
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+            }
         } else {
-            @Suppress("DEPRECATION")
-            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+            windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+            windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
             binding.bottomNavigation.visibility = View.GONE
+            // Убираем отступы, чтобы контент был на весь экран
+            binding.main.setPadding(0, 0, 0, 0)
+            ViewCompat.setOnApplyWindowInsetsListener(binding.main, null)
+
+            // Разрешаем контенту заходить в область выреза (челки)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            }
         }
+        // Заставляем систему пересчитать инсеты
+        ViewCompat.requestApplyInsets(binding.main)
     }
 
     override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
